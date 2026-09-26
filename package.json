@@ -1,0 +1,22 @@
+{
+  "name": "amoo-quadri-portfolio-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfolio Website & Research Portal for Quadri Ayomikun Amoo (Frontend + Backend REST API)",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:all": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\"",
+    "build": "npm run build --prefix frontend && npm run build --prefix backend",
+    "build:frontend": "npm run build --prefix frontend",
+    "build:backend": "npm run build --prefix backend",
+    "start": "npm run start --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}

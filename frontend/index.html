@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Theme flash prevention — runs synchronously before first paint -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('qa-theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = stored ? stored : (prefersDark ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
+
+    <!-- Primary meta -->
+    <title>Quadri Ayomikun Amoo — Software Engineer &amp; Researcher</title>
+    <meta name="description" content="Software engineer and researcher. B.Sc. Software Engineering, 4.45/5.00 CGPA, Second Class Upper. Frontend developer, published researcher, MSc candidate at Delta State University." />
+    <meta name="author" content="Quadri Ayomikun Amoo" />
+    <link rel="canonical" href="https://amoo-quadri.vercel.app/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://amoo-quadri.vercel.app/" />
+    <meta property="og:title" content="Quadri Ayomikun Amoo — Software Engineer &amp; Researcher" />
+    <meta property="og:description" content="Software engineer and researcher. B.Sc. Software Engineering, 4.45/5.00 CGPA, Second Class Upper. Frontend developer, published researcher, MSc candidate." />
+    <meta property="og:image" content="https://amoo-quadri.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Quadri Ayomikun Amoo — Software Engineer &amp; Researcher" />
+    <meta name="twitter:description" content="Software engineer and researcher. B.Sc. Software Engineering, 4.45/5.00 CGPA, Second Class Upper." />
+    <meta name="twitter:image" content="https://amoo-quadri.vercel.app/og-image.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Font preloads — self-hosted via Fontsource (added after install) -->
+    <!-- These will be uncommented once Fontsource packages are installed -->
+
+    <meta name="theme-color" content="#0E6B57" />
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
