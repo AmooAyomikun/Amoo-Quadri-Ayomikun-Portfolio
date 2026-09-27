@@ -38,37 +38,22 @@ export const VisitorMapSection: React.FC = () => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    // Generate mock data closely matching the user's reference map cluster
-    const mockData: VisitorData = {
-      total: 16,
-      countries: 5,
-      countryStats: { 'Nigeria': 8, 'Togo': 2, 'Ivory Coast': 1, 'Cameroon': 1, 'United States': 4 },
-      locations: [
-        { lat: 9.0820, lon: 8.6753, city: 'Abuja', country: 'Nigeria' },
-        { lat: 6.5244, lon: 3.3792, city: 'Lagos', country: 'Nigeria' },
-        { lat: 7.3775, lon: 3.9470, city: 'Ibadan', country: 'Nigeria' },
-        { lat: 8.4966, lon: 4.5421, city: 'Ilorin', country: 'Nigeria' },
-        { lat: 6.1370, lon: 1.2125, city: 'Lome', country: 'Togo' },
-        { lat: 5.3097, lon: -4.0127, city: 'Abidjan', country: 'Ivory Coast' },
-        { lat: 3.8480, lon: 11.5021, city: 'Yaounde', country: 'Cameroon' },
-        { lat: 40.7128, lon: -74.0060, city: 'New York', country: 'United States' }
-      ]
-    };
-
     const fetchVisitors = async () => {
       try {
+        // First log the current visitor
+        await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/visitors/log`, { method: 'POST' }).catch(() => {});
+        
+        // Then fetch the visitor list
         const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/visitors`);
         if (res.ok) {
           const data = await res.json();
-          if (data && data.total > 0) {
-            setVisitorData(data);
-            return;
-          }
+          setVisitorData(data);
+          return;
         }
       } catch (err) {
-        console.error('Failed to fetch visitor data, using mock data.');
+        console.error('Failed to fetch visitor data');
       }
-      setVisitorData(mockData);
+      setVisitorData({ total: 0, countries: 0, countryStats: {}, locations: [] });
     };
     
     fetchVisitors();
