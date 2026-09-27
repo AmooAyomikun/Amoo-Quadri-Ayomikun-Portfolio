@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/check-confirms.mjs && tsc && vite build",
-    "build:skip-confirm-check": "rm -rf node_modules && npm install && vite build",
+    "build:skip-confirm-check": "npm install @rolldown/binding-linux-x64-gnu --no-save --force && vite build",
     "preview": "vite preview",
     "lint": "oxlint",
     "format": "prettier --write src/",
