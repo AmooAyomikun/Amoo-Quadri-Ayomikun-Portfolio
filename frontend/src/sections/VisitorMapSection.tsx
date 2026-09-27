@@ -41,10 +41,10 @@ export const VisitorMapSection: React.FC = () => {
     const fetchVisitors = async () => {
       try {
         // First log the current visitor
-        await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/visitors/log`, { method: 'POST' }).catch(() => {});
+        await fetch(`https://portfolio-backend-st78.onrender.com/api/visitors/log`, { method: 'POST' }).catch(() => {});
         
         // Then fetch the visitor list
-        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/visitors`);
+        const res = await fetch(`https://portfolio-backend-st78.onrender.com/api/visitors`);
         if (res.ok) {
           const data = await res.json();
           setVisitorData(data);
