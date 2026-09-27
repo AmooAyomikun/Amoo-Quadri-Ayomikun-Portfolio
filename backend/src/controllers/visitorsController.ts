@@ -18,8 +18,13 @@ export const logVisitor = async (req: Request, res: Response): Promise<void> => 
   }
 
   try {
-    let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
-    if (Array.isArray(ip)) ip = ip[0];
+    let ipHeader = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
+    let ip = '';
+    if (Array.isArray(ipHeader)) {
+      ip = ipHeader[0].split(',')[0].trim();
+    } else if (typeof ipHeader === 'string') {
+      ip = ipHeader.split(',')[0].trim();
+    }
     
     if (ip.startsWith('::ffff:')) {
       ip = ip.substring(7);
