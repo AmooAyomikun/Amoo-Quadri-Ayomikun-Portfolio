@@ -192,7 +192,7 @@ export const VisitorMapSection: React.FC = () => {
 
                   {/* Render Country Labels for prominent countries */}
                   {geographies.map((geo) => {
-                    if (!labeledCountries.includes(geo.properties.name)) return null;
+                    if (!geo.properties || !labeledCountries.includes(geo.properties.name)) return null;
                     const centroid = geoCentroid(geo);
                     return (
                       <Marker key={`label-${geo.rsmKey}`} coordinates={centroid}>
