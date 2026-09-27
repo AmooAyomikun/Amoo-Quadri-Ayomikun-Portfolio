@@ -54,7 +54,7 @@ export default function GuestbookPage() {
 
   const fetchEntries = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/guestbook')
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/guestbook`)
       if (res.ok) {
         const data = await res.json()
         setEntries(data)
@@ -81,7 +81,7 @@ export default function GuestbookPage() {
     setIsSubmitting(true)
     
     try {
-      const res = await fetch('http://localhost:5000/api/guestbook', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/guestbook`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, message, signatureData })

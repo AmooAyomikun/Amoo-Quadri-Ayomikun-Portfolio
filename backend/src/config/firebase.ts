@@ -1,4 +1,5 @@
-import admin from 'firebase-admin';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -10,11 +11,11 @@ const __dirname = path.dirname(__filename);
 const serviceAccountPath = path.join(__dirname, '../../firebase-key.json');
 
 // Initialize Firebase Admin only if it hasn't been initialized and the key exists
-if (!admin.apps.length) {
+if (getApps().length === 0) {
   if (fs.existsSync(serviceAccountPath)) {
     const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
+    initializeApp({
+      credential: cert(serviceAccount)
     });
     console.log('Firebase Admin initialized successfully.');
   } else {
@@ -23,4 +24,4 @@ if (!admin.apps.length) {
   }
 }
 
-export const db = admin.apps.length ? admin.firestore() : null;
+export const db = getApps().length > 0 ? getFirestore() : null;

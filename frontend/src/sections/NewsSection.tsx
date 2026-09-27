@@ -37,7 +37,7 @@ export const NewsSection: React.FC = () => {
 
   const fetchNews = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/news')
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/news`)
       const data = await res.json()
       if (res.ok && data.success) {
         setNewsList(data.data)
@@ -99,7 +99,7 @@ export const NewsSection: React.FC = () => {
     setPublishing(true)
 
     try {
-      const res = await fetch('http://localhost:5000/api/news', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/news`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

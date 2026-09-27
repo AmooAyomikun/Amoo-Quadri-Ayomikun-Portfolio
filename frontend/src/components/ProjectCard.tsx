@@ -15,7 +15,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         {project.demoUrl && project.previewType !== 'image' ? (
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <iframe 
-              src={`http://localhost:5000/api/proxy?url=${encodeURIComponent(project.demoUrl)}`}
+              src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/proxy?url=${encodeURIComponent(project.demoUrl)}`}
               title={project.title} 
               className="absolute top-0 left-0 w-[400%] h-[400%] origin-top-left scale-[0.25] border-none pointer-events-none"
               scrolling="no"
