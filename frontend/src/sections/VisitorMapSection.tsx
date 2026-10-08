@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
-import { Terminal, Globe, MapPin, Sparkles, CornerDownLeft } from 'lucide-react';
+import { Terminal, Globe, CornerDownLeft } from 'lucide-react';
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -70,7 +70,7 @@ export const VisitorMapSection: React.FC = () => {
           try {
             res = await fetch(ep, { method: 'POST' });
             if (res.ok) break;
-          } catch (e) {
+          } catch {
             // try next
           }
         }
@@ -103,7 +103,7 @@ export const VisitorMapSection: React.FC = () => {
             }));
           }
         }
-      } catch (err) {
+      } catch {
         console.warn('Visitor API fallback active');
       }
     };
@@ -111,32 +111,118 @@ export const VisitorMapSection: React.FC = () => {
     logAndFetchVisitor();
   }, []);
 
-  const handleTerminalCommand = (cmdStr?: string) => {
-    const command = (cmdStr || terminalInput).trim().toLowerCase();
-    if (!command) return;
+  const handleTerminalCommand = async (cmdStr?: string) => {
+    const rawInput = (cmdStr || terminalInput).trim();
+    if (!rawInput) return;
 
-    const newLogs = [...terminalLogs, { text: `GUEST ~ $ ${command}`, type: 'input' as const }];
+    const command = rawInput.toLowerCase();
 
-    if (command === 'help') {
-      newLogs.push({ text: "AVAILABLE COMMANDS: help, about, skills, projects, contact, clear", type: 'output' });
-    } else if (command === 'about') {
-      newLogs.push({ text: "Quadri Ayomikun Amoo | M.Sc. Computer Science @ DSU | Software Engineer & AI Researcher.", type: 'output' });
-    } else if (command === 'skills') {
-      newLogs.push({ text: "React, TypeScript, Node.js, Python, PWA, Machine Learning, Geospatial Recommender Systems.", type: 'output' });
-    } else if (command === 'projects') {
-      newLogs.push({ text: "CleanReport PWA, Location-Based Hotel Recommender, KYNDA AI Assistant, Pathly LMS.", type: 'output' });
-    } else if (command === 'contact') {
-      newLogs.push({ text: "Email: amooayomikun12@gmail.com | LinkedIn: @amoo-quadri | GitHub: @AmooAyomikun", type: 'output' });
-    } else if (command === 'clear') {
+    if (command === 'clear') {
       setTerminalLogs([]);
       setTerminalInput('');
       return;
-    } else {
-      newLogs.push({ text: `Command not recognized: '${command}'. Type 'help' for available commands.`, type: 'output' });
     }
 
-    setTerminalLogs(newLogs);
+    // Add user input to terminal logs
+    setTerminalLogs(prev => [...prev, { text: `GUEST ~ $ ${rawInput}`, type: 'input' }]);
     setTerminalInput('');
+
+    // Instant local static command responses
+    if (command === 'help') {
+      setTerminalLogs(prev => [...prev, { text: "AVAILABLE COMMANDS: help, about, skills, projects, contact, clear. Or ask me ANY natural question!", type: 'output' }]);
+      return;
+    } else if (command === 'about') {
+      setTerminalLogs(prev => [...prev, { text: "Quadri Ayomikun Amoo | First-Class Software Engineering Graduate (5.0/5.0 Major GPA, 4.45/5.00 CGPA) @ Abiola Ajimobi Technical University | Full-Stack & AI Engineer.", type: 'output' }]);
+      return;
+    } else if (command === 'skills') {
+      setTerminalLogs(prev => [...prev, { text: "React, TypeScript, Node.js, Python, PWA, SQL, PostgreSQL, Machine Learning, Generative AI, Geospatial Recommender Systems.", type: 'output' }]);
+      return;
+    } else if (command === 'projects') {
+      setTerminalLogs(prev => [...prev, { text: "1. CleanReport PWA | 2. Location-Based Hotel Recommender | 3. KYNDA AI Assistant | 4. Pathly LMS | 5. Financial Churn ML Models", type: 'output' }]);
+      return;
+    } else if (command === 'contact') {
+      setTerminalLogs(prev => [...prev, { text: "Email: amooquadri555@gmail.com | Phone: +234 9071812921 | LinkedIn: linkedin.com/in/ayomikun-amoo-6b836428b | GitHub: github.com/amooquadri", type: 'output' }]);
+      return;
+    }
+
+    // Temporary thinking log
+    setTerminalLogs(prev => [...prev, { text: "AI: THINKING...", type: 'output' }]);
+
+    try {
+      const endpoints = [
+        'http://localhost:5000/api/chat',
+        'https://portfolio-backend-st78.onrender.com/api/chat'
+      ];
+
+      let reply = '';
+      for (const ep of endpoints) {
+        try {
+          const res = await fetch(ep, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: rawInput })
+          });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.reply) {
+              reply = json.reply;
+              break;
+            }
+          }
+        } catch {
+          // try next endpoint
+        }
+      }
+
+      if (!reply) {
+        // Fallback local smart response engine if backend offline
+        const lower = command;
+
+        const isGreeting = /\b(yo|wassup|what's up|sup|hi|hello|hey|heyy|howdy|hola|good morning|good afternoon|good evening|how are you|how far|wagywan)\b/i.test(lower);
+
+        if (isGreeting && !/\b(study|studied|school|gpa|cgpa|education|degree|where|research|thesis|project|projects|skill|skills|job|experience|contact|email|phone|goal|goals|vision|aim|award|awards|who)\b/i.test(lower)) {
+          reply = "Yo! What's up? 👋 I'm Quadri's AI Assistant. I'm doing great! Ask me anything about Quadri's software engineering projects, AI research, 5.0/5.0 Major GPA, education, or how to get in touch!";
+        } else if (/\b(study|studied|where|education|degree|university|school|college|gpa|cgpa|major|french|entrepreneurship|diploma|honors|rank|class)\b/i.test(lower)) {
+          reply = "Quadri earned his B.Sc. in Software Engineering from Abiola Ajimobi Technical University (formerly First Technical University), Ibadan, graduating with First-Class Honors (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA, Top 10% of class). He also holds Diplomas in French (Lower Credit) and Entrepreneurship (Upper Credit).";
+        } else if (/\b(goal|goals|vision|future|career|aspire|aspirations|aim|msc|phd|postgraduate|scholarship|scholarships|next step)\b/i.test(lower)) {
+          reply = "Quadri's primary goal is to pursue M.Sc. and Ph.D. research in Artificial Intelligence, Software Engineering, and Natural Language Processing while engineering intelligent computing systems that solve high-impact, real-world problems.";
+        } else if (/\b(award|awards|honors|prizes|prize|best student|subject honors|recognition)\b/i.test(lower)) {
+          reply = "Quadri received 4 Best Graduating Student Subject Honors: Operating Systems I, Human Computer Interaction (HCI), Software Engineering Professional Practice, and Fundamentals of Data Structures. He was also in the Top 10% of his graduating class.";
+        } else if (/\b(who|bio|summary|background|identity|intro|overview)\b/i.test(lower)) {
+          reply = "Quadri Ayomikun Amoo is a Software Engineering Researcher & Full-Stack Engineer with a First-Class Honors degree (5.0/5.0 Major GPA, 4.45/5.00 CGPA) from Abiola Ajimobi Technical University. He specializes in AI for Software Engineering, intelligent web systems (React, TypeScript, PWA, Node.js), and data analytics.";
+        } else if (/\b(research|thesis|supervisor|supervisors|sinebe|akinsola|hotel|recommender|geospatial|lab|publication|publications|scholar)\b/i.test(lower)) {
+          reply = "Quadri's research focuses on AI for Software Engineering and Intelligent Systems. His B.Sc. thesis under Dr. J.E.T. Akinsola developed a location-based hotel management & recommendation engine. He also served as Research Assistant (NYSC) under Prof. Jude Sinebe at the Postgraduate Research Lab.";
+        } else if (/\b(experience|work|job|jobs|intern|internship|internships|company|companies|circo|orange|codealpha|coast)\b/i.test(lower)) {
+          reply = "Industrial Experience:\n• Frontend Intern @ Circo Digital / Orange Programme (built CleanReport PWA with offline sync & maps)\n• Full Stack Intern @ CodeAlpha (built React/TypeScript/Node.js web apps)\n• Data Analyst Intern @ Coast Research Tech (built 10 financial ML models in Python/SQL & Power BI dashboards)";
+        } else if (/\b(cleanreport|sanitation|civic|pwa|offline)\b/i.test(lower)) {
+          reply = "CleanReport is a civic-tech PWA built by Quadri during his Circo Digital / Orange internship. It enables citizens to report sanitation issues offline, automatically syncing reports to the cloud upon reconnection with interactive maps and admin management.";
+        } else if (/\b(kynda|pathly|lms|study assistant)\b/i.test(lower)) {
+          reply = "• KYNDA AI: An AI-powered study assistant delivering interactive learning, question generation, and real-time study feedback.\n• Pathly LMS: A modern learning management system streamlining online course delivery and student-instructor workflows.";
+        } else if (/\b(teach|teaching|tutor|tutoring|mentor|mentorship|nassa|students)\b/i.test(lower)) {
+          reply = "Teaching Experience:\n• Undergraduate Tutor: Tutored ~350 computer science students weekly in Data Structures, Algorithms, and OOP.\n• Asst. Academic Support Officer @ NASSA: Taught 100 lower-level students Mathematics and Python programming.";
+        } else if (/\b(skill|skills|stack|tech|technology|technologies|language|languages|python|react|typescript|javascript|node|sql|postgresql|tailwind|ml|machine learning)\b/i.test(lower)) {
+          reply = "Core Technical Stack:\n• Frontend: React, TypeScript, JavaScript, HTML5, Modern CSS, Tailwind CSS, PWA\n• Backend & Databases: Python, Node.js, Express.js, Django REST, SQL, PostgreSQL, MySQL, Supabase, Prisma\n• AI & Data Science: Machine Learning, Generative AI, NLP, Data Analytics, Power BI\n• Tools: Git, GitHub, Postman, Vite";
+        } else if (/\b(project|projects|portfolio|built|apps|systems)\b/i.test(lower)) {
+          reply = "Featured Projects:\n1. CleanReport PWA (Civic-tech offline sanitation platform)\n2. Location-Based Hotel Recommender System (B.Sc. Thesis)\n3. KYNDA AI Study Assistant\n4. Pathly LMS\n5. Financial Churn Prediction ML Models (10 models built with Python/SQL)";
+        } else if (/\b(contact|email|phone|hire|recruiter|reach|linkedin|github|address|location|where live|nigeria|ibadan)\b/i.test(lower)) {
+          reply = "Get in Touch with Quadri:\n• Email: amooquadri555@gmail.com\n• Phone: +234 9071812921\n• LinkedIn: linkedin.com/in/ayomikun-amoo-6b836428b\n• GitHub: github.com/amooquadri\n• Location: Ibadan, Oyo State, Nigeria (Available worldwide for research, engineering, and graduate positions!)";
+        } else {
+          reply = "I am Quadri's AI Portfolio Assistant! Quadri Amoo is a First-Class Software Engineering Graduate (5.0/5.0 Major GPA) specializing in AI, React, TypeScript, and Data Science.\n\nYou can ask me about:\n• Education & GPA (e.g., 'where did he study', 'awards')\n• Research & Thesis (e.g., 'tell me about his thesis')\n• Projects & Work Experience (e.g., 'what has he built', 'internships')\n• Technical Skills (e.g., 'what languages does he use')\n• Future Goals (e.g., 'what are his goals')\n• Contact Details (e.g., 'how can I hire or email Quadri')";
+        }
+      }
+
+      // Replace THINKING... with actual AI reply
+      setTerminalLogs(prev => {
+        const filtered = prev.filter(l => l.text !== "AI: THINKING...");
+        return [...filtered, { text: reply, type: 'output' }];
+      });
+
+    } catch {
+      setTerminalLogs(prev => {
+        const filtered = prev.filter(l => l.text !== "AI: THINKING...");
+        return [...filtered, { text: "Sorry, I couldn't process your request right now. Try 'help' for available commands!", type: 'output' }];
+      });
+    }
 
     setTimeout(() => {
       terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });

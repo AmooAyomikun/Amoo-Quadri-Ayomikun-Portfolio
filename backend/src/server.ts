@@ -31,6 +31,7 @@ app.get('/api/health', (_req, res) => {
 import { getGithubActivity } from './controllers/githubController.js'
 import { logVisitor, getVisitors } from './controllers/visitorsController.js'
 import { getSignatures, addSignature } from './controllers/guestbookController.js'
+import { handleAiChat } from './controllers/aiController.js'
 
 // API routes
 app.get('/api/portfolio', getPortfolioData)
@@ -43,6 +44,7 @@ app.post('/api/visitors/log', logVisitor)
 app.get('/api/visitors', getVisitors)
 app.get('/api/guestbook', getSignatures)
 app.post('/api/guestbook', addSignature)
+app.post('/api/chat', handleAiChat)
 
 // Proxy endpoint to bypass X-Frame-Options for live previews
 app.get('/api/proxy', async (req, res) => {
