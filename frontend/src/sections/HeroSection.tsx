@@ -40,7 +40,7 @@ export const HeroSection: React.FC = () => {
             </div>
 
             {/* Hero Main Name Header */}
-            <h1 className="gsap-hero-item text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-[var(--color-text-main)] tracking-tight leading-[1.08] whitespace-nowrap">
+            <h1 className="gsap-hero-item text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-[var(--color-text-main)] tracking-tight leading-[1.15] break-words">
               Quadri Ayomikun Amoo
             </h1>
 

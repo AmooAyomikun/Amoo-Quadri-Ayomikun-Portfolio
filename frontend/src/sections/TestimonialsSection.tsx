@@ -37,30 +37,30 @@ export const TestimonialsSection: React.FC = () => {
         <div className="flex items-center justify-center gap-2 mb-10">
           <button
             onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
               filter === 'all'
-                ? 'bg-[var(--color-primary)] text-white shadow-xs'
-                : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
+                ? 'bg-[var(--color-primary)] !text-black font-bold shadow-xs'
+                : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)] font-medium'
             }`}
           >
             All Reviews ({portfolioData.testimonials.length})
           </button>
           <button
             onClick={() => setFilter('academic')}
-            className={`px-4 py-2 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
               filter === 'academic'
-                ? 'bg-[var(--color-primary)] text-white shadow-xs'
-                : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
+                ? 'bg-[var(--color-primary)] !text-black font-bold shadow-xs'
+                : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)] font-medium'
             }`}
           >
             Academic Supervisors
           </button>
           <button
             onClick={() => setFilter('industry')}
-            className={`px-4 py-2 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
               filter === 'industry'
-                ? 'bg-[var(--color-primary)] text-white shadow-xs'
-                : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
+                ? 'bg-[var(--color-primary)] !text-black font-bold shadow-xs'
+                : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)] font-medium'
             }`}
           >
             Industry Product Leads

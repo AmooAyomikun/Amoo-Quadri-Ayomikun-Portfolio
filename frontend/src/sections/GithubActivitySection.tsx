@@ -161,19 +161,19 @@ export const GithubActivitySection: React.FC = () => {
           <div className="flex items-center gap-2 p-4 border-b border-[var(--color-border)] bg-[var(--color-surface-base)]">
             <button 
               onClick={() => setActiveTab('all')}
-              className={`px-3 py-1.5 text-xs font-mono rounded-md transition-colors ${activeTab === 'all' ? 'bg-[var(--color-primary)] text-white' : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]'}`}
+              className={`px-3 py-1.5 text-xs font-mono rounded-md transition-colors ${activeTab === 'all' ? 'bg-[var(--color-primary)] !text-black font-bold' : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]'}`}
             >
               All Activity
             </button>
             <button 
               onClick={() => setActiveTab('commits')}
-              className={`px-3 py-1.5 text-xs font-mono rounded-md transition-colors ${activeTab === 'commits' ? 'bg-[var(--color-primary)] text-white' : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]'}`}
+              className={`px-3 py-1.5 text-xs font-mono rounded-md transition-colors ${activeTab === 'commits' ? 'bg-[var(--color-primary)] !text-black font-bold' : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]'}`}
             >
               Commits
             </button>
             <button 
               onClick={() => setActiveTab('prs')}
-              className={`px-3 py-1.5 text-xs font-mono rounded-md transition-colors ${activeTab === 'prs' ? 'bg-[var(--color-primary)] text-white' : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]'}`}
+              className={`px-3 py-1.5 text-xs font-mono rounded-md transition-colors ${activeTab === 'prs' ? 'bg-[var(--color-primary)] !text-black font-bold' : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]'}`}
             >
               Pull Requests
             </button>

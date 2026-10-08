@@ -34,7 +34,7 @@ export const FloatingDock: React.FC = () => {
             to={link.path}
             className={`group relative flex items-center justify-center p-2.5 rounded-full transition-all duration-200 ${
               active
-                ? 'bg-[var(--color-primary)] text-white shadow-xs'
+                ? 'bg-[var(--color-primary)] !text-black shadow-xs'
                 : 'text-[var(--color-text-subtle)] hover:text-[var(--color-text-main)] hover:bg-[var(--color-surface-elevated)]'
             }`}
           >

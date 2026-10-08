@@ -6,5 +6,14 @@
     "lat": 0,
     "lon": 0,
     "timestamp": "2026-09-24T15:25:36.446Z"
+  },
+  {
+    "ip": "143.105.174.218",
+    "country": "Nigeria",
+    "countryCode": "NG",
+    "city": "Lagos",
+    "lat": 6.5243,
+    "lon": 3.3792,
+    "timestamp": "2026-10-07T00:31:19.849Z"
   }
 ]

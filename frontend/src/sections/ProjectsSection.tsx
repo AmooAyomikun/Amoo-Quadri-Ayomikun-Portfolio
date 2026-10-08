@@ -34,10 +34,10 @@ export const ProjectsSection: React.FC = () => {
             <button
               key={cat.id}
               onClick={() => setFilter(cat.id)}
-              className={`px-4 py-2 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
                 filter === cat.id
-                  ? 'bg-[var(--color-primary)] text-black font-bold shadow-xs'
-                  : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
+                  ? 'bg-[var(--color-primary)] !text-black font-extrabold shadow-xs'
+                  : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)] font-medium'
               }`}
             >
               {cat.label}

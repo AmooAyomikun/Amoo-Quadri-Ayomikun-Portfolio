@@ -69,10 +69,10 @@ export const Navbar: React.FC = () => {
             <Link
               key={link.name}
               to={link.path}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-medium transition-all ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all ${
                 isActive(link.path)
-                  ? 'bg-[var(--color-primary)] text-black font-bold shadow-xs'
-                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] hover:bg-[var(--color-surface-card)]'
+                  ? 'bg-[var(--color-primary)] !text-black font-extrabold shadow-xs'
+                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] hover:bg-[var(--color-surface-card)] font-medium'
               }`}
             >
               {link.name}
@@ -85,7 +85,7 @@ export const Navbar: React.FC = () => {
           <a
             href="/Amoo_Quadri_CV.pdf"
             download="Amoo_Quadri_CV.pdf"
-            className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[var(--color-primary-light)] text-[var(--color-primary)] border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)] hover:text-white transition-all flex items-center gap-2"
+            className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[var(--color-primary-light)] text-[var(--color-primary)] border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)] hover:!text-black transition-all flex items-center gap-2"
           >
             <Download className="w-3.5 h-3.5" />
             Download CV
@@ -137,7 +137,7 @@ export const Navbar: React.FC = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`px-3 py-2.5 rounded-lg text-xs font-mono font-medium transition-colors ${
                   isActive(link.path)
-                    ? 'bg-[var(--color-primary)] text-black font-bold'
+                    ? 'bg-[var(--color-primary)] !text-black font-extrabold'
                     : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]'
                 }`}
               >
@@ -148,7 +148,7 @@ export const Navbar: React.FC = () => {
               href="/Amoo_Quadri_CV.pdf"
               download="Amoo_Quadri_CV.pdf"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2.5 rounded-lg text-xs font-mono font-bold bg-[var(--color-primary)] text-white flex items-center justify-center gap-1.5"
+              className="px-3 py-2.5 rounded-lg text-xs font-mono font-bold bg-[var(--color-primary)] !text-black flex items-center justify-center gap-1.5"
             >
               <Download className="w-4 h-4" />
               Download CV (PDF)

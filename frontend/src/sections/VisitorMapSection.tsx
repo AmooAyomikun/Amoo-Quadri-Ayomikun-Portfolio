@@ -1,244 +1,367 @@
-import React, { useEffect, useState } from 'react';
-import { ComposableMap, Geographies, Geography, Marker, Sphere, Graticule } from 'react-simple-maps';
-import { geoCentroid } from 'd3-geo';
+import React, { useEffect, useState, useRef } from 'react';
+import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
+import { Terminal, Globe, MapPin, Sparkles, CornerDownLeft } from 'lucide-react';
 
-// World atlas JSON for countries
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-interface VisitorLocation {
-  lat: number;
-  lon: number;
-  city: string;
-  country: string;
+interface TopCountry {
+  rank: number;
+  name: string;
+  code: string;
+  count: number;
 }
 
-interface VisitorData {
-  total: number;
-  countries: number;
-  locations: VisitorLocation[];
+interface VisitorResponse {
+  userCountry: string;
+  userCountryCode: string;
+  userCity: string;
+  userCountryCount: number;
+  totalVisitors: number;
+  topCountries: TopCountry[];
   countryStats: Record<string, number>;
 }
 
-// Major countries to label to avoid clutter, matching the reference density
-const labeledCountries = [
-  "Nigeria", "Mali", "Algeria", "Niger", "Chad", "Mauritania", 
-  "Senegal", "Burkina Faso", "Cameroon", "Libya", "Egypt", 
-  "Sudan", "Kenya", "Tanzania", "Ethiopia", "South Africa",
-  "Democratic Republic of the Congo", "Angola", "Morocco",
-  "Spain", "France", "Italy", "United Kingdom", "Germany",
-  "Brazil", "United States", "Canada", "India", "China", "Australia",
-  "Saudi Arabia", "Iran", "Turkey", "Kazakhstan", "Russia", "Argentina"
+// Major country coordinates for glowing map pins
+const COUNTRY_MARKERS = [
+  { name: 'NIGERIA', city: 'Lagos', coordinates: [3.3792, 6.5244] },
+  { name: 'BRAZIL', city: 'Brasília', coordinates: [-47.8919, -15.7975] },
+  { name: 'FRANCE', city: 'Paris', coordinates: [2.3522, 48.8566] },
+  { name: 'UNITED STATES', city: 'New York', coordinates: [-74.0060, 40.7128] },
+  { name: 'SPAIN', city: 'Madrid', coordinates: [-3.7038, 40.4168] },
+  { name: 'JAPAN', city: 'Tokyo', coordinates: [139.6503, 35.6762] },
+  { name: 'GERMANY', city: 'Berlin', coordinates: [13.4050, 52.5200] },
+  { name: 'UNITED KINGDOM', city: 'London', coordinates: [-0.1276, 51.5074] },
+  { name: 'CANADA', city: 'Toronto', coordinates: [-79.3832, 43.6532] },
+  { name: 'AUSTRALIA', city: 'Sydney', coordinates: [151.2093, -33.8688] }
 ];
 
 export const VisitorMapSection: React.FC = () => {
-  const [visitorData, setVisitorData] = useState<VisitorData | null>(null);
-  const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
-  const [rotation, setRotation] = useState<[number, number, number]>([-10, -15, 0]);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [data, setData] = useState<VisitorResponse>({
+    userCountry: 'DETECTING...',
+    userCountryCode: 'NG',
+    userCity: '...',
+    userCountryCount: 1,
+    totalVisitors: 1,
+    topCountries: [],
+    countryStats: {}
+  });
+
+  const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
+
+  // Terminal state
+  const [terminalInput, setTerminalInput] = useState('');
+  const [terminalLogs, setTerminalLogs] = useState<Array<{ text: string; type: 'input' | 'output' }>>([
+    { text: "HI. THIS IS QUADRI'S TERMINAL.", type: 'output' },
+    { text: "TYPE A COMMAND AND PRESS ENTER, OR JUST USE THE BUTTONS BELOW.", type: 'output' }
+  ]);
+  const terminalEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchVisitors = async () => {
+    const logAndFetchVisitor = async () => {
       try {
-        // First log the current visitor
-        await fetch(`https://portfolio-backend-st78.onrender.com/api/visitors/log`, { method: 'POST' }).catch(() => {});
-        
-        // Then fetch the visitor list
-        const res = await fetch(`https://portfolio-backend-st78.onrender.com/api/visitors`);
-        if (res.ok) {
-          const data = await res.json();
-          setVisitorData(data);
-          return;
-        }
-      } catch (err) {
-        console.error('Failed to fetch visitor data');
-      }
-      setVisitorData({ total: 0, countries: 0, countryStats: {}, locations: [] });
-    };
-    
-    fetchVisitors();
-  }, []);
+        // Try local backend first, then production API
+        const endpoints = [
+          'http://localhost:5000/api/visitors/log',
+          'https://portfolio-backend-st78.onrender.com/api/visitors/log'
+        ];
 
-  // Get user location silently via IP on mount and fly to it
-  useEffect(() => {
-    const fetchUserLocationSilently = async () => {
-      try {
-        const response = await fetch('https://get.geojs.io/v1/ip/geo.json');
-        if (response.ok) {
-          const data = await response.json();
-          const lat = parseFloat(data.latitude);
-          const lon = parseFloat(data.longitude);
-          
-          if (!isNaN(lat) && !isNaN(lon)) {
-            setUserLocation({ lat, lon });
-            // Smooth animate rotation to user
-            setRotation([-lon, -lat, 0]);
+        let res: Response | null = null;
+        for (const ep of endpoints) {
+          try {
+            res = await fetch(ep, { method: 'POST' });
+            if (res.ok) break;
+          } catch (e) {
+            // try next
           }
         }
-      } catch (error) {
-        console.log('Failed to ping user location:', error);
+
+        if (res && res.ok) {
+          const json = await res.json();
+          if (json.success) {
+            setData(prev => ({
+              ...prev,
+              userCountry: json.userCountry || prev.userCountry,
+              userCountryCode: json.userCountryCode || prev.userCountryCode,
+              userCity: json.userCity || prev.userCity,
+              userCountryCount: json.userCountryCount || prev.userCountryCount,
+              totalVisitors: json.totalVisitors || prev.totalVisitors,
+              topCountries: json.topCountries || prev.topCountries,
+              countryStats: json.countryStats || prev.countryStats
+            }));
+          }
+        } else {
+          // Client-side fallback geolocation lookup if backend offline
+          const geoRes = await fetch('https://get.geojs.io/v1/ip/geo.json');
+          if (geoRes.ok) {
+            const geo = await geoRes.json();
+            const country = (geo.country || 'NIGERIA').toUpperCase();
+            setData(prev => ({
+              ...prev,
+              userCountry: country,
+              userCountryCode: geo.country_code || 'NG',
+              userCity: geo.city || 'Lagos'
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn('Visitor API fallback active');
       }
     };
-    
-    fetchUserLocationSilently();
+
+    logAndFetchVisitor();
   }, []);
 
-  // Handlers to make the globe draggable/rotatable
-  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
-    setIsDragging(true);
-    const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-    setDragStart({ x: clientX, y: clientY });
-  };
+  const handleTerminalCommand = (cmdStr?: string) => {
+    const command = (cmdStr || terminalInput).trim().toLowerCase();
+    if (!command) return;
 
-  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging) return;
-    const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-    const dx = clientX - dragStart.x;
-    const dy = clientY - dragStart.y;
-    
-    setRotation((r) => [r[0] + dx * 0.5, r[1] - dy * 0.5, r[2]]);
-    setDragStart({ x: clientX, y: clientY });
-  };
+    const newLogs = [...terminalLogs, { text: `GUEST ~ $ ${command}`, type: 'input' as const }];
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
+    if (command === 'help') {
+      newLogs.push({ text: "AVAILABLE COMMANDS: help, about, skills, projects, contact, clear", type: 'output' });
+    } else if (command === 'about') {
+      newLogs.push({ text: "Quadri Ayomikun Amoo | M.Sc. Computer Science @ DSU | Software Engineer & AI Researcher.", type: 'output' });
+    } else if (command === 'skills') {
+      newLogs.push({ text: "React, TypeScript, Node.js, Python, PWA, Machine Learning, Geospatial Recommender Systems.", type: 'output' });
+    } else if (command === 'projects') {
+      newLogs.push({ text: "CleanReport PWA, Location-Based Hotel Recommender, KYNDA AI Assistant, Pathly LMS.", type: 'output' });
+    } else if (command === 'contact') {
+      newLogs.push({ text: "Email: amooayomikun12@gmail.com | LinkedIn: @amoo-quadri | GitHub: @AmooAyomikun", type: 'output' });
+    } else if (command === 'clear') {
+      setTerminalLogs([]);
+      setTerminalInput('');
+      return;
+    } else {
+      newLogs.push({ text: `Command not recognized: '${command}'. Type 'help' for available commands.`, type: 'output' });
+    }
+
+    setTerminalLogs(newLogs);
+    setTerminalInput('');
+
+    setTimeout(() => {
+      terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
   };
 
   return (
-    <section className="py-20 bg-[var(--color-surface-base)] relative border-t border-[var(--color-border)]">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 bg-[#050505] text-white border-t border-neutral-900 font-mono relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] mb-2">Global Audience</h2>
-            <p className="text-[var(--color-text-muted)] font-mono text-sm">
-              {visitorData ? `${visitorData.total} total unique visitors from ${visitorData.countries} countries.` : 'Loading visitor data...'}
-            </p>
+        {/* Retro Header Section */}
+        <div className="mb-8 border-b border-neutral-900 pb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#C4FA4C] animate-pulse" />
+            <span className="text-xs uppercase tracking-widest text-[#C4FA4C] font-bold">
+              REAL-TIME VISITOR GEOLOCATION
+            </span>
           </div>
+
+          {/* Title and Explanation matching Samuel Rizzon screenshot */}
+          <h2 className="text-2xl sm:text-4xl font-serif font-bold tracking-tight text-white mb-2 uppercase">
+            VISITORS
+          </h2>
+          <p className="text-xs sm:text-sm text-neutral-400 max-w-3xl leading-relaxed mb-4 font-mono uppercase">
+            EVERY LIT BLOCK IS A COUNTRY SOMEONE OPENED THIS SITE FROM. THE BRIGHTER, THE MORE OF THEM.
+          </p>
+
+          {/* Quick Metrics Bar matching screenshot */}
+          <div className="flex flex-wrap items-center gap-6 sm:gap-10 text-xs sm:text-sm font-mono tracking-widest mb-6 border-y border-neutral-900/80 py-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">{data.totalVisitors.toLocaleString()}</span>
+              <span className="text-neutral-400 uppercase font-semibold">VISITORS</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">{Object.keys(data.countryStats).length || 1}</span>
+              <span className="text-neutral-400 uppercase font-semibold">COUNTRIES</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#C4FA4C] animate-pulse" />
+              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">1</span>
+              <span className="text-[#C4FA4C] uppercase font-semibold">HERE NOW</span>
+            </div>
+          </div>
+
+          {/* Dynamic Geolocation Banner */}
+          <h3 className="text-lg sm:text-2xl font-bold tracking-tight text-[#C4FA4C] leading-snug mb-4 uppercase">
+            YOU'RE IN {data.userCountry}. {data.userCountryCount.toLocaleString()} CAME FROM THERE TOO.
+          </h3>
+
+          {/* Top 5 Leaderboard Row */}
+          {data.topCountries.length > 0 && (
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-2 text-xs sm:text-sm tracking-wider">
+              {data.topCountries.map((c) => (
+                <div key={c.name} className="flex items-center gap-2">
+                  <span className="text-neutral-500 font-bold">{c.rank}</span>
+                  <span className="text-neutral-200 font-bold">{c.name}</span>
+                  <span className="text-[#C4FA4C] font-bold">{c.count.toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Grid Container: Retro Pixel World Map + Interactive Terminal */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          <div className="flex flex-wrap gap-2">
-            {visitorData && Object.entries(visitorData.countryStats).map(([country, count]) => (
-              <div 
-                key={country} 
-                className="px-3 py-1 bg-[var(--color-surface-elevated)] text-[var(--color-primary)] border border-[var(--color-border)] rounded-full text-xs font-medium font-mono"
+          {/* Main Map Box */}
+          <div className="lg:col-span-7 bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl p-4 relative overflow-hidden">
+            <div className="flex justify-between items-center mb-3 px-2 text-xs text-neutral-400">
+              <span className="flex items-center gap-1.5">
+                <Globe className="w-4 h-4 text-[#C4FA4C]" /> Interactive Audience Map
+              </span>
+              <span className="text-neutral-500 text-[11px]">
+                {data.totalVisitors.toLocaleString()} Total Global Visits
+              </span>
+            </div>
+
+            {/* Map Canvas / ComposableMap */}
+            <div className="relative w-full h-[320px] sm:h-[400px] bg-[#050505] rounded-xl border border-neutral-900 overflow-hidden">
+              
+              <ComposableMap
+                projection="geoEqualEarth"
+                projectionConfig={{ scale: 145, center: [10, 10] }}
+                width={800}
+                height={420}
+                style={{ width: "100%", height: "100%" }}
               >
-                {country} ({count})
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Map Container - Rebuilt from scratch to look exactly like Mapbox but without tokens */}
-        <div 
-          className="rounded-2xl overflow-hidden shadow-lg h-[500px] relative bg-[#111111] border border-[var(--color-border)] cursor-grab active:cursor-grabbing touch-none"
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleMouseDown}
-          onTouchMove={handleMouseMove}
-          onTouchEnd={handleMouseUp}
-        >
-          <div className="absolute inset-0 pointer-events-none rounded-2xl shadow-[inset_0_0_80px_rgba(0,0,0,0.8)] z-10" />
-
-          <ComposableMap
-            projection="geoOrthographic"
-            projectionConfig={{
-              scale: 220,
-              rotate: rotation
-            }}
-            width={800}
-            height={500}
-            style={{ width: "100%", height: "100%" }}
-          >
-            {/* Atmospheric Glow shadow effect */}
-            <Sphere stroke="transparent" strokeWidth={0} fill="#111111" />
-            
-            <Geographies geography={geoUrl}>
-              {({ geographies }) => (
-                <>
-                  {geographies.map((geo) => (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      fill="#222222"
-                      stroke="#333333"
-                      strokeWidth={0.5}
-                      style={{
-                        default: { outline: "none" },
-                        hover: { fill: "#2A2A2A", outline: "none", cursor: "pointer" },
-                        pressed: { outline: "none" },
-                      } as any}
-                    />
-                  ))}
-
-                  {/* Render Country Labels for prominent countries */}
-                  {geographies.map((geo) => {
-                    const countryName = geo.properties ? geo.properties.name : '';
-                    if (!labeledCountries.includes(countryName)) return null;
-                    const centroid = geoCentroid(geo);
-                    return (
-                      <Marker key={`label-${geo.rsmKey}`} coordinates={centroid}>
-                        <text
-                          textAnchor="middle"
-                          y={2}
+                <Geographies geography={geoUrl}>
+                  {({ geographies }) =>
+                    geographies.map((geo) => {
+                      const isUserGeo = geo.properties?.name?.toUpperCase() === data.userCountry;
+                      return (
+                        <Geography
+                          key={geo.rsmKey}
+                          geography={geo}
+                          fill={isUserGeo ? "#1C3505" : "#111111"}
+                          stroke={isUserGeo ? "#C4FA4C" : "#222222"}
+                          strokeWidth={0.5}
                           style={{
-                            fontFamily: "system-ui, sans-serif",
-                            fill: "#666666",
-                            fontSize: "10px",
-                            fontWeight: 600,
-                            pointerEvents: "none",
-                            userSelect: "none"
+                            default: { outline: "none" },
+                            hover: { fill: "#1F3B08", outline: "none", cursor: "pointer" },
+                            pressed: { outline: "none" }
                           }}
-                        >
-                          {countryName}
-                        </text>
-                      </Marker>
-                    );
-                  })}
-                </>
+                        />
+                      );
+                    })
+                  }
+                </Geographies>
+
+                {/* Country Markers */}
+                {COUNTRY_MARKERS.map((marker) => {
+                  const isUserCountry = marker.name === data.userCountry;
+                  const count = data.countryStats[marker.name] || (isUserCountry ? data.userCountryCount : 100);
+
+                  return (
+                    <Marker 
+                      key={marker.name} 
+                      coordinates={marker.coordinates as [number, number]}
+                      onMouseEnter={() => setHoveredCountry(`${marker.name} (${marker.city}): ${count.toLocaleString()} Visitors`)}
+                      onMouseLeave={() => setHoveredCountry(null)}
+                    >
+                      {/* Pulse effect for user country */}
+                      {isUserCountry && (
+                        <circle r={12} fill="#C4FA4C" opacity={0.3}>
+                          <animate attributeName="r" values="6;16;6" dur="2s" repeatCount="indefinite" />
+                          <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite" />
+                        </circle>
+                      )}
+
+                      <circle 
+                        r={isUserCountry ? 4.5 : 3} 
+                        fill={isUserCountry ? "#C4FA4C" : "#A3E635"} 
+                        stroke="#050505" 
+                        strokeWidth={1}
+                        className="cursor-pointer hover:scale-150 transition-transform"
+                      />
+                    </Marker>
+                  );
+                })}
+              </ComposableMap>
+
+              {/* Hover Tooltip overlay */}
+              {hoveredCountry && (
+                <div className="absolute top-4 left-4 bg-black/90 border border-[#C4FA4C] text-[#C4FA4C] px-3 py-1.5 rounded-lg text-xs font-mono shadow-lg pointer-events-none animate-fade-in">
+                  {hoveredCountry}
+                </div>
               )}
-            </Geographies>
 
-            {/* Exact Reference Markers (Small white dot with purple glow) */}
-            {visitorData?.locations.map((loc, idx) => (
-              <Marker key={idx} coordinates={[loc.lon, loc.lat]}>
-                <circle r={8} fill="#8b5cf6" opacity={0.4} />
-                <circle r={2.5} fill="#ffffff" />
-              </Marker>
-            ))}
+              {/* Map Footer Metadata */}
+              <div className="absolute bottom-3 left-4 right-4 flex justify-between items-center text-[10px] text-neutral-500 font-mono bg-black/60 backdrop-blur-xs p-2 rounded-lg border border-neutral-900">
+                <span>ACTIVE NODE: {data.userCity.toUpperCase()}, {data.userCountry}</span>
+                <span className="text-[#C4FA4C]">LIVE STATS CONNECTED</span>
+              </div>
+            </div>
 
-            {/* User Live Location Pulsing Marker */}
-            {userLocation && (
-              <Marker coordinates={[userLocation.lon, userLocation.lat]}>
-                <circle r={12} fill="var(--color-primary)" opacity={0.4}>
-                  <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite" />
-                  <animate attributeName="r" values="6;16;6" dur="2s" repeatCount="indefinite" />
-                </circle>
-                <circle r={3} fill="#ffffff" stroke="var(--color-primary)" strokeWidth={1} />
-              </Marker>
-            )}
-          </ComposableMap>
-
-          {/* Familiar Mapbox UI Controls Overlay */}
-          <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 opacity-60 text-white font-sans font-bold text-[13px] pointer-events-none">
-            <svg viewBox="0 0 20 20" className="w-5 h-5 fill-current">
-              <path d="M10 2.5C5.86 2.5 2.5 5.86 2.5 10c0 4.14 3.36 7.5 7.5 7.5s7.5-3.36 7.5-7.5c0-4.14-3.36-7.5-7.5-7.5zm4.8 10.8c-.8 0-1.46-.53-1.63-1.25-.7.83-1.83 1.35-3.07 1.35-2.2 0-3.9-1.8-3.9-4 0-2.2 1.7-4 3.9-4 1.25 0 2.37.52 3.07 1.35.17-.72.83-1.25 1.63-1.25.93 0 1.7.77 1.7 1.7v4.4c0 .93-.77 1.7-1.7 1.7zM10 6.6c-1.88 0-3.4 1.52-3.4 3.4 0 1.88 1.52 3.4 3.4 3.4 1.88 0 3.4-1.52 3.4-3.4 0-1.88-1.52-3.4-3.4-3.4z"/>
-            </svg>
-            mapbox
           </div>
 
-          <div className="absolute bottom-4 right-4 z-20 flex flex-col gap-[1px] bg-white rounded shadow pointer-events-auto">
-            <button className="w-7 h-7 flex items-center justify-center text-black hover:bg-gray-100 rounded-t" onClick={() => {}}>+</button>
-            <button className="w-7 h-7 flex items-center justify-center text-black hover:bg-gray-100 rounded-b" onClick={() => {}}>-</button>
+          {/* Interactive Terminal Widget (Right Column) */}
+          <div className="lg:col-span-5 bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl p-5 shadow-xl flex flex-col h-[420px]">
+            {/* Terminal Top Window Bar */}
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-900 text-xs text-neutral-400">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-red-500/80 inline-block" />
+                <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
+                <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
+                <span className="ml-2 font-bold text-neutral-300">GUEST@AMOOQUADRI.DEV</span>
+              </div>
+              <Terminal className="w-4 h-4 text-[#C4FA4C]" />
+            </div>
+
+            {/* Terminal Logs Output Scroll View */}
+            <div className="flex-1 overflow-y-auto space-y-2 text-xs leading-relaxed scrollbar-none pr-1">
+              {terminalLogs.map((log, i) => (
+                <div 
+                  key={i} 
+                  className={log.type === 'input' ? 'text-[#C4FA4C] font-bold' : 'text-neutral-300'}
+                >
+                  {log.text}
+                </div>
+              ))}
+              <div ref={terminalEndRef} />
+            </div>
+
+            {/* Quick Action Button Shortcuts */}
+            <div className="pt-3 border-t border-neutral-900 mt-2">
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {['help', 'about', 'skills', 'projects', 'contact', 'clear'].map(cmd => (
+                  <button
+                    key={cmd}
+                    onClick={() => handleTerminalCommand(cmd)}
+                    className="px-2 py-1 bg-neutral-900 hover:bg-neutral-800 text-[#C4FA4C] text-[10px] font-mono rounded border border-neutral-800 transition-colors cursor-pointer"
+                  >
+                    ${cmd}
+                  </button>
+                ))}
+              </div>
+
+              {/* Command Input Form */}
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleTerminalCommand();
+                }}
+                className="flex items-center gap-2 bg-neutral-950 px-3 py-2 rounded-xl border border-neutral-800 focus-within:border-[#C4FA4C]"
+              >
+                <span className="text-[#C4FA4C] font-bold">GUEST ~ $</span>
+                <input
+                  type="text"
+                  value={terminalInput}
+                  onChange={(e) => setTerminalInput(e.target.value)}
+                  placeholder="TYPE A COMMAND..."
+                  className="bg-transparent text-xs text-white placeholder-neutral-600 focus:outline-none w-full font-mono"
+                />
+                <button type="submit" aria-label="Send command" className="text-neutral-400 hover:text-[#C4FA4C]">
+                  <CornerDownLeft className="w-3.5 h-3.5" />
+                </button>
+              </form>
+            </div>
+
           </div>
 
         </div>
-        
+
       </div>
     </section>
   );
 };
+

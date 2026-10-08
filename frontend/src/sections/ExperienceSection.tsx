@@ -21,30 +21,30 @@ export const ExperienceSection: React.FC = () => {
         <div className="flex items-center justify-center gap-2 mb-12">
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-4 py-2 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
               activeTab === 'all'
-                ? 'bg-[var(--color-primary)] text-white shadow-xs'
-                : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
+                ? 'bg-[var(--color-primary)] !text-black font-bold shadow-xs'
+                : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)] font-medium'
             }`}
           >
             All Track Record ({portfolioData.experience.length})
           </button>
           <button
             onClick={() => setActiveTab('industry')}
-            className={`px-4 py-2 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
               activeTab === 'industry'
-                ? 'bg-[var(--color-primary)] text-white shadow-xs'
-                : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
+                ? 'bg-[var(--color-primary)] !text-black font-bold shadow-xs'
+                : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)] font-medium'
             }`}
           >
             Industrial Experience
           </button>
           <button
             onClick={() => setActiveTab('teaching')}
-            className={`px-4 py-2 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
               activeTab === 'teaching'
-                ? 'bg-[var(--color-primary)] text-white shadow-xs'
-                : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
+                ? 'bg-[var(--color-primary)] !text-black font-bold shadow-xs'
+                : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)] font-medium'
             }`}
           >
             Teaching & Mentorship
