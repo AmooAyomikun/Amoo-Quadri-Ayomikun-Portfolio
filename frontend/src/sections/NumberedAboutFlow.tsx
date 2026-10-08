@@ -40,8 +40,8 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 02. ACADEMICS',
       tabLabel: '02. ACADEMICS',
       shortLabel: 'ACADEMICS',
-      accentColor: '#00D2FE',
-      tabBg: 'bg-[#00D2FE]',
+      accentColor: '#C4FA4C',
+      tabBg: 'bg-[#C4FA4C]',
       tabText: 'text-black',
       title: 'Academic Excellence',
       icon: <GraduationCap className="w-4 h-4 shrink-0" />,
@@ -57,8 +57,8 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 03. RESEARCH',
       tabLabel: '03. RESEARCH',
       shortLabel: 'RESEARCH',
-      accentColor: '#F59E0B',
-      tabBg: 'bg-[#F59E0B]',
+      accentColor: '#C4FA4C',
+      tabBg: 'bg-[#C4FA4C]',
       tabText: 'text-black',
       title: 'Research Focus & Systems',
       icon: <BookOpen className="w-4 h-4 shrink-0" />,
@@ -74,9 +74,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 04. LEADERSHIP',
       tabLabel: '04. LEADERSHIP',
       shortLabel: 'LEADERSHIP',
-      accentColor: '#E11D48',
-      tabBg: 'bg-[#E11D48]',
-      tabText: 'text-white',
+      accentColor: '#C4FA4C',
+      tabBg: 'bg-[#C4FA4C]',
+      tabText: 'text-black',
       title: 'Community Leadership & Teaching',
       icon: <Users className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -91,9 +91,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 05. VISION',
       tabLabel: '05. VISION',
       shortLabel: 'VISION',
-      accentColor: '#8B5CF6',
-      tabBg: 'bg-[#8B5CF6]',
-      tabText: 'text-white',
+      accentColor: '#C4FA4C',
+      tabBg: 'bg-[#C4FA4C]',
+      tabText: 'text-black',
       title: 'Looking Forward',
       icon: <Award className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -209,11 +209,9 @@ export const NumberedAboutFlow: React.FC = () => {
                 onClick={() => selectTab(idx)}
                 aria-label={`Select section ${item.tabLabel}`}
                 className={`w-[135px] sm:w-[185px] shrink-0 relative flex items-center justify-center gap-1.5 sm:gap-2 h-[38px] sm:h-[46px] px-2 sm:px-4 font-mono text-[10px] sm:text-xs md:text-sm font-extrabold tracking-wider uppercase transition-all duration-300 cursor-pointer ${
-                  item.tabBg
-                } ${item.tabText} ${
                   isActive
-                    ? 'z-30 shadow-2xl scale-[1.02] ring-1 ring-white/30'
-                    : 'z-10 opacity-85 hover:opacity-100 scale-100'
+                    ? 'bg-[#C4FA4C] !text-black z-30 shadow-2xl scale-[1.02] ring-1 ring-[#C4FA4C]/40'
+                    : 'bg-[#171717] text-[var(--color-text-muted)] border-t border-x border-[var(--color-border)] z-10 opacity-80 hover:opacity-100 hover:text-[#C4FA4C] scale-100'
                 }`}
                 style={{
                   clipPath: clipPolygon,
