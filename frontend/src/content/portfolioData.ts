@@ -99,7 +99,7 @@ export const portfolioData = {
     linkedIn: "http://www.linkedin.com/in/ayomikun-amoo-6b836428b",
     github: "https://github.com/amooquadri",
     cvPdfUrl: "/Amoo_Quadri_CV.pdf",
-    bio: "I am a first-class Software Engineering graduate (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA) and current MSc Computer Science student at Delta State University. My work bridges academic research in intelligent computing, data-driven systems, and machine learning with production-grade full-stack and frontend engineering.",
+    bio: "I am a first-class Software Engineering graduate (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA) and dedicated Software Engineering & Applied AI Researcher. My work bridges academic research in intelligent computing, data-driven systems, and machine learning with production-grade full-stack and frontend engineering.",
     stats: [
       { label: "Major GPA", value: "5.0 / 5.0", detail: "Abiola Ajimobi Technical Univ" },
       { label: "Final CGPA", value: "4.45 / 5.00", detail: "89% Equivalent (3.56/4.00)" },
@@ -122,17 +122,6 @@ export const portfolioData = {
   },
 
   education: [
-    {
-      institution: "Delta State University",
-      location: "Asaba, Nigeria",
-      imageUrl: "/delta state uni.png",
-      degree: "Master of Science (M.Sc.) in Computer Science",
-      period: "2025 – Present",
-      highlights: [
-        "Focusing on advanced software engineering, artificial intelligence, data-driven systems, and intelligent computing.",
-        "NYSC Research Assistant supporting academic research under Professor Jude Sinebe."
-      ]
-    },
     {
       institution: "First Technical University (now Abiola Ajimobi Technical University), Ibadan",
       location: "Ibadan, Nigeria",
@@ -191,13 +180,13 @@ export const portfolioData = {
 
   research: [
     {
-      id: 'dsu-nysc-research',
+      id: 'cs-nysc-research',
       title: 'Applied AI & Intelligent Computing Research',
       role: 'Research Assistant (NYSC)',
-      institution: 'Delta State University, Asaba, Delta State',
+      institution: 'Department of Computer Science / Postgraduate Research Lab',
       period: 'Sept. 2025 – Sept. 2026',
       supervisor: 'Prof. Jude Sinebe',
-      location: 'Asaba, Delta State, Nigeria',
+      location: 'Nigeria',
       focusArea: 'Applied Data Science, Machine Learning & Intelligent Software Systems',
       abstract: 'Conducting empirical research under Prof. Jude Sinebe, exploring data-driven problem solving, AI computational models, literature analysis, and experimental evaluation of software reliability.',
       contributions: [
@@ -536,7 +525,7 @@ export const portfolioData = {
       id: 'prof-sinebe',
       name: 'Prof. Jude Sinebe',
       role: 'Professor & NYSC Research Supervisor',
-      organization: 'Delta State University, Asaba, Nigeria',
+      organization: 'Department of Computer Science',
       relationship: 'Research Supervisor (2025–2026)',
       category: 'academic',
       quote: 'Ayomikun possesses outstanding analytical rigor and technical precision. His ability to apply machine learning and software engineering methodology to intelligent computing research is exceptional for a young scholar.',

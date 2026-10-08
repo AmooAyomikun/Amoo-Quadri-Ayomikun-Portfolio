@@ -37,7 +37,7 @@ export default function AboutPage() {
                 Software Engineering Scholar & Research Assistant
               </p>
               <p className="text-base text-[var(--color-text-muted)] leading-relaxed max-w-2xl">
-                Graduated with a first-class B.Sc. in Software Engineering (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA). Currently pursuing an MSc in Computer Science at Delta State University while supporting research under Prof. Jude Sinebe.
+                Graduated with a first-class B.Sc. in Software Engineering (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA). Currently focused on postgraduate research in applied artificial intelligence, software reliability, and intelligent computing.
               </p>
             </div>
 

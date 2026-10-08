@@ -116,7 +116,7 @@ export const ContactSection: React.FC = () => {
                   <div>
                     <div className="text-xs font-mono text-[var(--color-text-subtle)] uppercase">Primary Location</div>
                     <p className="text-sm font-semibold text-[var(--color-text-main)]">
-                      Ibadan, Oyo State & Delta State, Nigeria
+                      Ibadan, Oyo State, Nigeria
                     </p>
                   </div>
                 </div>

@@ -16,7 +16,7 @@ export const testimonialsData: Testimonial[] = [
     id: 'prof-sinebe',
     name: 'Prof. Jude Sinebe',
     role: 'Professor & Research Supervisor',
-    organization: 'Delta State University, Asaba, Nigeria',
+    organization: 'Department of Computer Science',
     relationship: 'NYSC Research Supervisor (2025–2026)',
     category: 'academic',
     quote: 'Ayomikun possesses outstanding analytical rigor and technical precision. His ability to apply machine learning and software engineering methodology to intelligent computing research is exceptional for a young scholar.',

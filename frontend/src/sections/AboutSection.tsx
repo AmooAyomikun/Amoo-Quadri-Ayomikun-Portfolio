@@ -27,12 +27,12 @@ export const AboutSection: React.FC = () => {
                 I am a highly motivated Software Engineering graduate with a strong academic record (4.45/5.00 Final CGPA). I am passionate about applying software engineering principles and emerging technologies to develop practical solutions to real-world problems.
               </p>
               <p className="text-sm text-[var(--color-text-muted)] leading-relaxed mb-4">
-                Pursuing my MSc in Computer Science at Delta State University enables me to deepen my knowledge of software quality, artificial intelligence, data-driven systems, and advanced computing. As a NYSC Research Assistant under Prof. Jude Sinebe, I focus on empirical validation, machine learning, and software reliability.
+                My ongoing research in Computer Science enables me to deepen my knowledge of software quality, artificial intelligence, data-driven systems, and advanced computing. As a NYSC Research Assistant under Prof. Jude Sinebe, I focus on empirical validation, machine learning, and software reliability.
               </p>
               <div className="pt-4 border-t border-[var(--color-border)] flex flex-wrap gap-2">
-                <Badge variant="primary">4.45/5.00 CGPA</Badge>
+                <Badge variant="primary">5.0/5.0 Major GPA</Badge>
                 <Badge variant="accent">Top 10% Class Rank</Badge>
-                <Badge variant="outline">MSc Scholar @ DSU</Badge>
+                <Badge variant="outline">AI & SE Scholar</Badge>
               </div>
             </div>
           </div>

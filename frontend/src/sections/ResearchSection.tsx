@@ -149,7 +149,7 @@ export const ResearchSection: React.FC = () => {
                 <Activity className="w-6 h-6" />
               </div>
               <h4 className="text-xl font-bold text-[var(--color-text-main)] mb-1">Research Assistant</h4>
-              <p className="text-sm text-[var(--color-text-muted)] mb-4">Delta State University, Asaba</p>
+              <p className="text-sm text-[var(--color-text-muted)] mb-4">Postgraduate Computer Science Lab</p>
               
               <div className="flex flex-wrap items-center gap-2 mb-6 text-[11px] font-mono font-bold tracking-wider">
                 <span className="px-3 py-1.5 bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-md flex items-center gap-1.5 text-[var(--color-text-muted)]">

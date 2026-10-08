@@ -15,14 +15,14 @@ export interface NewsItem {
 export const initialNewsData: NewsItem[] = [
   {
     id: 'news-dsu-assistantship',
-    title: 'Appointed NYSC Research Assistant under Prof. Jude Sinebe at Delta State University',
+    title: 'Appointed NYSC Research Assistant under Prof. Jude Sinebe',
     date: 'Sept 2025',
     category: 'Research',
-    summary: 'Selected to join the Computer Science postgraduate research lab at Delta State University, investigating applied data science and software reliability.',
-    content: 'I am honored to serve as a NYSC Research Assistant in the Department of Computer Science at Delta State University, Asaba under the mentorship of Professor Jude Sinebe. Our research focuses on computational intelligence, machine learning model evaluation, and software quality assurance methodologies.',
+    summary: 'Selected to join the Computer Science postgraduate research lab, investigating applied data science and software reliability.',
+    content: 'I am honored to serve as a NYSC Research Assistant in the Department of Computer Science under the mentorship of Professor Jude Sinebe. Our research focuses on computational intelligence, machine learning model evaluation, and software quality assurance methodologies.',
     author: 'Quadri Ayomikun Amoo',
     readTime: '2 min read',
-    tags: ['Research Assistantship', 'Delta State Univ', 'Prof Jude Sinebe', 'AI'],
+    tags: ['Research Assistantship', 'Computer Science', 'Prof Jude Sinebe', 'AI'],
     isPinned: true
   },
   {

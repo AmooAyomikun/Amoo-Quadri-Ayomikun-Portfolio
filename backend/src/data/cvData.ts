@@ -9,7 +9,7 @@ export const cvData = {
     googleScholar: "https://scholar.google.com/citations?hl=en&user=e9bX70kAAAAJ",
     linkedIn: "http://www.linkedin.com/in/ayomikun-amoo-6b836428b",
     github: "https://github.com/amooquadri",
-    summary: "A highly motivated Software Engineering graduate with a 5.0/5.0 Major GPA and hands-on experience in software development, research, and industry projects. Committed to building an impactful career at the intersection of software engineering, artificial intelligence, data-driven systems, and intelligent computing. Pursuing MSc in Computer Science at Delta State University.",
+    summary: "A highly motivated Software Engineering graduate with a 5.0/5.0 Major GPA and hands-on experience in software development, research, and industry projects. Committed to building an impactful career at the intersection of software engineering, artificial intelligence, data-driven systems, and intelligent computing.",
     researchInterests: [
       "Applied Data Science",
       "Artificial Intelligence",
@@ -23,13 +23,6 @@ export const cvData = {
     ]
   },
   education: [
-    {
-      institution: "Delta State University",
-      location: "Asaba, Delta State, Nigeria",
-      degree: "Master of Science (M.Sc.) in Computer Science",
-      period: "In Progress (2025–Present)",
-      details: "Focusing on software engineering, artificial intelligence, data-driven systems, and advanced computing."
-    },
     {
       institution: "First Technical University (now Abiola Ajimobi Technical University)",
       location: "Ibadan, Nigeria",
@@ -72,7 +65,7 @@ export const cvData = {
   researchExperience: [
     {
       role: "Research Assistant (NYSC)",
-      institution: "Delta State University, Asaba, Delta State, Nigeria",
+      institution: "Department of Computer Science / Postgraduate Research Lab",
       period: "Sept. 2025 – Sept. 2026",
       supervisor: "Prof. Jude Sinebe",
       highlights: [
