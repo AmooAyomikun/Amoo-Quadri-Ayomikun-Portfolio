@@ -25,7 +25,16 @@ export const getNews = (req: Request, res: Response): void => {
 }
 
 export const publishNews = (req: Request, res: Response): void => {
-  const { title, category, summary, content, tags, externalUrl } = req.body as Partial<NewsItem>
+  const { title, category, summary, content, tags, externalUrl, adminPassphrase } = req.body as Partial<NewsItem> & { adminPassphrase?: string }
+  const authHeader = req.headers['x-admin-key']
+
+  if (authHeader !== 'quadri2026' && adminPassphrase !== 'quadri2026' && process.env.NODE_ENV === 'production') {
+    res.status(401).json({
+      success: false,
+      error: 'Unauthorized: Only Quadri Amoo (Admin) is authorized to publish announcements.'
+    })
+    return
+  }
 
   if (!title || !summary || !content) {
     res.status(400).json({

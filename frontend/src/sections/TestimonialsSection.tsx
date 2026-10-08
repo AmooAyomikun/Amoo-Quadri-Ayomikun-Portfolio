@@ -20,26 +20,29 @@ export const TestimonialsSection: React.FC = () => {
   })
 
   useEffect(() => {
-    const pinEl = pinContainerRef.current
-    const trackEl = trackRef.current
-    if (!pinEl || !trackEl) return
+    const section = sectionRef.current
+    const track = trackRef.current
+    if (!section || !track) return
 
-    // Small delay to ensure DOM dimensions are computed
     const timer = setTimeout(() => {
-      const getScrollAmount = () => trackEl.scrollWidth - trackEl.clientWidth
+      const getScrollAmount = () => {
+        return Math.max(0, track.scrollWidth - (window.innerWidth - 64))
+      }
 
-      if (getScrollAmount() <= 0) return
+      const totalScroll = getScrollAmount()
+
+      if (totalScroll <= 0) return
 
       const ctx = gsap.context(() => {
-        gsap.to(trackEl, {
-          x: () => -getScrollAmount(),
+        gsap.to(track, {
+          x: () => -totalScroll,
           ease: 'none',
           scrollTrigger: {
-            trigger: pinEl,
+            trigger: section,
             pin: true,
             scrub: 1,
-            start: 'top top+=70',
-            end: () => `+=${getScrollAmount() + 300}`,
+            start: 'top top+=80',
+            end: () => `+=${totalScroll + 400}`,
             invalidateOnRefresh: true,
             anticipatePin: 1,
             onUpdate: (self) => {
@@ -47,10 +50,12 @@ export const TestimonialsSection: React.FC = () => {
             }
           }
         })
-      }, pinEl)
+      }, section)
+
+      ScrollTrigger.refresh()
 
       return () => ctx.revert()
-    }, 150)
+    }, 200)
 
     return () => clearTimeout(timer)
   }, [filter, filteredTestimonials.length])

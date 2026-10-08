@@ -30,10 +30,12 @@ export const NewsSection: React.FC = () => {
     category: 'Research' as NewsItem['category'],
     summary: '',
     content: '',
-    tags: ''
+    tags: '',
+    adminKey: ''
   })
   const [publishing, setPublishing] = useState(false)
   const [publishStatus, setPublishStatus] = useState('')
+  const [publishError, setPublishError] = useState('')
 
   const fetchNews = async () => {
     try {
@@ -95,26 +97,38 @@ export const NewsSection: React.FC = () => {
 
   const handlePublishSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setPublishError('')
+    setPublishStatus('')
+
+    if (form.adminKey.trim().toLowerCase() !== 'quadri2026' && form.adminKey.trim().toLowerCase() !== 'quadri') {
+      setPublishError('Unauthorized: Only Quadri Amoo (Admin) is authorized to publish announcements.')
+      return
+    }
+
     if (!form.title || !form.summary || !form.content) return
     setPublishing(true)
 
     try {
       const res = await fetch(`https://portfolio-backend-st78.onrender.com/api/news`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-admin-key': 'quadri2026'
+        },
         body: JSON.stringify({
           title: form.title,
           category: form.category,
           summary: form.summary,
           content: form.content,
-          tags: form.tags ? form.tags.split(',').map(t => t.trim()) : ['Update']
+          tags: form.tags ? form.tags.split(',').map(t => t.trim()) : ['Update'],
+          adminPassphrase: form.adminKey
         })
       })
 
       const data = await res.json()
       if (res.ok && data.success) {
         setPublishStatus('News published successfully!')
-        setForm({ title: '', category: 'Research', summary: '', content: '', tags: '' })
+        setForm({ title: '', category: 'Research', summary: '', content: '', tags: '', adminKey: '' })
         fetchNews()
         setTimeout(() => {
           setPublishModalOpen(false)
@@ -123,7 +137,7 @@ export const NewsSection: React.FC = () => {
       } else {
         throw new Error(data.error || 'Failed to publish')
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Publish news failed:', err)
       setPublishStatus('Published locally to news feed.')
       const localNewsItem: NewsItem = {
@@ -264,12 +278,31 @@ export const NewsSection: React.FC = () => {
               </button>
             </div>
 
+            {publishError && (
+              <div className="p-3 rounded-lg bg-red-950/80 border border-red-800 text-red-300 text-xs font-mono">
+                {publishError}
+              </div>
+            )}
+
             {publishStatus && (
-              <div className="p-3 rounded-lg bg-emerald-50 text-emerald-800 text-xs flex items-center gap-2">
+              <div className="p-3 rounded-lg bg-emerald-950/80 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2 font-mono">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{publishStatus}</span>
               </div>
             )}
+
+            <div>
+              <label className="block text-xs font-mono text-[var(--color-primary)] font-bold mb-1">Admin Security Passphrase *</label>
+              <input
+                type="password"
+                required
+                value={form.adminKey}
+                onChange={e => setForm({ ...form, adminKey: e.target.value })}
+                placeholder="Enter Quadri's Admin Passphrase..."
+                className="w-full px-3.5 py-2 rounded-lg bg-[var(--color-surface-base)] border border-[var(--color-border)] text-sm font-mono focus:border-[var(--color-primary)] focus:outline-none"
+              />
+              <span className="text-[10px] text-[var(--color-text-subtle)] font-mono mt-0.5 block">Only authorized admin (Quadri Amoo) can publish articles.</span>
+            </div>
 
             <div>
               <label className="block text-xs font-mono text-[var(--color-text-muted)] mb-1">Headline Title *</label>

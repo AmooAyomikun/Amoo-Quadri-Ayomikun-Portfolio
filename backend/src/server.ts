@@ -28,7 +28,7 @@ app.get('/api/health', (_req, res) => {
   })
 })
 
-import { getGithubActivity } from './controllers/githubController.js'
+import { getGithubActivity, getGithubContributions } from './controllers/githubController.js'
 import { logVisitor, getVisitors } from './controllers/visitorsController.js'
 import { getSignatures, addSignature } from './controllers/guestbookController.js'
 import { handleAiChat } from './controllers/aiController.js'
@@ -40,6 +40,7 @@ app.get('/api/news', getNews)
 app.post('/api/news', publishNews)
 app.post('/api/contact', submitContact)
 app.get('/api/github-activity', getGithubActivity)
+app.get('/api/github-contributions', getGithubContributions)
 app.post('/api/visitors/log', logVisitor)
 app.get('/api/visitors', getVisitors)
 app.get('/api/guestbook', getSignatures)
