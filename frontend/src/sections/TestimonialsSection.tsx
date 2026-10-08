@@ -20,6 +20,9 @@ export const TestimonialsSection: React.FC = () => {
   })
 
   useEffect(() => {
+    // Only enable GSAP pinning on desktop (width >= 1024px)
+    if (window.innerWidth < 1024) return
+
     const section = sectionRef.current
     const track = trackRef.current
     if (!section || !track) return
@@ -47,7 +50,7 @@ export const TestimonialsSection: React.FC = () => {
           pin: true,
           scrub: 0.8,
           start: 'top top+=64',
-          end: () => `+=${totalScroll + 250}`,
+          end: () => `+=${totalScroll}`,
           invalidateOnRefresh: true,
           anticipatePin: 1,
           onUpdate: (self) => {
@@ -74,16 +77,21 @@ export const TestimonialsSection: React.FC = () => {
   const handleManualScroll = (direction: 'left' | 'right') => {
     const track = trackRef.current
     if (!track) return
-    const cardWidth = 500 + 24
+    const cardWidth = 320
     const scrollDelta = direction === 'right' ? cardWidth : -cardWidth
-    window.scrollBy({ top: scrollDelta, behavior: 'smooth' })
+
+    if (window.innerWidth < 1024 && track.parentElement) {
+      track.parentElement.scrollBy({ left: scrollDelta, behavior: 'smooth' })
+    } else {
+      window.scrollBy({ top: scrollDelta, behavior: 'smooth' })
+    }
   }
 
   return (
     <section 
       id="testimonials" 
       ref={sectionRef} 
-      className="py-6 sm:py-10 bg-[var(--color-surface-base)] relative overflow-hidden border-t border-[var(--color-border)] flex flex-col justify-center min-h-[90vh]"
+      className="py-6 sm:py-10 bg-[var(--color-surface-base)] relative overflow-hidden border-t border-[var(--color-border)] flex flex-col justify-center min-h-0 lg:min-h-[90vh]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         
@@ -173,15 +181,15 @@ export const TestimonialsSection: React.FC = () => {
         </div>
 
         {/* Horizontal Scroll Track Wrapper */}
-        <div className="overflow-hidden py-1">
+        <div className="overflow-x-auto lg:overflow-hidden scrollbar-none py-1 snap-x snap-mandatory">
           <div 
             ref={trackRef} 
-            className="flex gap-6 items-stretch w-max"
+            className="flex gap-4 sm:gap-6 items-stretch w-max"
           >
             {filteredTestimonials.map((testimonial) => (
               <div 
                 key={testimonial.id} 
-                className="w-[280px] sm:w-[440px] lg:w-[500px] shrink-0 flex flex-col"
+                className="w-[280px] sm:w-[440px] lg:w-[500px] shrink-0 snap-start flex flex-col"
               >
                 <TestimonialCard testimonial={testimonial} />
               </div>

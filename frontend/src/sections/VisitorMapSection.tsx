@@ -41,15 +41,9 @@ export const VisitorMapSection: React.FC = () => {
     userCountryCode: 'NG',
     userCity: 'Lagos',
     userCountryCount: 1,
-    totalVisitors: 1240,
-    topCountries: [
-      { rank: 1, name: 'NIGERIA', code: 'NG', count: 850 },
-      { rank: 2, name: 'UNITED STATES', code: 'US', count: 210 },
-      { rank: 3, name: 'UNITED KINGDOM', code: 'GB', count: 95 },
-      { rank: 4, name: 'GERMANY', code: 'DE', count: 50 },
-      { rank: 5, name: 'CANADA', code: 'CA', count: 35 }
-    ],
-    countryStats: { NIGERIA: 850, 'UNITED STATES': 210, 'UNITED KINGDOM': 95, GERMANY: 50, CANADA: 35 }
+    totalVisitors: 1,
+    topCountries: [],
+    countryStats: {}
   });
 
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
@@ -72,12 +66,18 @@ export const VisitorMapSection: React.FC = () => {
         if (geoRes.ok) {
           const geo = await geoRes.json();
           const country = (geo.country || 'NIGERIA').toUpperCase();
+          const countryCode = geo.country_code || 'NG';
+          const city = geo.city || 'Lagos';
           if (isMounted) {
             setData(prev => ({
               ...prev,
               userCountry: country,
-              userCountryCode: geo.country_code || 'NG',
-              userCity: geo.city || 'Lagos'
+              userCountryCode: countryCode,
+              userCity: city,
+              topCountries: prev.topCountries.length > 0 ? prev.topCountries : [
+                { rank: 1, name: country, code: countryCode, count: prev.userCountryCount || 1 }
+              ],
+              countryStats: Object.keys(prev.countryStats).length > 0 ? prev.countryStats : { [country]: 1 }
             }));
           }
         }
@@ -113,10 +113,10 @@ export const VisitorMapSection: React.FC = () => {
                   userCountry: json.userCountry || prev.userCountry,
                   userCountryCode: json.userCountryCode || prev.userCountryCode,
                   userCity: json.userCity || prev.userCity,
-                  userCountryCount: json.userCountryCount || prev.userCountryCount,
-                  totalVisitors: json.totalVisitors || prev.totalVisitors,
-                  topCountries: json.topCountries?.length ? json.topCountries : prev.topCountries,
-                  countryStats: Object.keys(json.countryStats || {}).length ? json.countryStats : prev.countryStats
+                  userCountryCount: json.userCountryCount || 1,
+                  totalVisitors: json.totalVisitors || 1,
+                  topCountries: Array.isArray(json.topCountries) ? json.topCountries : [],
+                  countryStats: json.countryStats || {}
                 }));
                 break;
               }
@@ -297,7 +297,9 @@ export const VisitorMapSection: React.FC = () => {
 
           {/* Dynamic Geolocation Banner */}
           <h3 className="text-lg sm:text-2xl font-bold tracking-tight text-[#C4FA4C] leading-snug mb-4 uppercase">
-            YOU'RE IN {data.userCountry}. {data.userCountryCount.toLocaleString()} CAME FROM THERE TOO.
+            {data.userCountryCount <= 1
+              ? `YOU'RE IN ${data.userCountry}. YOU'RE THE FIRST VISITOR FROM THERE!`
+              : `YOU'RE IN ${data.userCountry}. ${data.userCountryCount.toLocaleString()} VISITORS HAVE VISITED FROM THERE.`}
           </h3>
 
           {/* Top 5 Leaderboard Row */}

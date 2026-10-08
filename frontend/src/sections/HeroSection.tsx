@@ -40,26 +40,27 @@ export const HeroSection: React.FC = () => {
             </div>
 
             {/* Hero Main Name Header */}
-            <h1 className="gsap-hero-item text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-[var(--color-text-main)] tracking-tight leading-[1.15] break-words">
+            <h1 className="gsap-hero-item text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-[var(--color-text-main)] tracking-tight leading-[1.15] break-words">
               Quadri Ayomikun Amoo
             </h1>
 
-            <div className="gsap-hero-item text-xl sm:text-2xl text-[var(--color-primary)] font-serif italic font-semibold mt-2 mb-6">
+            <div className="gsap-hero-item text-lg sm:text-2xl text-[var(--color-primary)] font-serif italic font-semibold mt-1 mb-4">
               Software Engineer & Researcher
             </div>
 
-            <p className="gsap-hero-item text-base sm:text-lg text-[var(--color-text-muted)] leading-relaxed max-w-2xl font-sans mb-8">
+            <p className="gsap-hero-item text-sm sm:text-lg text-[var(--color-text-muted)] leading-relaxed max-w-2xl font-sans mb-6">
               I build modern web applications with a strong focus on creating fast, intuitive, and accessible user experiences. While frontend is where I do my best work, I also enjoy building complete full-stack applications that solve real problems.
-              <br /><br />
-              Beyond software engineering, I am deeply involved in academic research, focusing on machine learning, data-driven systems, and intelligent computing. I'm always learning, exploring new technologies, and turning ideas into products that people can use every day.
+              <br className="hidden sm:block" />
+              Beyond software engineering, I am deeply involved in academic research, focusing on machine learning, data-driven systems, and intelligent computing.
             </p>
 
             {/* CTA Buttons: Primary Projects + Download CV */}
-            <div className="gsap-hero-item pt-2 flex flex-wrap items-center gap-4">
+            <div className="gsap-hero-item pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
               <Button
                 href="/projects"
                 variant="primary"
                 size="lg"
+                className="w-full sm:w-auto text-center justify-center"
               >
                 View My Work
               </Button>
@@ -67,7 +68,7 @@ export const HeroSection: React.FC = () => {
               <a
                 href="/Amoo_Quadri_CV.pdf"
                 download="Amoo_Quadri_CV.pdf"
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full font-sans text-sm font-semibold bg-[var(--color-surface-card)] text-[var(--color-text-main)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all shadow-sm"
+                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full font-sans text-sm font-semibold bg-[var(--color-surface-card)] text-[var(--color-text-main)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all shadow-sm w-full sm:w-auto"
               >
                 <Download className="w-4 h-4 text-[var(--color-primary)]" />
                 Download CV (PDF)
@@ -75,7 +76,7 @@ export const HeroSection: React.FC = () => {
             </div>
 
             {/* Quick Links */}
-            <div className="gsap-hero-item pt-6 border-t border-[var(--color-border)] flex flex-wrap items-center gap-6 text-sm font-sans text-[var(--color-text-muted)]">
+            <div className="gsap-hero-item pt-6 border-t border-[var(--color-border)] flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm font-sans text-[var(--color-text-muted)]">
               <Link to="/about" className="hover:text-[var(--color-text-main)] transition-colors flex items-center gap-1.5">
                 <GraduationCap className="w-4 h-4 text-[var(--color-primary)]" /> Read Biography
               </Link>
@@ -91,14 +92,26 @@ export const HeroSection: React.FC = () => {
 
           {/* Right Portrait Image */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end relative">
-            <div className="gsap-profile-cutout relative w-full max-w-sm sm:max-w-md">
-              <div className="relative p-2 sm:p-6">
+            <div className="gsap-profile-cutout relative w-full max-w-xs sm:max-w-md">
+              <div className="relative p-1 sm:p-4">
                 <div className="relative bg-[var(--color-surface-card)] rounded-[2rem] p-2 shadow-xl border border-[var(--color-border)] overflow-hidden">
                   <img
                     src={profileImg}
                     alt="Quadri Ayomikun Amoo"
                     className="w-full h-auto object-cover object-top rounded-[1.5rem] transition-transform duration-700 hover:scale-[1.03]"
                   />
+                  {/* Floating Pill Badge */}
+                  <div className="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md border border-[var(--color-primary)]/40 p-2.5 rounded-xl flex items-center justify-between shadow-lg">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-primary)] animate-pulse" />
+                      <span className="text-[11px] font-mono text-white font-bold uppercase tracking-wider">
+                        Available Worldwide
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-[var(--color-primary)] font-bold">
+                      5.0/5.0 Major GPA
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -348,14 +348,14 @@ export const GithubActivitySection: React.FC = () => {
           </div>
 
           {/* Right Column: Year Filter Tabs matching GitHub profile sidebar */}
-          <div className="lg:col-span-2 flex flex-row lg:flex-col gap-2">
+          <div className="lg:col-span-2 flex flex-row lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
             {YEARS.map(yr => {
               const isActive = yr === selectedYear;
               return (
                 <button
                   key={yr}
                   onClick={() => setSelectedYear(yr)}
-                  className={`w-full py-2 px-4 rounded-xl text-xs sm:text-sm font-sans font-semibold transition-all cursor-pointer text-left flex items-center justify-between ${
+                  className={`shrink-0 lg:w-full py-2 px-4 rounded-xl text-xs sm:text-sm font-sans font-semibold transition-all cursor-pointer text-left flex items-center justify-between gap-2 ${
                     isActive
                       ? 'bg-[#1F6FEB] text-white shadow-lg font-bold'
                       : 'bg-[#0D1117] hover:bg-[#161B22] text-neutral-400 border border-[#21262D]'
