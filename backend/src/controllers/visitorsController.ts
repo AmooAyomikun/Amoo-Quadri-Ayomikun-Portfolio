@@ -120,7 +120,12 @@ export const logVisitor = async (req: Request, res: Response): Promise<void> => 
         const existingSnapshot = await visitorsRef.where('ip', '==', ip).limit(1).get();
         if (!existingSnapshot.empty) {
           await visitorsRef.doc(existingSnapshot.docs[0].id).update({
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            country,
+            countryCode,
+            city,
+            lat,
+            lon
           });
         } else {
           await visitorsRef.add({
@@ -132,6 +137,12 @@ export const logVisitor = async (req: Request, res: Response): Promise<void> => 
             lon,
             timestamp: new Date().toISOString()
           });
+        }
+        
+        // Fetch full historical visitors from Firestore so the count is accurate
+        const allSnapshot = await visitorsRef.get();
+        if (!allSnapshot.empty) {
+          visitors = allSnapshot.docs.map(doc => doc.data() as VisitorRecord);
         }
       } catch (dbErr) {
         console.error('Firestore sync error:', dbErr);

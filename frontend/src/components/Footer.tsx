@@ -56,33 +56,33 @@ export const Footer: React.FC = () => {
               </p>
             </div>
 
-            {/* Navigation Column */}
-            <div className="lg:col-span-2 space-y-4">
-              <h3 className="font-mono font-bold text-xs text-black uppercase tracking-widest">
-                NAVIGATION
-              </h3>
-              <ul className="space-y-2.5 text-xs text-black/80 font-medium font-sans">
-                <li><a href="/" className="hover:text-black hover:underline transition-colors">Home</a></li>
-                <li><a href="/education" className="hover:text-black hover:underline transition-colors">Education</a></li>
-                <li><a href="/experience" className="hover:text-black hover:underline transition-colors">Experience</a></li>
-                <li><a href="/research" className="hover:text-black hover:underline transition-colors">Research</a></li>
-                <li><a href="/projects" className="hover:text-black hover:underline transition-colors">Projects</a></li>
-                <li><a href="/guestbook" className="hover:text-black hover:underline transition-colors">Guestbook</a></li>
-              </ul>
-            </div>
-
-            {/* Support / Connect Column */}
-            <div className="lg:col-span-2 space-y-4">
-              <h3 className="font-mono font-bold text-xs text-black uppercase tracking-widest">
-                SUPPORT
-              </h3>
-              <ul className="space-y-2.5 text-xs text-black/80 font-medium font-sans">
-                <li><a href="/contact" className="hover:text-black hover:underline transition-colors">Contact Me</a></li>
-                <li><a href={portfolioData.personal.github} target="_blank" rel="noreferrer" className="hover:text-black hover:underline transition-colors">GitHub ↗</a></li>
-                <li><a href={portfolioData.personal.linkedIn} target="_blank" rel="noreferrer" className="hover:text-black hover:underline transition-colors">LinkedIn ↗</a></li>
-                <li><a href={portfolioData.personal.googleScholar} target="_blank" rel="noreferrer" className="hover:text-black hover:underline transition-colors">Google Scholar ↗</a></li>
-                <li><a href="/Amoo_Quadri_CV.pdf" download="Amoo_Quadri_CV.pdf" className="hover:text-black hover:underline transition-colors">Download CV ↓</a></li>
-              </ul>
+            {/* Navigation & Support Columns Combined */}
+            <div className="lg:col-span-4 grid grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <h3 className="font-mono font-bold text-xs text-black uppercase tracking-widest">
+                  NAVIGATION
+                </h3>
+                <ul className="space-y-2.5 text-xs text-black/80 font-medium font-sans">
+                  <li><a href="/" className="hover:text-black hover:underline transition-colors">Home</a></li>
+                  <li><a href="/education" className="hover:text-black hover:underline transition-colors">Education</a></li>
+                  <li><a href="/experience" className="hover:text-black hover:underline transition-colors">Experience</a></li>
+                  <li><a href="/research" className="hover:text-black hover:underline transition-colors">Research</a></li>
+                  <li><a href="/projects" className="hover:text-black hover:underline transition-colors">Projects</a></li>
+                  <li><a href="/guestbook" className="hover:text-black hover:underline transition-colors">Guestbook</a></li>
+                </ul>
+              </div>
+              <div className="space-y-4">
+                <h3 className="font-mono font-bold text-xs text-black uppercase tracking-widest">
+                  SUPPORT
+                </h3>
+                <ul className="space-y-2.5 text-xs text-black/80 font-medium font-sans">
+                  <li><a href="/contact" className="hover:text-black hover:underline transition-colors">Contact Me</a></li>
+                  <li><a href={portfolioData.personal.github} target="_blank" rel="noreferrer" className="hover:text-black hover:underline transition-colors">GitHub ↗</a></li>
+                  <li><a href={portfolioData.personal.linkedIn} target="_blank" rel="noreferrer" className="hover:text-black hover:underline transition-colors">LinkedIn ↗</a></li>
+                  <li><a href={portfolioData.personal.googleScholar} target="_blank" rel="noreferrer" className="hover:text-black hover:underline transition-colors">Google Scholar ↗</a></li>
+                  <li><a href="/Amoo_Quadri_CV.pdf" download="Amoo_Quadri_CV.pdf" className="hover:text-black hover:underline transition-colors">Download CV ↓</a></li>
+                </ul>
+              </div>
             </div>
 
             {/* Subscribe & Social Icons Column */}

@@ -45,6 +45,12 @@ export const addSignature = async (req: Request, res: Response): Promise<void> =
     return
   }
 
+  const profanityRegex = /fuck|shit|bitch|asshole|dick|pussy|cunt/i;
+  if (profanityRegex.test(name) || (message && profanityRegex.test(message))) {
+    res.status(400).json({ error: 'Inappropriate language detected. Please keep it professional.' })
+    return
+  }
+
   const newEntry = {
     name,
     message: message || '',

@@ -82,14 +82,7 @@ export const Navbar: React.FC = () => {
 
         {/* Right Controls: Theme Toggle & Direct CV Button */}
         <div className="hidden md:flex items-center gap-3">
-          <a
-            href="/Amoo_Quadri_CV.pdf"
-            download="Amoo_Quadri_CV.pdf"
-            className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[var(--color-primary-light)] text-[var(--color-primary)] border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)] hover:!text-black transition-all flex items-center gap-2"
-          >
-            <Download className="w-3.5 h-3.5" />
-            Download CV
-          </a>
+
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
@@ -101,14 +94,7 @@ export const Navbar: React.FC = () => {
 
         {/* Mobile Menu Toggle */}
         <div className="flex items-center gap-2 lg:hidden">
-          <a
-            href="/Amoo_Quadri_CV.pdf"
-            download="Amoo_Quadri_CV.pdf"
-            className="p-2 rounded-lg border border-[var(--color-primary)]/40 bg-[var(--color-primary-light)] text-[var(--color-primary)] text-xs font-mono font-bold flex items-center gap-1"
-          >
-            <Download className="w-4 h-4" />
-            CV
-          </a>
+
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
@@ -144,15 +130,7 @@ export const Navbar: React.FC = () => {
                 {link.name}
               </Link>
             ))}
-            <a
-              href="/Amoo_Quadri_CV.pdf"
-              download="Amoo_Quadri_CV.pdf"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2.5 rounded-lg text-xs font-mono font-bold bg-[var(--color-primary)] !text-black flex items-center justify-center gap-1.5"
-            >
-              <Download className="w-4 h-4" />
-              Download CV (PDF)
-            </a>
+
           </div>
         </div>
       )}

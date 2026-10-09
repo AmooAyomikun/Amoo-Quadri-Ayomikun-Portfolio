@@ -97,6 +97,7 @@ export const portfolioData = {
     address: "No.23, Gbadura str. Wofun, Olodo, Ibadan, Oyo State, Nigeria",
     googleScholar: "https://scholar.google.com/citations?hl=en&user=e9bX70kAAAAJ",
     linkedIn: "http://www.linkedin.com/in/ayomikun-amoo-6b836428b",
+    twitter: "https://x.com/ayomhykun",
     github: "https://github.com/amooquadri",
     cvPdfUrl: "/Amoo_Quadri_CV.pdf",
     bio: "I am a first-class Software Engineering graduate (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA) and dedicated Software Engineering & Applied AI Researcher. My work bridges academic research in intelligent computing, data-driven systems, and machine learning with production-grade full-stack and frontend engineering.",

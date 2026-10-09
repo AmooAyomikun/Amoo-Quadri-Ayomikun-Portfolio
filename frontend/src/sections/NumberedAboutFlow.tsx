@@ -19,11 +19,11 @@ export const NumberedAboutFlow: React.FC = () => {
       accentColor: '#C4FA4C',
       tabBg: 'bg-[#C4FA4C]',
       tabText: 'text-black',
-      title: 'Software Engineer & Researcher',
+      title: 'Full-Stack Engineer & AI Enthusiast',
       icon: <Sparkles className="w-4 h-4 shrink-0" />,
       textHtml: (
         <>
-          I am <strong>Quadri Ayomikun Amoo</strong>, a software engineer and researcher interested in the intersection of <strong>artificial intelligence</strong>, <strong>software engineering</strong>, <strong>intelligent computing systems</strong>, and <strong>data analytics</strong>. My work focuses on using AI to solve practical software-centric problems and developing intelligent systems that are <strong>practical, reliable, and accessible</strong>.
+          Hi, I'm <strong>Quadri Ayomikun Amoo</strong>. I specialize in architecting scalable software solutions and exploring advanced data analytics. I am deeply fascinated by how intelligent systems can be leveraged to streamline complex engineering workflows. My core mission is bridging the gap between theoretical AI research and robust, production-ready applications.
         </>
       ),
       highlights: ['Artificial Intelligence', 'Software Engineering', 'Intelligent Systems']
@@ -36,14 +36,14 @@ export const NumberedAboutFlow: React.FC = () => {
       accentColor: '#C4FA4C',
       tabBg: 'bg-[#C4FA4C]',
       tabText: 'text-black',
-      title: 'Academic Excellence',
+      title: 'Academic Milestones',
       icon: <GraduationCap className="w-4 h-4 shrink-0" />,
       textHtml: (
         <>
-          I hold a <strong>Bachelor of Science in Software Engineering</strong> with <strong>First-Class Honors (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA)</strong> from Abiola Ajimobi Technical University, graduating in the <strong>Top 10% of my class</strong>. I was recognized with <strong>4 Best Graduating Student Subject Honors</strong> in Operating Systems I, HCI, Software Engineering Practice, and Data Structures. Additionally, I hold <strong>Diplomas in French and Entrepreneurship (Upper Credit)</strong>.
+          I recently graduated in the top 10% of my cohort with a <strong>B.Sc. in Software Engineering (Second-Class Honors, Upper Division)</strong> from Abiola Ajimobi Technical University. During my studies, I maintained a <strong>4.45 / 5.00 Final CGPA</strong> alongside a perfect <strong>5.0/5.0 Major GPA</strong>, and earned four subject-specific excellence awards (including OS and Data Structures). I also broadened my skill set by completing diplomas in both French and Entrepreneurship.
         </>
       ),
-      highlights: ['5.0/5.0 Major GPA', 'Top 10% Class Honors', '4 Subject Excellence Awards']
+      highlights: ['4.45 / 5.00 CGPA', '5.0/5.0 Major GPA', '4 Subject Excellence Awards']
     },
     {
       num: '03',
@@ -53,11 +53,11 @@ export const NumberedAboutFlow: React.FC = () => {
       accentColor: '#C4FA4C',
       tabBg: 'bg-[#C4FA4C]',
       tabText: 'text-black',
-      title: 'Research Focus & Systems',
+      title: 'Applied Research',
       icon: <BookOpen className="w-4 h-4 shrink-0" />,
       textHtml: (
         <>
-          My research interests include <strong>AI for Software Engineering</strong>, <strong>intelligent software systems</strong>, <strong>Natural Language Processing</strong>, and <strong>software quality & reliability</strong>. Previously, under <strong>Dr. J.E.T. Akinsola</strong>, I developed a <strong>location-based recommendation and reservation system</strong> for my B.Sc. thesis, achieving high recommendation precision and seamless operational workflows.
+          My academic investigations primarily revolve around Natural Language Processing and software reliability. For my undergraduate thesis, supervised by Dr. J.E.T. Akinsola, I engineered a highly precise location-based recommendation engine. I am constantly looking for ways to apply machine learning to improve software quality assurance and operational workflows.
         </>
       ),
       highlights: ['Applied Data Science', 'Recommender Systems', 'Software Quality & QA']
@@ -70,11 +70,11 @@ export const NumberedAboutFlow: React.FC = () => {
       accentColor: '#C4FA4C',
       tabBg: 'bg-[#C4FA4C]',
       tabText: 'text-black',
-      title: 'Community Leadership & Teaching',
+      title: 'Mentorship & Impact',
       icon: <Users className="w-4 h-4 shrink-0" />,
       textHtml: (
         <>
-          Beyond research and engineering, I am passionate about mentoring the next generation of software engineers. I tutored <strong>~350 undergraduate computer science students weekly</strong> in <strong>Algorithms, Data Structures, and Programming</strong>. Additionally, as <strong>NASSA Asst. Academic Support Officer</strong>, I taught 100 students Mathematics and Python logic.
+          Knowledge sharing is a cornerstone of my professional ethos. I spent significant time during my undergraduate years breaking down complex topics like Data Structures and Algorithms for over <strong>350 peers</strong> on a weekly basis. In my role as an Academic Support Officer, I also designed and led foundational Python and Mathematics tutorials for over 100 students.
         </>
       ),
       highlights: ['350+ Students Tutored Weekly', 'NASSA Support Officer', 'Algorithms & Data Structures']
@@ -87,11 +87,11 @@ export const NumberedAboutFlow: React.FC = () => {
       accentColor: '#C4FA4C',
       tabBg: 'bg-[#C4FA4C]',
       tabText: 'text-black',
-      title: 'Looking Forward',
+      title: 'Next Steps',
       icon: <Award className="w-4 h-4 shrink-0" />,
       textHtml: (
         <>
-          I am interested in <strong>MSc and PhD research opportunities</strong> in <strong>Artificial Intelligence, Software Engineering, and Computer Science</strong>—particularly projects combining intelligent software systems with practical engineering challenges and real-world societal impact.
+          Looking ahead, I am actively seeking postgraduate <strong>(MSc/PhD) placements</strong> where I can dive deeper into the mechanics of Artificial Intelligence and advanced Computer Science. I am particularly drawn to research groups that tackle hard engineering problems and strive to create technologies that deliver tangible, positive changes to society.
         </>
       ),
       highlights: ['MSc & PhD Research', 'Postgraduate Scholarships', 'Intelligent Systems Research'],
@@ -110,7 +110,7 @@ export const NumberedAboutFlow: React.FC = () => {
       <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
         
         {/* Developer Styled Section Header: <About Me /> */}
-        <div className="sticky top-[70px] z-40 bg-[var(--color-surface-base)]/95 backdrop-blur-sm py-4 -my-4 mb-4 sm:mb-8 border-b border-transparent">
+        <div className="sticky top-16 md:top-20 z-40 bg-[var(--color-surface-base)]/95 backdrop-blur-sm py-4 mb-4 sm:mb-8 border-b border-transparent">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[var(--color-surface-card)] text-[var(--color-primary)] text-[10px] sm:text-xs font-mono font-bold border border-[var(--color-border)] mb-1 shadow-xs">

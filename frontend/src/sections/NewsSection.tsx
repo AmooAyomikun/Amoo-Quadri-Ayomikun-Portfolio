@@ -175,14 +175,7 @@ export const NewsSection: React.FC = () => {
             </h2>
           </div>
 
-          <Button
-            onClick={() => setPublishModalOpen(true)}
-            variant="outline"
-            size="sm"
-            icon={<PlusCircle className="w-4 h-4 text-[var(--color-primary)]" />}
-          >
-            Publish Announcement
-          </Button>
+
         </div>
 
         {/* News Items Grid */}
@@ -261,118 +254,7 @@ export const NewsSection: React.FC = () => {
         </div>
       )}
 
-      {/* Publish News Modal */}
-      {publishModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <form onSubmit={handlePublishSubmit} className="bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl max-w-lg w-full p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-serif font-bold text-[var(--color-text-main)]">
-                Publish New Announcement
-              </h3>
-              <button
-                type="button"
-                onClick={() => setPublishModalOpen(false)}
-                className="p-2 rounded-lg text-[var(--color-text-muted)]"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {publishError && (
-              <div className="p-3 rounded-lg bg-red-950/80 border border-red-800 text-red-300 text-xs font-mono">
-                {publishError}
-              </div>
-            )}
-
-            {publishStatus && (
-              <div className="p-3 rounded-lg bg-emerald-950/80 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2 font-mono">
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>{publishStatus}</span>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-xs font-mono text-[var(--color-primary)] font-bold mb-1">Admin Security Passphrase *</label>
-              <input
-                type="password"
-                required
-                value={form.adminKey}
-                onChange={e => setForm({ ...form, adminKey: e.target.value })}
-                placeholder="Enter Quadri's Admin Passphrase..."
-                className="w-full px-3.5 py-2 rounded-lg bg-[var(--color-surface-base)] border border-[var(--color-border)] text-sm font-mono focus:border-[var(--color-primary)] focus:outline-none"
-              />
-              <span className="text-[10px] text-[var(--color-text-subtle)] font-mono mt-0.5 block">Only authorized admin (Quadri Amoo) can publish articles.</span>
-            </div>
-
-            <div>
-              <label className="block text-xs font-mono text-[var(--color-text-muted)] mb-1">Headline Title *</label>
-              <input
-                type="text"
-                required
-                value={form.title}
-                onChange={e => setForm({ ...form, title: e.target.value })}
-                placeholder="Paper Accepted / Project Launched..."
-                className="w-full px-3.5 py-2 rounded-lg bg-[var(--color-surface-base)] border border-[var(--color-border)] text-sm"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-mono text-[var(--color-text-muted)] mb-1">Category</label>
-                <select
-                  value={form.category}
-                  onChange={e => setForm({ ...form, category: e.target.value as NewsItem['category'] })}
-                  className="w-full px-3.5 py-2 rounded-lg bg-[var(--color-surface-base)] border border-[var(--color-border)] text-sm"
-                >
-                  <option value="Research">Research</option>
-                  <option value="Industry">Industry</option>
-                  <option value="Academics">Academics</option>
-                  <option value="Awards">Awards</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-mono text-[var(--color-text-muted)] mb-1">Tags (Comma Separated)</label>
-                <input
-                  type="text"
-                  value={form.tags}
-                  onChange={e => setForm({ ...form, tags: e.target.value })}
-                  placeholder="AI, Paper, Award"
-                  className="w-full px-3.5 py-2 rounded-lg bg-[var(--color-surface-base)] border border-[var(--color-border)] text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-mono text-[var(--color-text-muted)] mb-1">Summary *</label>
-              <input
-                type="text"
-                required
-                value={form.summary}
-                onChange={e => setForm({ ...form, summary: e.target.value })}
-                placeholder="Brief 1-sentence overview..."
-                className="w-full px-3.5 py-2 rounded-lg bg-[var(--color-surface-base)] border border-[var(--color-border)] text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-mono text-[var(--color-text-muted)] mb-1">Full Content *</label>
-              <textarea
-                required
-                rows={4}
-                value={form.content}
-                onChange={e => setForm({ ...form, content: e.target.value })}
-                placeholder="Detailed announcement content..."
-                className="w-full px-3.5 py-2 rounded-lg bg-[var(--color-surface-base)] border border-[var(--color-border)] text-sm"
-              />
-            </div>
-
-            <Button type="submit" variant="primary" size="md" disabled={publishing} className="w-full">
-              {publishing ? 'Publishing...' : 'Publish Update to API'}
-            </Button>
-          </form>
-        </div>
-      )}
     </section>
   )
 }

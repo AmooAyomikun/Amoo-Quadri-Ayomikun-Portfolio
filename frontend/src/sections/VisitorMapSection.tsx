@@ -97,7 +97,7 @@ export const VisitorMapSection: React.FC = () => {
         for (const ep of endpoints) {
           try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s max timeout
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s max timeout to allow Render cold start
 
             const res = await fetch(ep, {
               method: 'POST',
