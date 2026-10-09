@@ -100,18 +100,7 @@ export const HeroSection: React.FC = () => {
                     alt="Quadri Ayomikun Amoo"
                     className="w-full h-auto object-cover object-top rounded-[1.5rem] transition-transform duration-700 hover:scale-[1.03]"
                   />
-                  {/* Floating Pill Badge */}
-                  <div className="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md border border-[var(--color-primary)]/40 p-2.5 rounded-xl flex items-center justify-between shadow-lg">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-primary)] animate-pulse" />
-                      <span className="text-[11px] font-mono text-white font-bold uppercase tracking-wider">
-                        Available Worldwide
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-mono text-[var(--color-primary)] font-bold">
-                      5.0/5.0 Major GPA
-                    </span>
-                  </div>
+
                 </div>
               </div>
             </div>

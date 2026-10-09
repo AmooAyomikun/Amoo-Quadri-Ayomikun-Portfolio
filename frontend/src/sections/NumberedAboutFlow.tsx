@@ -101,7 +101,7 @@ export const NumberedAboutFlow: React.FC = () => {
 
   return (
     <section
-      className="relative z-10 bg-[var(--color-surface-base)] py-10 sm:py-20"
+      className="relative z-10 bg-[var(--color-surface-base)] pt-4 pb-10 sm:pt-8 sm:pb-16"
     >
       {/* Background Grid Pattern */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(var(--color-primary)_1px,transparent_1px)] [background-size:24px_24px]" />
@@ -197,8 +197,6 @@ export const NumberedAboutFlow: React.FC = () => {
               </div>
             )
           })}
-          {/* Scroll Spacer to prevent overlapping next section */}
-          <div style={{ height: '25vh' }} className="w-full shrink-0" />
         </div>
 
         {/* --- DESKTOP STACKED CARDS FLOW (>= md) --- */}
@@ -306,8 +304,6 @@ export const NumberedAboutFlow: React.FC = () => {
               </div>
             )
           })}
-          {/* Scroll Spacer to prevent overlapping next section */}
-          <div style={{ height: '30vh' }} className="w-full shrink-0" />
         </div>
       </div>
     </section>
