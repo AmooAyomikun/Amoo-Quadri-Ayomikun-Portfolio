@@ -4,6 +4,7 @@ import { ArrowRight, GraduationCap, Briefcase, Download, Terminal, Sparkles, Awa
 import { Button } from '../components/Button'
 import profileImg from '../assets/profile.png'
 import gsap from 'gsap'
+import { motion } from 'framer-motion'
 
 export const HeroSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -56,23 +57,26 @@ export const HeroSection: React.FC = () => {
 
             {/* CTA Buttons: Primary Projects + Download CV */}
             <div className="gsap-hero-item pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
-              <Button
-                href="/projects"
-                variant="primary"
-                size="lg"
-                className="w-full sm:w-auto text-center justify-center"
-              >
-                View My Work
-              </Button>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
+                <Button
+                  href="/projects"
+                  variant="primary"
+                  size="lg"
+                  className="w-full sm:w-auto text-center justify-center"
+                >
+                  View My Work
+                </Button>
+              </motion.div>
 
-              <a
+              <motion.a
+                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 href="/Amoo_Quadri_CV.pdf"
                 download="Amoo_Quadri_CV.pdf"
                 className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full font-sans text-sm font-semibold bg-[var(--color-surface-card)] text-[var(--color-text-main)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all shadow-sm w-full sm:w-auto"
               >
                 <Download className="w-4 h-4 text-[var(--color-primary)]" />
                 Download CV (PDF)
-              </a>
+              </motion.a>
             </div>
 
             {/* Quick Links */}
@@ -92,13 +96,17 @@ export const HeroSection: React.FC = () => {
 
           {/* Right Portrait Image */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end relative">
-            <div className="gsap-profile-cutout relative w-full max-w-xs sm:max-w-md">
+            <motion.div 
+              whileHover={{ y: -10 }}
+              transition={{ type: 'spring', stiffness: 100 }}
+              className="gsap-profile-cutout relative w-full max-w-xs sm:max-w-md"
+            >
               <div className="relative p-1 sm:p-4">
                 <div className="relative bg-[var(--color-surface-card)] rounded-[2rem] p-2 shadow-xl border border-[var(--color-border)] overflow-hidden">
                   <img
                     src={profileImg}
                     alt="Quadri Ayomikun Amoo"
-                    className="w-full h-auto object-cover object-top rounded-[1.5rem] transition-transform duration-700 hover:scale-[1.03]"
+                    className="w-full h-auto object-cover object-top rounded-[1.5rem]"
                   />
 
                 </div>

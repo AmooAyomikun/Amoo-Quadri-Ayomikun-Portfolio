@@ -236,7 +236,7 @@ export const portfolioData = {
       type: 'JOURNAL ARTICLE',
       status: 'PUBLISHED',
       journal: 'Zenodo',
-      link: 'https://zenodo.org'
+      link: 'https://zenodo.org/records/22926326'
     },
     {
       id: 'pub-bias',
@@ -246,7 +246,7 @@ export const portfolioData = {
       type: 'PREPRINT',
       status: 'OPEN',
       journal: 'Zenodo',
-      link: 'https://zenodo.org'
+      link: 'https://zenodo.org/records/20269104'
     }
   ] as PublicationItem[],
 

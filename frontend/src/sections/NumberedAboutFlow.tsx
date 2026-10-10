@@ -8,6 +8,7 @@ import {
   Sparkles,
   Code
 } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 export const NumberedAboutFlow: React.FC = () => {
   const items = [
@@ -134,7 +135,11 @@ export const NumberedAboutFlow: React.FC = () => {
         <div className="md:hidden flex flex-col gap-[15vh] mt-4">
           {items.map((item, idx) => {
             return (
-              <div 
+              <motion.div 
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
                 key={item.num} 
                 className="sticky w-full"
                 style={{
@@ -142,7 +147,8 @@ export const NumberedAboutFlow: React.FC = () => {
                   zIndex: 10 + idx
                 }}
               >
-                <div 
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
                   className="p-4 sm:p-5 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl shadow-[0_-10px_30px_rgba(0,0,0,0.4)] flex flex-col transition-all"
                   style={{
                     borderTopWidth: '4px',
@@ -209,7 +215,11 @@ export const NumberedAboutFlow: React.FC = () => {
               : `polygon(${slantPx}px 0, calc(100% - ${slantPx}px) 0, 100% 100%, 0 100%)`
 
             return (
-              <div 
+              <motion.div 
+                initial={{ opacity: 0, y: 70 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-150px" }}
+                transition={{ duration: 0.6, type: 'spring', stiffness: 80 }}
                 key={item.num}
                 className="sticky w-full"
                 style={{
@@ -219,8 +229,9 @@ export const NumberedAboutFlow: React.FC = () => {
               >
                 {/* Tab Container */}
                 <div className="relative w-full h-[46px]">
-                  <div
-                    className="absolute top-0 flex items-center justify-center gap-2 px-4 h-[46px] font-mono text-sm font-extrabold tracking-wider uppercase transition-all duration-300 shadow-2xl"
+                  <motion.div
+                    whileHover={{ y: -2 }}
+                    className="absolute top-0 flex items-center justify-center gap-2 px-4 h-[46px] font-mono text-sm font-extrabold tracking-wider uppercase transition-all duration-300 shadow-2xl cursor-pointer"
                     style={{
                       width: '175px',
                       left: `${idx * 153}px`,
@@ -231,7 +242,7 @@ export const NumberedAboutFlow: React.FC = () => {
                   >
                     <span className="shrink-0">{item.icon}</span>
                     <span className="truncate">{item.tabLabel}</span>
-                  </div>
+                  </motion.div>
                 </div>
 
                 {/* Card Body Container */}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const techRow1 = [
   { name: 'TypeScript', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg' },
@@ -31,7 +32,13 @@ export const TechStackSection: React.FC = () => {
         </div>
       </div>
 
-      <div className="relative w-full flex flex-col gap-4 overflow-hidden group">
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6 }}
+        className="relative w-full flex flex-col gap-4 overflow-hidden group"
+      >
         {/* Left/Right Fade Gradients for a seamless effect */}
         <div className="absolute top-0 bottom-0 left-0 w-24 bg-gradient-to-r from-[var(--color-surface-base)] to-transparent z-10 pointer-events-none" />
         <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-[var(--color-surface-base)] to-transparent z-10 pointer-events-none" />
@@ -39,30 +46,32 @@ export const TechStackSection: React.FC = () => {
         {/* Row 1 */}
         <div className="flex animate-marquee space-x-4 whitespace-nowrap w-max">
           {getMarqueeItems(techRow1).map((tech, idx) => (
-            <div
+            <motion.div
+              whileHover={{ scale: 1.1, y: -2 }}
               key={`r1-${idx}`}
-              className="flex items-center gap-2.5 px-6 py-3 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-full shadow-sm hover:border-[var(--color-border-hover)] transition-colors cursor-default"
+              className="flex items-center gap-2.5 px-6 py-3 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-full shadow-sm hover:border-[var(--color-primary)] transition-colors cursor-default"
             >
               <img src={tech.iconUrl} alt={tech.name} className="w-5 h-5" style={{ filter: tech.name === 'Next.js' ? 'invert(1)' : 'none' }} />
               <span className="text-[var(--color-text-main)] font-medium text-sm">{tech.name}</span>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* Row 2 (Delayed/Reversed direction or offset) */}
         <div className="flex animate-marquee space-x-4 whitespace-nowrap w-max" style={{ animationDirection: 'reverse' }}>
           {getMarqueeItems(techRow2).map((tech, idx) => (
-            <div
+            <motion.div
+              whileHover={{ scale: 1.1, y: -2 }}
               key={`r2-${idx}`}
-              className="flex items-center gap-2.5 px-6 py-3 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-full shadow-sm hover:border-[var(--color-border-hover)] transition-colors cursor-default"
+              className="flex items-center gap-2.5 px-6 py-3 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-full shadow-sm hover:border-[var(--color-primary)] transition-colors cursor-default"
             >
               <img src={tech.iconUrl} alt={tech.name} className="w-5 h-5" />
               <span className="text-[var(--color-text-main)] font-medium text-sm">{tech.name}</span>
-            </div>
+            </motion.div>
           ))}
         </div>
 
-      </div>
+      </motion.div>
     </section>
   );
 };

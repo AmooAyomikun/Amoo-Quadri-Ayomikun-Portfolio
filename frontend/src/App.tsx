@@ -18,6 +18,9 @@ const GuestbookPage = lazy(() => import('./pages/GuestbookPage'))
 const CaseStudyCleanReport = lazy(() => import('./pages/CaseStudyCleanReport'))
 const CaseStudyHotel = lazy(() => import('./pages/CaseStudyHotel'))
 const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage'))
+const NewsArticlePage = lazy(() => import('./pages/NewsArticlePage'))
+const AdminLogin = lazy(() => import('./pages/AdminLogin'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 export default function App() {
@@ -43,7 +46,12 @@ export default function App() {
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/testimonials" element={<TestimonialsPage />} />
             <Route path="/news" element={<NewsPage />} />
+            <Route path="/news/:id" element={<NewsArticlePage />} />
             <Route path="/guestbook" element={<GuestbookPage />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/case-study/clean-report" element={<CaseStudyCleanReport />} />
             <Route path="/case-study/hotel-recommendation" element={<CaseStudyHotel />} />
