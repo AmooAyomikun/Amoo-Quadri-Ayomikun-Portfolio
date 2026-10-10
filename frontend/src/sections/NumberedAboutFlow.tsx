@@ -199,8 +199,8 @@ export const NumberedAboutFlow: React.FC = () => {
                       </span>
                     ))}
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             )
           })}
         </div>
@@ -312,7 +312,7 @@ export const NumberedAboutFlow: React.FC = () => {
                     ))}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )
           })}
         </div>
