@@ -5,7 +5,7 @@ import NodeCache from 'node-cache';
 const cache = new NodeCache({ stdTTL: 60 }); // 1 minute cache to allow live updates
 
 export const getGithubActivity = async (req: Request, res: Response): Promise<void> => {
-  const username = 'AmooAyomikun';
+  const username = process.env.GITHUB_USERNAME || 'AmooAyomikun';
   const cacheKey = `github_events_${username}`;
 
   const cachedData = cache.get(cacheKey);
@@ -59,8 +59,9 @@ export const getGithubActivity = async (req: Request, res: Response): Promise<vo
 };
 
 export const getGithubContributions = async (req: Request, res: Response): Promise<void> => {
-  const username = 'AmooAyomikun';
-  const year = (req.query.year as string) || '2026';
+  const username = process.env.GITHUB_USERNAME || 'AmooAyomikun';
+  const currentYear = new Date().getFullYear().toString();
+  const year = (req.query.year as string) || currentYear;
   const cacheKey = `github_contributions_${username}_${year}`;
 
   const cached = cache.get(cacheKey);
@@ -69,64 +70,141 @@ export const getGithubContributions = async (req: Request, res: Response): Promi
     return;
   }
 
+  let totalCount = 0;
+  const days: Array<{ date: string; level: number; count: number; tooltip: string }> = [];
+
   try {
-    let url = `https://github.com/users/${username}/contributions`;
-    if (year !== '2026') {
-      url = `https://github.com/users/${username}/contributions?from=${year}-01-01&to=${year}-12-31`;
-    }
-    
-    let totalCount = (year === '2026' ? 1418 : year === '2025' ? 2 : year === '2024' ? 10 : 0);
+    let usedGraphQL = false;
 
-    // Parse day attributes: data-date, data-level, tool-tip
-    const dayRegex = /<td[^>]*data-date="([^"]+)"[^>]*data-level="(\d)"[^>]*>[\s\S]*?(?:<tool-tip[^>]*>([^<]+)<\/tool-tip>)?/gi;
-    const days: Array<{ date: string; level: number; count: number; tooltip: string }> = [];
-
-    try {
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
-      });
-
-      if (!response.ok) {
-        console.warn(`GitHub contributions scraping returned ${response.status}`);
-      } else {
-        const html = await response.text();
-
-        // Extract total contribution count text
-        const totalMatch = html.match(/([\d,]+)\s+contributions/i);
-        const parsedTotalCount = totalMatch ? parseInt(totalMatch[1].replace(/,/g, ''), 10) : 0;
-        if (parsedTotalCount > totalCount) {
-          totalCount = parsedTotalCount;
+    // --- TRY GRAPHQL API FIRST (FOR PRIVATE CONTRIBUTIONS) ---
+    if (process.env.GITHUB_TOKEN) {
+      try {
+        const now = new Date();
+        const currentYear = now.getFullYear().toString();
+        let fromDate, toDate;
+        
+        if (year === currentYear) {
+          // Exactly 1 year back from today to avoid the 1-year GraphQL limit
+          const oneYearAgo = new Date();
+          oneYearAgo.setFullYear(now.getFullYear() - 1);
+          fromDate = oneYearAgo.toISOString();
+          toDate = now.toISOString();
+        } else {
+          fromDate = `${year}-01-01T00:00:00Z`;
+          toDate = `${year}-12-31T23:59:59Z`;
         }
 
-        let match: RegExpExecArray | null;
-        while ((match = dayRegex.exec(html)) !== null) {
-          const date = match[1];
-          const level = parseInt(match[2], 10);
-          const tooltip = match[3] ? match[3].trim() : '';
-
-          let count = 0;
-          if (tooltip) {
-            const countMatch = tooltip.match(/^(\d+)\s+contribution/i);
-            if (countMatch) {
-              count = parseInt(countMatch[1], 10);
+        const query = `
+          query($userName:String!) {
+            user(login: $userName){
+              contributionsCollection(from: "${fromDate}", to: "${toDate}") {
+                contributionCalendar {
+                  totalContributions
+                  weeks {
+                    contributionDays {
+                      contributionCount
+                      date
+                    }
+                  }
+                }
+              }
             }
-          } else if (level > 0) {
-            count = level * 2;
+          }
+        `;
+        
+        const graphqlRes = await fetch('https://api.github.com/graphql', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+            'Content-Type': 'application/json',
+            'User-Agent': 'Portfolio-App'
+          },
+          body: JSON.stringify({ query, variables: { userName: username } })
+        });
+
+        if (graphqlRes.ok) {
+          const gqlData = await graphqlRes.json();
+          if (gqlData.data && gqlData.data.user && gqlData.data.user.contributionsCollection) {
+            const calendar = gqlData.data.user.contributionsCollection.contributionCalendar;
+            totalCount = calendar.totalContributions;
+            
+            calendar.weeks.forEach((week: any) => {
+              week.contributionDays.forEach((day: any) => {
+                const count = day.contributionCount;
+                const level = count > 8 ? 4 : count > 5 ? 3 : count > 2 ? 2 : count > 0 ? 1 : 0;
+                days.push({
+                  date: day.date,
+                  level,
+                  count,
+                  tooltip: `${count} contributions on ${day.date}`
+                });
+              });
+            });
+            usedGraphQL = true;
+          } else {
+            console.error("GraphQL response missing data:", gqlData);
+          }
+        } else {
+          console.error("GraphQL request failed:", await graphqlRes.text());
+        }
+      } catch (gqlErr) {
+        console.warn('GraphQL fetch failed, falling back to HTML scraping', gqlErr);
+      }
+    }
+
+    // --- FALLBACK TO HTML SCRAPING ---
+    if (!usedGraphQL) {
+      let url = `https://github.com/users/${username}/contributions`;
+      const currentYearStr = new Date().getFullYear().toString();
+      if (year !== currentYearStr) {
+        url = `https://github.com/users/${username}/contributions?from=${year}-01-01&to=${year}-12-31`;
+      }
+      
+      const dayRegex = /<td[^>]*data-date="([^"]+)"[^>]*data-level="(\d)"[^>]*>[\s\S]*?(?:<tool-tip[^>]*>([^<]+)<\/tool-tip>)?/gi;
+
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          }
+        });
+
+        if (!response.ok) {
+          console.warn(`GitHub contributions scraping returned ${response.status}`);
+        } else {
+          const html = await response.text();
+
+          const totalMatch = html.match(/([\d,]+)\s+contributions/i);
+          const parsedTotalCount = totalMatch ? parseInt(totalMatch[1].replace(/,/g, ''), 10) : 0;
+          if (parsedTotalCount > totalCount) {
+            totalCount = parsedTotalCount;
           }
 
-          days.push({ date, level, count, tooltip });
+          let match: RegExpExecArray | null;
+          while ((match = dayRegex.exec(html)) !== null) {
+            const date = match[1];
+            const level = parseInt(match[2], 10);
+            const tooltip = match[3] ? match[3].trim() : '';
+
+            let count = 0;
+            if (tooltip) {
+              const countMatch = tooltip.match(/^(\d+)\s+contribution/i);
+              if (countMatch) {
+                count = parseInt(countMatch[1], 10);
+              }
+            } else if (level > 0) {
+              count = level * 2;
+            }
+
+            days.push({ date, level, count, tooltip });
+          }
         }
+      } catch (scrapeErr) {
+        console.warn('Failed to scrape HTML contributions:', scrapeErr);
       }
-    } catch (scrapeErr) {
-      console.warn('Failed to scrape HTML contributions:', scrapeErr);
     }
 
     // --- LIVE UPDATE AUGMENTATION ---
-    // GitHub's HTML contribution graph is heavily cached.
-    // To show "live" updates immediately (like a push that just happened),
-    // we fetch the user's public events API (which updates instantly) and augment the current day's data!
     try {
       const headers: Record<string, string> = {
         'Accept': 'application/vnd.github.v3+json',
@@ -138,8 +216,6 @@ export const getGithubContributions = async (req: Request, res: Response): Promi
       const eventsRes = await fetch(`https://api.github.com/users/${username}/events/public`, { headers });
       if (eventsRes.ok) {
         const events = await eventsRes.json();
-        
-        // Group events by date (YYYY-MM-DD)
         const recentCounts: Record<string, number> = {};
         (events as any[]).forEach(event => {
           if (['PushEvent', 'PullRequestEvent', 'CreateEvent', 'IssuesEvent'].includes(event.type)) {
@@ -148,16 +224,14 @@ export const getGithubContributions = async (req: Request, res: Response): Promi
           }
         });
 
-        // Augment our parsed days
         days.forEach(day => {
           if (recentCounts[day.date]) {
-            // If the live events show more contributions than the cached HTML graph, update it!
             if (recentCounts[day.date] > day.count) {
               const diff = recentCounts[day.date] - day.count;
               day.count = recentCounts[day.date];
               day.level = day.count > 8 ? 4 : day.count > 5 ? 3 : day.count > 2 ? 2 : 1;
               day.tooltip = `${day.count} contributions on ${day.date} (Live)`;
-              totalCount += diff; // Add the missing ones to the total!
+              totalCount += diff; 
             }
           }
         });
@@ -165,7 +239,6 @@ export const getGithubContributions = async (req: Request, res: Response): Promi
     } catch (augmentErr) {
       console.error('Failed to augment with live events:', augmentErr);
     }
-    // --- END LIVE UPDATE AUGMENTATION ---
 
     const result = {
       username,
@@ -177,7 +250,7 @@ export const getGithubContributions = async (req: Request, res: Response): Promi
     cache.set(cacheKey, result);
     res.json(result);
   } catch (err) {
-    console.error('Error fetching contributions HTML:', err);
+    console.error('Error fetching contributions:', err);
     res.status(500).json({ error: 'Failed to fetch contribution data' });
   }
 };

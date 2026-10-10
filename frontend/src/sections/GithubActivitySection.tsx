@@ -9,17 +9,17 @@ interface ContributionDay {
   level: 0 | 1 | 2 | 3 | 4;
 }
 
-const YEARS = [2026, 2025, 2024, 2023] as const;
+const currentYear = new Date().getFullYear();
+const DYNAMIC_YEARS = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3];
 
 export const GithubActivitySection: React.FC = () => {
-  const [selectedYear, setSelectedYear] = useState<number>(2026);
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+  const [username, setUsername] = useState<string>('AmooAyomikun'); // Will update from backend
   const [realContributions, setRealContributions] = useState<{
     totalContributions: number;
     daysMap: Record<string, { level: 0 | 1 | 2 | 3 | 4; count: number }>;
   } | null>(null);
   const [hoveredDay, setHoveredDay] = useState<{ day: ContributionDay; x: number; y: number } | null>(null);
-
-  const username = 'AmooAyomikun';
 
   // Fetch real GitHub contribution graph from backend API or GitHub direct
   useEffect(() => {
@@ -46,6 +46,9 @@ export const GithubActivitySection: React.FC = () => {
         }
 
         if (data && isMounted) {
+          if (data.username) {
+            setUsername(data.username);
+          }
           const map: Record<string, { level: 0 | 1 | 2 | 3 | 4; count: number }> = {};
           if (Array.isArray(data.days)) {
             data.days.forEach((d: any) => {
@@ -58,7 +61,7 @@ export const GithubActivitySection: React.FC = () => {
             });
           }
           setRealContributions({
-            totalContributions: data.totalContributions ?? (selectedYear === 2026 ? 1418 : selectedYear === 2025 ? 2 : selectedYear === 2024 ? 10 : 0),
+            totalContributions: data.totalContributions ?? 0,
             daysMap: map
           });
         }
@@ -76,13 +79,13 @@ export const GithubActivitySection: React.FC = () => {
 
   // Generate 52 weeks (365 days) contribution calendar matrix for selected year
   const { contributionMatrix, totalContributions, monthLabels } = useMemo(() => {
-    const today = new Date(2026, 9, 8); // Oct 8, 2026 anchor
+    const today = new Date(); // Use actual current date
     
     // Determine start and end date for the selected year grid
     let startDate: Date;
     let endDate: Date;
 
-    if (selectedYear === 2026) {
+    if (selectedYear === currentYear) {
       endDate = today;
       startDate = subDays(today, 364);
     } else {
@@ -92,17 +95,9 @@ export const GithubActivitySection: React.FC = () => {
 
     const allDays = eachDayOfInterval({ start: startDate, end: endDate });
 
-    // Exact totals from AmooAyomikun's GitHub profile
-    const fallbackTotals: Record<number, number> = {
-      2026: 1418,
-      2025: 2,
-      2024: 10,
-      2023: 0
-    };
-
     const displayTotal = realContributions
       ? realContributions.totalContributions
-      : fallbackTotals[selectedYear] ?? 0;
+      : 0;
 
     const daysData: ContributionDay[] = allDays.map((d) => {
       const dateStr = format(d, 'yyyy-MM-dd');
@@ -113,31 +108,6 @@ export const GithubActivitySection: React.FC = () => {
       if (realContributions && realContributions.daysMap[dateStr]) {
         level = realContributions.daysMap[dateStr].level;
         count = realContributions.daysMap[dateStr].count;
-      } else {
-        // Fallback exact real distribution for AmooAyomikun
-        if (selectedYear === 2026) {
-          // 1,418 contributions mainly in early 2026 / recent months
-          const m = d.getMonth();
-          const dayNum = d.getDate();
-          if (m >= 1 && m <= 9) {
-            if ((dayNum % 2 === 0 || dayNum % 3 === 0) && d.getDay() !== 0) {
-              count = (dayNum % 7) + 1;
-              level = count > 8 ? 4 : count > 5 ? 3 : count > 2 ? 2 : 1;
-            }
-          }
-        } else if (selectedYear === 2025) {
-          // Exactly 2 contributions in 2025
-          if (dateStr === '2025-11-12' || dateStr === '2025-12-04') {
-            count = 1;
-            level = 1;
-          }
-        } else if (selectedYear === 2024) {
-          // Exactly 10 contributions in 2024
-          if (dateStr === '2024-02-15' || dateStr === '2024-03-20') {
-            count = 5;
-            level = 2;
-          }
-        }
       }
 
       return {
@@ -246,7 +216,7 @@ export const GithubActivitySection: React.FC = () => {
             {/* Header: Total count & Contribution settings */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-[#21262D]">
               <h3 className="text-base sm:text-lg font-sans font-semibold text-neutral-100">
-                <span className="font-bold text-white">{totalContributions.toLocaleString()}</span> contributions in {selectedYear === 2026 ? 'the last year' : selectedYear}
+                <span className="font-bold text-white">{totalContributions.toLocaleString()}</span> contributions in {selectedYear === currentYear ? 'the last year' : selectedYear}
               </h3>
 
               <div className="flex items-center gap-2">
@@ -349,7 +319,7 @@ export const GithubActivitySection: React.FC = () => {
 
           {/* Right Column: Year Filter Tabs matching GitHub profile sidebar */}
           <div className="lg:col-span-2 flex flex-row lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
-            {YEARS.map(yr => {
+            {DYNAMIC_YEARS.map(yr => {
               const isActive = yr === selectedYear;
               return (
                 <button
