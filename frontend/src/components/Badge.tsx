@@ -4,7 +4,7 @@ import { cx } from '../lib/utils'
 interface BadgeProps {
   children: React.ReactNode
   variant?: 'primary' | 'accent' | 'outline' | 'subtle'
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'md' | 'lg'
   className?: string
 }
 
@@ -18,7 +18,8 @@ export const Badge: React.FC<BadgeProps> = ({
   
   const sizeStyles = {
     sm: "px-2.5 py-0.5 text-xs",
-    md: "px-3 py-1 text-xs tracking-wide"
+    md: "px-3 py-1 text-xs tracking-wide",
+    lg: "px-4 py-1.5 text-sm tracking-wide"
   }
 
   const variantStyles = {

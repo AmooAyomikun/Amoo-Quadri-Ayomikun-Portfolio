@@ -351,11 +351,13 @@ export const VisitorMapSection: React.FC = () => {
                           fill={isUserGeo ? "#1C3505" : "#111111"}
                           stroke={isUserGeo ? "#C4FA4C" : "#222222"}
                           strokeWidth={0.5}
+                          // react-simple-maps accepts per-state styles at runtime;
+                          // @types/react-simple-maps types `style` as plain CSS.
                           style={{
                             default: { outline: "none" },
                             hover: { fill: "#1F3B08", outline: "none", cursor: "pointer" },
                             pressed: { outline: "none" }
-                          }}
+                          } as unknown as React.ComponentProps<typeof Geography>['style']}
                         />
                       );
                     })

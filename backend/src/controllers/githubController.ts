@@ -123,8 +123,19 @@ export const getGithubContributions = async (req: Request, res: Response): Promi
         });
 
         if (graphqlRes.ok) {
-          const gqlData = await graphqlRes.json();
-          if (gqlData.data && gqlData.data.user && gqlData.data.user.contributionsCollection) {
+          const gqlData = (await graphqlRes.json()) as {
+            data?: {
+              user?: {
+                contributionsCollection?: {
+                  contributionCalendar: {
+                    totalContributions: number;
+                    weeks: Array<{ contributionDays: Array<{ contributionCount: number; date: string }> }>;
+                  };
+                };
+              };
+            };
+          };
+          if (gqlData.data?.user?.contributionsCollection) {
             const calendar = gqlData.data.user.contributionsCollection.contributionCalendar;
             totalCount = calendar.totalContributions;
             

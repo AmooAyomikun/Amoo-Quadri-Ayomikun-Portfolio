@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/check-confirms.mjs && tsc && vite build",
+    "build": "node scripts/check-confirms.mjs && tsc -b && vite build",
     "build:skip-confirm-check": "vite build",
     "preview": "vite preview",
     "lint": "oxlint",
