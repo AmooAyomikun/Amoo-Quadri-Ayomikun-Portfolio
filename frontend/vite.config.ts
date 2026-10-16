@@ -10,19 +10,7 @@ export default defineConfig({
       '@': `${import.meta.dirname}/src`,
     },
   },
-  server: {
-    proxy: {
-      '/mapbox': {
-        target: 'https://api.mapbox.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/mapbox/, ''),
-        headers: {
-          'Origin': 'https://ma-olatunbosun.onrender.com',
-          'Referer': 'https://ma-olatunbosun.onrender.com/'
-        }
-      }
-    }
-  },
+
   build: {
     rollupOptions: {
       output: {

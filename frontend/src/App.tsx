@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react'
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { ThemeProvider } from './lib/theme'
 import { LensProvider } from './lib/lens'
@@ -24,7 +24,21 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 export default function App() {
-  const [loading, setLoading] = useState(true)
+  // Issue 5.8: Seen-once preloader session memory for recruiters and Lighthouse scores
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !sessionStorage.getItem('portfolio_preloader_seen')
+    }
+    return true
+  })
+
+  const handlePreloaderComplete = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('portfolio_preloader_seen', 'true')
+    }
+    setLoading(false)
+  }, [])
+
   const location = useLocation()
 
   // Scroll to top on route change
@@ -35,7 +49,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <LensProvider>
-        {loading && <Preloader onComplete={() => setLoading(false)} />}
+        {loading && <Preloader onComplete={handlePreloaderComplete} />}
         <Suspense fallback={<div className="min-h-screen bg-[var(--color-surface-base)]" />}>
           <Routes>
             <Route path="/" element={<Home />} />

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { cx } from '../lib/utils'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -38,6 +39,16 @@ export const Button: React.FC<ButtonProps> = ({
   const combinedClasses = cx(baseStyles, sizeStyles[size], variantStyles[variant], className)
 
   if (href) {
+    const isInternalLink = href.startsWith('/') && !target && !href.startsWith('//') && !href.endsWith('.pdf')
+    if (isInternalLink) {
+      return (
+        <Link to={href} className={combinedClasses}>
+          {icon && <span className="shrink-0">{icon}</span>}
+          <span>{children}</span>
+        </Link>
+      )
+    }
+
     return (
       <a href={href} target={target} rel={target === '_blank' ? 'noopener noreferrer' : undefined} className={combinedClasses}>
         {icon && <span className="shrink-0">{icon}</span>}

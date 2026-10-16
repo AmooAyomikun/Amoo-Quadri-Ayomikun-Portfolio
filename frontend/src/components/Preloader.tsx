@@ -23,6 +23,11 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   const dividerRef = useRef<HTMLDivElement>(null)
   const nameTextRef = useRef<HTMLHeadingElement>(null)
   const roleTextRef = useRef<HTMLParagraphElement>(null)
+  const onCompleteRef = useRef(onComplete)
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete
+  }, [onComplete])
 
   // 1. Counter simulation interval - Paced smoothly over ~2.4 seconds
   useEffect(() => {
@@ -70,14 +75,15 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   }, [])
 
   // 3. Trigger Synchronized Push Wipe & Staggered Brand Reveal on 100%
+  const isFinishedCount = count >= 100
   useEffect(() => {
-    if (count < 100) return
+    if (!isFinishedCount) return
     setIsPushing(true)
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         onComplete: () => {
-          if (onComplete) onComplete()
+          onCompleteRef.current?.()
         }
       })
 
@@ -155,7 +161,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     }, containerRef)
 
     return () => ctx.revert()
-  }, [count, onComplete])
+  }, [isFinishedCount])
 
   const handleSkip = () => {
     setCount(100)

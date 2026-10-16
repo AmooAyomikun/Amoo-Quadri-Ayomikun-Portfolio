@@ -3,8 +3,9 @@ import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import gsap from 'gsap'
 import SignatureCanvas from 'react-signature-canvas'
-import { PenTool, CheckCircle, RefreshCw } from 'lucide-react'
+import { PenTool, CheckCircle, RefreshCw, AlertCircle } from 'lucide-react'
 import { apiUrl } from '../lib/api'
+import { useTheme } from '../lib/theme'
 
 interface GuestbookEntry {
   id: string
@@ -15,23 +16,40 @@ interface GuestbookEntry {
 }
 
 export default function GuestbookPage() {
+  const { theme } = useTheme()
   const [entries, setEntries] = useState<GuestbookEntry[]>([])
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   
   const sigCanvas = useRef<SignatureCanvas>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const [canvasSize, setCanvasSize] = useState({ width: 300, height: 128 })
 
+  // Issue 5.2: Preserve in-progress signature on window resize
   useEffect(() => {
     const updateSize = () => {
       if (wrapperRef.current) {
-        setCanvasSize({
-          width: wrapperRef.current.offsetWidth,
-          height: wrapperRef.current.offsetHeight
+        const newWidth = wrapperRef.current.offsetWidth
+        const newHeight = wrapperRef.current.offsetHeight
+
+        setCanvasSize(prev => {
+          if (prev.width === newWidth && prev.height === newHeight) return prev
+
+          const savedData = sigCanvas.current && !sigCanvas.current.isEmpty()
+            ? sigCanvas.current.toDataURL()
+            : null
+
+          if (savedData) {
+            setTimeout(() => {
+              sigCanvas.current?.fromDataURL(savedData)
+            }, 60)
+          }
+
+          return { width: newWidth, height: newHeight }
         })
       }
     }
@@ -71,13 +89,15 @@ export default function GuestbookPage() {
     sigCanvas.current?.clear()
   }
 
+  // Issue 5.3: Actionable feedback for 400, 503, and network errors
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitError(null)
     
     const signatureData = sigCanvas.current?.isEmpty() ? '' : sigCanvas.current?.toDataURL('image/png')
     
-    if (!name || (!message && !signatureData)) {
-      alert('Please enter your name and either a message or a signature.')
+    if (!name.trim() || (!message.trim() && !signatureData)) {
+      setSubmitError('Please enter your name and either a message or a signature.')
       return
     }
 
@@ -102,11 +122,16 @@ export default function GuestbookPage() {
         }, 3000)
       } else {
         const errJson = await res.json().catch(() => ({}))
-        alert(errJson.error || 'Failed to submit signature.')
+        const errorMsg = errJson.error || (res.status === 503
+          ? 'Guestbook service is temporarily unavailable (503). Please try again in a few moments.'
+          : res.status === 400
+          ? 'Invalid submission data (400). Please check your inputs.'
+          : `Submission failed with status ${res.status}.`)
+        setSubmitError(errorMsg)
       }
     } catch (err) {
       console.error('Failed to submit entry', err)
-      alert('Error submitting entry. Please ensure backend is reachable.')
+      setSubmitError('Network error: unable to connect to the backend server. Please verify your connection.')
     } finally {
       setIsSubmitting(false)
     }
@@ -148,7 +173,10 @@ export default function GuestbookPage() {
                   <input
                     type="text"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(e.target.value)
+                      if (submitError) setSubmitError(null)
+                    }}
                     required
                     placeholder="John Doe"
                     className="w-full bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)] transition-colors"
@@ -159,7 +187,10 @@ export default function GuestbookPage() {
                   <label className="block text-xs font-mono text-[var(--color-text-muted)] mb-2">MESSAGE</label>
                   <textarea
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    onChange={(e) => {
+                      setMessage(e.target.value)
+                      if (submitError) setSubmitError(null)
+                    }}
                     placeholder="You are amazing, keep it up! 🔥"
                     rows={3}
                     className="w-full bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)] transition-colors resize-none"
@@ -169,24 +200,31 @@ export default function GuestbookPage() {
                 <div>
                   <div className="flex justify-between items-end mb-2">
                     <label className="block text-xs font-mono text-[var(--color-text-muted)]">SIGNATURE DRAWING</label>
-                    <button type="button" onClick={clearSignature} className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] flex items-center gap-1">
+                    <button type="button" onClick={clearSignature} className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] flex items-center gap-1 cursor-pointer">
                       <RefreshCw className="w-3 h-3" /> Clear
                     </button>
                   </div>
                   <div ref={wrapperRef} className="bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-lg overflow-hidden h-32 relative group">
                     <SignatureCanvas 
                       ref={sigCanvas}
-                      penColor={document.documentElement.classList.contains('dark') ? 'white' : 'black'}
+                      penColor={theme === 'dark' ? '#F4F4F5' : '#09090B'}
                       canvasProps={{ 
                         width: canvasSize.width, 
                         height: canvasSize.height,
-                        className: 'cursor-crosshair' 
+                        className: 'cursor-crosshair w-full h-full' 
                       }}
                       backgroundColor="transparent"
                     />
                     <div className="absolute inset-0 pointer-events-none border-2 border-transparent group-focus-within:border-[var(--color-primary)] rounded-lg transition-colors" />
                   </div>
                 </div>
+
+                {submitError && (
+                  <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
 
                 <button
                   type="submit"
@@ -223,7 +261,12 @@ export default function GuestbookPage() {
                       
                       {entry.signatureData && (
                         <div className="w-full h-24 flex items-center justify-center bg-[var(--color-surface-elevated)] rounded-xl border border-[var(--color-border)]/50 p-2">
-                          <img src={entry.signatureData} alt="Signature" className="max-h-full max-w-full opacity-90 invert dark:invert-0" style={{ filter: 'var(--signature-filter)' }} />
+                          {/* Issue 5.2: Invert only in dark mode; dark ink shows perfectly in light mode */}
+                          <img 
+                            src={entry.signatureData} 
+                            alt={`${entry.name}'s signature`} 
+                            className="max-h-full max-w-full opacity-90 dark:invert transition-all" 
+                          />
                         </div>
                       )}
                     </div>

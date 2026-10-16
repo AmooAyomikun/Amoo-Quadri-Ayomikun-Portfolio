@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Mail, ArrowUp, CheckCircle2 } from 'lucide-react'
 import { portfolioData } from '../content/portfolioData'
 
@@ -89,12 +90,12 @@ export const Footer: React.FC = () => {
                   NAVIGATION
                 </h3>
                 <ul className="space-y-2.5 text-xs text-black/80 font-medium font-sans">
-                  <li><a href="/" className="hover:text-black hover:underline transition-colors">Home</a></li>
-                  <li><a href="/education" className="hover:text-black hover:underline transition-colors">Education</a></li>
-                  <li><a href="/experience" className="hover:text-black hover:underline transition-colors">Experience</a></li>
-                  <li><a href="/research" className="hover:text-black hover:underline transition-colors">Research</a></li>
-                  <li><a href="/projects" className="hover:text-black hover:underline transition-colors">Projects</a></li>
-                  <li><a href="/guestbook" className="hover:text-black hover:underline transition-colors">Guestbook</a></li>
+                  <li><Link to="/" className="hover:text-black hover:underline transition-colors">Home</Link></li>
+                  <li><Link to="/education" className="hover:text-black hover:underline transition-colors">Education</Link></li>
+                  <li><Link to="/experience" className="hover:text-black hover:underline transition-colors">Experience</Link></li>
+                  <li><Link to="/research" className="hover:text-black hover:underline transition-colors">Research</Link></li>
+                  <li><Link to="/projects" className="hover:text-black hover:underline transition-colors">Projects</Link></li>
+                  <li><Link to="/guestbook" className="hover:text-black hover:underline transition-colors">Guestbook</Link></li>
                 </ul>
               </div>
               <div className="space-y-4">
@@ -102,7 +103,7 @@ export const Footer: React.FC = () => {
                   SUPPORT
                 </h3>
                 <ul className="space-y-2.5 text-xs text-black/80 font-medium font-sans">
-                  <li><a href="/contact" className="hover:text-black hover:underline transition-colors">Contact Me</a></li>
+                  <li><Link to="/contact" className="hover:text-black hover:underline transition-colors">Contact Me</Link></li>
                   <li><a href={portfolioData.personal.github} target="_blank" rel="noreferrer" className="hover:text-black hover:underline transition-colors">GitHub ↗</a></li>
                   <li><a href={portfolioData.personal.linkedIn} target="_blank" rel="noreferrer" className="hover:text-black hover:underline transition-colors">LinkedIn ↗</a></li>
                   <li><a href={portfolioData.personal.googleScholar} target="_blank" rel="noreferrer" className="hover:text-black hover:underline transition-colors">Google Scholar ↗</a></li>

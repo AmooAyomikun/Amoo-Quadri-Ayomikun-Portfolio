@@ -214,43 +214,6 @@ export const getGithubContributions = async (req: Request, res: Response): Promi
         console.warn('Failed to scrape HTML contributions:', scrapeErr);
       }
     }
-
-    // --- LIVE UPDATE AUGMENTATION ---
-    try {
-      const headers: Record<string, string> = {
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'Portfolio-App'
-      };
-      if (process.env.GITHUB_TOKEN) {
-        headers['Authorization'] = `token ${process.env.GITHUB_TOKEN}`;
-      }
-      const eventsRes = await fetch(`https://api.github.com/users/${username}/events/public`, { headers });
-      if (eventsRes.ok) {
-        const events = await eventsRes.json();
-        const recentCounts: Record<string, number> = {};
-        (events as any[]).forEach(event => {
-          if (['PushEvent', 'PullRequestEvent', 'CreateEvent', 'IssuesEvent'].includes(event.type)) {
-            const dateStr = event.created_at.split('T')[0];
-            recentCounts[dateStr] = (recentCounts[dateStr] || 0) + 1;
-          }
-        });
-
-        days.forEach(day => {
-          if (recentCounts[day.date]) {
-            if (recentCounts[day.date] > day.count) {
-              const diff = recentCounts[day.date] - day.count;
-              day.count = recentCounts[day.date];
-              day.level = day.count > 8 ? 4 : day.count > 5 ? 3 : day.count > 2 ? 2 : 1;
-              day.tooltip = `${day.count} contributions on ${day.date} (Live)`;
-              totalCount += diff; 
-            }
-          }
-        });
-      }
-    } catch (augmentErr) {
-      console.error('Failed to augment with live events:', augmentErr);
-    }
-
     const result = {
       username,
       year: parseInt(year, 10),

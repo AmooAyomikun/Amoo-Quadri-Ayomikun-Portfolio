@@ -86,7 +86,7 @@ export default function NewsArticlePage() {
   if (!news) {
     return (
       <div className="min-h-screen bg-[var(--color-surface-base)] flex items-center justify-center flex-col gap-4">
-        <h1 className="text-2xl font-serif text-white">Article not found.</h1>
+        <h1 className="text-2xl font-serif text-[var(--color-text-main)]">Article not found.</h1>
         <button onClick={() => navigate('/news')} className="text-[var(--color-primary)] hover:underline font-mono">
           Return to News
         </button>
@@ -132,7 +132,7 @@ export default function NewsArticlePage() {
               {news.summary}
             </p>
             <div className="text-sm sm:text-base leading-relaxed text-[var(--color-text-main)] space-y-4 sm:space-y-6">
-              {news.content.split('\n').map((paragraph, idx) => (
+              {news.content.replace(/\\n/g, '\n').split(/\n+/).filter(Boolean).map((paragraph, idx) => (
                 <p key={idx}>{paragraph}</p>
               ))}
             </div>

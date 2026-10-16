@@ -463,6 +463,8 @@ export const portfolioData = {
       imageUrl: '/cleanreport.png',
       demoUrl: 'https://cleanreport-frontend.vercel.app/',
       githubUrl: 'https://github.com/AmooAyomikun/axion-circle',
+      caseStudyPath: '/case-study/clean-report',
+      previewType: 'image',
       featured: true
     },
     {
@@ -491,6 +493,8 @@ export const portfolioData = {
       imageUrl: '/hotel_recommendation.png',
       demoUrl: 'https://zenodo.org/records/22926326',
       githubUrl: 'https://github.com/amooquadri/hotel-recommendation-system',
+      caseStudyPath: '/case-study/hotel-recommendation',
+      previewType: 'image',
       featured: true
     },
     {

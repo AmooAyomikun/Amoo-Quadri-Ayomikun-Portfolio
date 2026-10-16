@@ -8,12 +8,20 @@
     <script>
       (function () {
         try {
-          var stored = localStorage.getItem('qa-theme');
+          var stored = localStorage.getItem('aq-theme') || localStorage.getItem('qa-theme');
           var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var theme = stored ? stored : (prefersDark ? 'dark' : 'light');
+          var theme = (stored === 'dark' || stored === 'light') ? stored : (prefersDark ? 'dark' : 'light');
           document.documentElement.setAttribute('data-theme', theme);
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+          }
         } catch (e) {
           document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.classList.add('light');
         }
       })();
     </script>
@@ -47,7 +55,6 @@
     <!-- These will be uncommented once Fontsource packages are installed -->
 
     <meta name="theme-color" content="#0E6B57" />
-    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
   </head>
   <body>
     <div id="root"></div>

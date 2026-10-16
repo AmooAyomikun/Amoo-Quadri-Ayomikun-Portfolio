@@ -74,13 +74,21 @@ export default function ProjectDetailPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 w-full">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 w-full">
+                {project.caseStudyPath && (
+                  <Link
+                    to={project.caseStudyPath}
+                    className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[var(--color-primary)] !text-black font-bold rounded-xl hover:bg-lime-400 transition-colors shadow-md text-sm"
+                  >
+                    Read Detailed Case Study <ExternalLink className="w-4 h-4" />
+                  </Link>
+                )}
                 {project.demoUrl && (
                   <a
                     href={project.demoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-[var(--color-primary)] text-white rounded-xl font-medium hover:bg-[var(--color-primary-dark)] transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--color-surface-elevated)] text-[var(--color-text-main)] border border-[var(--color-border)] rounded-xl font-medium hover:border-[var(--color-primary)] transition-colors text-sm"
                   >
                     Visit Live Demo <ExternalLink className="w-4 h-4" />
                   </a>
@@ -90,7 +98,7 @@ export default function ProjectDetailPage() {
                     href={project.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-[var(--color-surface-card)] text-[var(--color-text-main)] border border-[var(--color-border)] rounded-xl font-medium hover:border-[var(--color-primary)] transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--color-surface-card)] text-[var(--color-text-main)] border border-[var(--color-border)] rounded-xl font-medium hover:border-[var(--color-primary)] transition-colors text-sm"
                   >
                     Source Code <Code className="w-4 h-4" />
                   </a>
@@ -98,10 +106,10 @@ export default function ProjectDetailPage() {
               </div>
             </div>
 
-            {/* Right Column: Image Display */}
+            {/* Right Column: Image Display (Issue 5.7: prioritize screenshots, only use iframe if explicitly configured) */}
             <div className="lg:col-span-7">
-              <div className="w-full h-full min-h-[60vh] rounded-3xl overflow-hidden relative border border-[var(--color-border)] shadow-2xl bg-[var(--color-surface-card)]">
-                {project.demoUrl && project.previewType !== 'image' ? (
+              <div className="w-full h-full min-h-[50vh] rounded-3xl overflow-hidden relative border border-[var(--color-border)] shadow-2xl bg-[var(--color-surface-card)] flex items-center justify-center">
+                {project.demoUrl && project.previewType === 'iframe' ? (
                   <div className="absolute inset-0 w-full h-full overflow-hidden">
                     <iframe 
                       src={apiUrl(`/api/proxy?url=${encodeURIComponent(project.demoUrl)}`)}
@@ -114,7 +122,7 @@ export default function ProjectDetailPage() {
                   <img 
                     src={project.imageUrl} 
                     alt={project.title} 
-                    className="absolute -top-[10%] -bottom-[8%] left-0 right-0 w-full h-[118%] max-w-none object-cover object-center" 
+                    className="w-full h-full object-cover object-center" 
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center p-8 bg-gradient-to-br from-[var(--color-surface-elevated)] to-[var(--color-surface-card)]">

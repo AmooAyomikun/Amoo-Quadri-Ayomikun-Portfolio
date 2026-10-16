@@ -13,8 +13,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('aq-theme') as Theme
-      if (saved) return saved
+      const saved = (localStorage.getItem('aq-theme') || localStorage.getItem('qa-theme')) as Theme
+      if (saved === 'dark' || saved === 'light') return saved
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
     }
     return 'light'
@@ -22,6 +22,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     const root = document.documentElement
+    root.setAttribute('data-theme', theme)
     if (theme === 'dark') {
       root.classList.add('dark')
       root.classList.remove('light')
@@ -30,6 +31,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       root.classList.add('light')
     }
     localStorage.setItem('aq-theme', theme)
+    localStorage.setItem('qa-theme', theme)
   }, [theme])
 
   const toggleTheme = () => {

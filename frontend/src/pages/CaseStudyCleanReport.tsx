@@ -12,7 +12,7 @@ export default function CaseStudyCleanReport() {
       <main id="main-content" className="pt-32 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <Button href="/#projects" variant="ghost" size="sm" icon={<ArrowLeft className="w-4 h-4" />} className="mb-6">
+          <Button href="/projects" variant="ghost" size="sm" icon={<ArrowLeft className="w-4 h-4" />} className="mb-6">
             Back to Projects
           </Button>
 

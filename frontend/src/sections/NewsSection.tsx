@@ -285,7 +285,7 @@ export const NewsSection: React.FC = () => {
               </div>
 
               <div className="text-sm text-[var(--color-text-muted)] leading-relaxed border-t border-[var(--color-border)] pt-4 whitespace-pre-line font-sans">
-                {selectedNews.content}
+                {selectedNews.content.replace(/\\n/g, '\n')}
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[var(--color-border)]">
