@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Mail, Phone, MapPin, Send, CheckCircle2, AlertCircle, GraduationCap } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Mail, Phone, MapPin, Send, CheckCircle2, AlertCircle, GraduationCap, ExternalLink, Loader2 } from 'lucide-react'
 import { portfolioData } from '../content/portfolioData'
-import { SectionHeader } from '../components/SectionHeader'
 import { Button } from '../components/Button'
+import { apiUrl } from '../lib/api'
 
 export const ContactSection: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +11,7 @@ export const ContactSection: React.FC = () => {
     email: '',
     subject: '',
     message: '',
-    lens: 'research' as 'research' | 'industry'
+    lens: 'research' as 'research' | 'industry' | 'general'
   })
 
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
@@ -22,17 +23,17 @@ export const ContactSection: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.name || !formData.email || !formData.message) {
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       setStatus('error')
-      setStatusMsg('Please fill in your name, email, and message.')
+      setStatusMsg('Please provide your name, a valid email address, and message.')
       return
     }
 
     setStatus('submitting')
+    setStatusMsg('')
 
     try {
-      // Attempt backend API submission
-      const response = await fetch(`https://portfolio-backend-st78.onrender.com/api/contact`, {
+      const response = await fetch(apiUrl('/api/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -42,25 +43,31 @@ export const ContactSection: React.FC = () => {
 
       if (response.ok && result.success) {
         setStatus('success')
-        setStatusMsg('Thank you! Your message has been submitted successfully to Quadri Ayomikun Amoo.')
+        setStatusMsg('Thank you! Your message has been successfully delivered and saved to Quadri\'s inbox.')
         setFormData({ name: '', email: '', subject: '', message: '', lens: 'research' })
       } else {
-        throw new Error(result.error || 'Server response error')
+        throw new Error(result.error || 'Server rejected message submission')
       }
-    } catch (err) {
-      console.warn('Backend API submission fallback:', err)
-      // Fallback success indication for static/client environments
-      setStatus('success')
-      setStatusMsg('Thank you! Your message inquiry has been recorded. Direct email notification opened.')
-      window.location.href = `mailto:${portfolioData.personal.email}?subject=${encodeURIComponent(formData.subject || 'Portfolio Contact Inquiry')}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nLens: ${formData.lens}\n\n${formData.message}`)}`
+    } catch (err: any) {
+      console.warn('Backend contact submission error:', err)
+      setStatus('error')
+      setStatusMsg(err.message || 'Unable to deliver message through the contact server right now.')
     }
   }
 
+  const mailtoFallbackUrl = `mailto:${portfolioData.personal.email}?subject=${encodeURIComponent(formData.subject || 'Portfolio Inquiry')}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nLens: ${formData.lens}\n\n${formData.message}`)}`
+
   return (
-    <section id="contact" className="py-20 bg-[var(--color-surface-card)] border-t border-[var(--color-border)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="contact" className="py-20 bg-[var(--color-surface-card)] border-t border-[var(--color-border)] relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        <div className="text-center max-w-3xl mx-auto mb-12">
+        {/* Header with animation */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center max-w-3xl mx-auto mb-12"
+        >
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[var(--color-surface-base)] text-[var(--color-primary)] text-xs font-mono font-bold border border-[var(--color-border)] mb-3 shadow-xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>console.log(&quot;Let&apos;s work together!&quot;);</span>
@@ -73,13 +80,18 @@ export const ContactSection: React.FC = () => {
           <p className="mt-3 text-sm sm:text-base text-[var(--color-text-muted)] leading-relaxed font-sans">
             Whether you are discussing postgraduate research positions, academic scholarships, software engineering roles, or technical collaborations, I look forward to hearing from you.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           
           {/* Direct Contact Info */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="card-elevated p-6 bg-[var(--color-surface-base)] space-y-6">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="lg:col-span-5 space-y-6"
+          >
+            <div className="card-elevated p-6 bg-[var(--color-surface-base)] space-y-6 rounded-2xl border border-[var(--color-border)] shadow-md">
               <h3 className="text-xl font-serif font-bold text-[var(--color-text-main)]">
                 Direct Channels
               </h3>
@@ -91,7 +103,7 @@ export const ContactSection: React.FC = () => {
                   </div>
                   <div>
                     <div className="text-xs font-mono text-[var(--color-text-subtle)] uppercase">Email Address</div>
-                    <a href={`mailto:${portfolioData.personal.email}`} className="text-sm font-semibold text-[var(--color-text-main)] hover:text-[var(--color-primary)]">
+                    <a href={`mailto:${portfolioData.personal.email}`} className="text-sm font-semibold text-[var(--color-text-main)] hover:text-[var(--color-primary)] transition-colors">
                       {portfolioData.personal.email}
                     </a>
                   </div>
@@ -103,7 +115,7 @@ export const ContactSection: React.FC = () => {
                   </div>
                   <div>
                     <div className="text-xs font-mono text-[var(--color-text-subtle)] uppercase">Phone & WhatsApp</div>
-                    <a href={`tel:${portfolioData.personal.phone.replace(/\s+/g, '')}`} className="text-sm font-semibold text-[var(--color-text-main)] hover:text-[var(--color-primary)]">
+                    <a href={`tel:${portfolioData.personal.phone.replace(/\s+/g, '')}`} className="text-sm font-semibold text-[var(--color-text-main)] hover:text-[var(--color-primary)] transition-colors">
                       {portfolioData.personal.phone}
                     </a>
                   </div>
@@ -124,12 +136,12 @@ export const ContactSection: React.FC = () => {
 
               <div className="pt-4 border-t border-[var(--color-border)]">
                 <div className="text-xs font-mono text-[var(--color-text-subtle)] mb-2 uppercase">Academic & Code Portals</div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-2.5">
                   <a
                     href={portfolioData.personal.googleScholar}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-xs font-mono text-[var(--color-text-muted)] hover:text-[var(--color-primary)]"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-xs font-mono text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors"
                   >
                     <GraduationCap className="w-3.5 h-3.5" /> Google Scholar
                   </a>
@@ -137,7 +149,7 @@ export const ContactSection: React.FC = () => {
                     href={portfolioData.personal.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-xs font-mono text-[var(--color-text-muted)] hover:text-[var(--color-primary)]"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-xs font-mono text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors"
                   >
                     GitHub
                   </a>
@@ -145,26 +157,43 @@ export const ContactSection: React.FC = () => {
               </div>
 
             </div>
-          </div>
+          </motion.div>
 
           {/* Interactive Contact Form */}
-          <div className="lg:col-span-7">
-            <form onSubmit={handleSubmit} className="card-elevated p-6 bg-[var(--color-surface-base)] space-y-4">
-              <h3 className="text-xl font-serif font-bold text-[var(--color-text-main)] mb-2">
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="lg:col-span-7"
+          >
+            <form onSubmit={handleSubmit} className="card-elevated p-6 sm:p-8 bg-[var(--color-surface-base)] space-y-4 rounded-2xl border border-[var(--color-border)] shadow-md">
+              <h3 className="text-xl font-serif font-bold text-[var(--color-text-main)] mb-1">
                 Send a Message
               </h3>
 
               {status === 'success' && (
-                <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-500" />
                   <span>{statusMsg}</span>
                 </div>
               )}
 
               {status === 'error' && (
-                <div className="p-4 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{statusMsg}</span>
+                <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-200 text-xs space-y-2">
+                  <div className="flex items-center gap-2 font-bold">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                    <span>Submission Failed: {statusMsg}</span>
+                  </div>
+                  <div className="pt-1 flex items-center gap-2">
+                    <span className="text-[11px] text-neutral-400">Alternative:</span>
+                    <a
+                      href={mailtoFallbackUrl}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 font-mono text-[11px] transition-colors"
+                    >
+                      <span>Send directly via Email Client</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
                 </div>
               )}
 
@@ -180,7 +209,7 @@ export const ContactSection: React.FC = () => {
                     onChange={handleChange}
                     placeholder="Prof. John Doe / Jane Smith"
                     required
-                    className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
                   />
                 </div>
 
@@ -195,7 +224,7 @@ export const ContactSection: React.FC = () => {
                     onChange={handleChange}
                     placeholder="johndoe@university.edu"
                     required
-                    className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
                   />
                 </div>
               </div>
@@ -209,10 +238,11 @@ export const ContactSection: React.FC = () => {
                     name="lens"
                     value={formData.lens}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
                   >
                     <option value="research">Postgraduate Research / Scholarship Opportunity</option>
                     <option value="industry">Frontend / Full-Stack Developer Role</option>
+                    <option value="general">General Collaboration / Discussion</option>
                   </select>
                 </div>
 
@@ -226,7 +256,7 @@ export const ContactSection: React.FC = () => {
                     value={formData.subject}
                     onChange={handleChange}
                     placeholder="Research Position / Project Collaboration"
-                    className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
                   />
                 </div>
               </div>
@@ -242,7 +272,7 @@ export const ContactSection: React.FC = () => {
                   onChange={handleChange}
                   placeholder="Share details regarding your research opportunity, software project, or inquiry..."
                   required
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
                 />
               </div>
 
@@ -251,13 +281,13 @@ export const ContactSection: React.FC = () => {
                 variant="primary"
                 size="lg"
                 disabled={status === 'submitting'}
-                icon={<Send className="w-4 h-4" />}
+                icon={status === 'submitting' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 className="w-full sm:w-auto"
               >
                 {status === 'submitting' ? 'Submitting Message...' : 'Send Message'}
               </Button>
             </form>
-          </div>
+          </motion.div>
 
         </div>
 

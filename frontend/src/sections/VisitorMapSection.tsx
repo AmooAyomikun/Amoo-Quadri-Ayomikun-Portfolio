@@ -1,6 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
-import { Terminal, Globe, CornerDownLeft } from 'lucide-react';
+import { Terminal, Globe, CornerDownLeft, Radio } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { apiUrl } from '../lib/api';
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -11,6 +13,14 @@ interface TopCountry {
   count: number;
 }
 
+interface VisitorLocation {
+  lat: number;
+  lon: number;
+  city: string;
+  country: string;
+  countryCode?: string;
+}
+
 interface VisitorResponse {
   userCountry: string;
   userCountryCode: string;
@@ -19,34 +29,79 @@ interface VisitorResponse {
   totalVisitors: number;
   topCountries: TopCountry[];
   countryStats: Record<string, number>;
+  locations: VisitorLocation[];
 }
 
-// Major country coordinates for glowing map pins
-const COUNTRY_MARKERS = [
-  { name: 'NIGERIA', city: 'Lagos', coordinates: [3.3792, 6.5244] },
-  { name: 'BRAZIL', city: 'Brasília', coordinates: [-47.8919, -15.7975] },
-  { name: 'FRANCE', city: 'Paris', coordinates: [2.3522, 48.8566] },
-  { name: 'UNITED STATES', city: 'New York', coordinates: [-74.0060, 40.7128] },
-  { name: 'SPAIN', city: 'Madrid', coordinates: [-3.7038, 40.4168] },
-  { name: 'JAPAN', city: 'Tokyo', coordinates: [139.6503, 35.6762] },
-  { name: 'GERMANY', city: 'Berlin', coordinates: [13.4050, 52.5200] },
-  { name: 'UNITED KINGDOM', city: 'London', coordinates: [-0.1276, 51.5074] },
-  { name: 'CANADA', city: 'Toronto', coordinates: [-79.3832, 43.6532] },
-  { name: 'AUSTRALIA', city: 'Sydney', coordinates: [151.2093, -33.8688] }
-];
+// Country name normalization dictionary (Issue 4.4: TopoJSON vs Geolocation API naming discrepancies)
+const COUNTRY_ALIASES: Record<string, string> = {
+  'united states of america': 'united states',
+  'usa': 'united states',
+  'us': 'united states',
+  'united kingdom': 'united kingdom',
+  'great britain': 'united kingdom',
+  'uk': 'united kingdom',
+  'england': 'united kingdom',
+  'russian federation': 'russia',
+  'korea, republic of': 'south korea',
+  'republic of korea': 'south korea',
+  'korea': 'south korea',
+  'dem. rep. congo': 'democratic republic of the congo',
+  'democratic republic of the congo': 'democratic republic of the congo',
+  'congo': 'republic of the congo',
+  'czech republic': 'czechia',
+  'viet nam': 'vietnam',
+  'iran, islamic republic of': 'iran',
+  'syrian arab republic': 'syria',
+  'tanzania, united republic of': 'tanzania',
+  'ivory coast': "côte d'ivoire",
+  'lao pdr': 'laos',
+  'moldova, republic of': 'moldova',
+  'venezuela, bolivarian republic of': 'venezuela',
+  'bolivia, plurinational state of': 'bolivia',
+};
+
+const normalizeCountry = (name: string): string => {
+  if (!name) return '';
+  let s = name.toLowerCase().trim();
+  s = s.replace(/^the\s+/, '');
+  if (COUNTRY_ALIASES[s]) {
+    return COUNTRY_ALIASES[s];
+  }
+  for (const [alias, canonical] of Object.entries(COUNTRY_ALIASES)) {
+    if (s === alias || s.includes(alias) || alias.includes(s)) {
+      return canonical;
+    }
+  }
+  return s;
+};
+
+const findCountryCount = (geoName: string, stats: Record<string, number>): number => {
+  if (!geoName || !stats) return 0;
+  if (typeof stats[geoName] === 'number') return stats[geoName];
+  const normGeo = normalizeCountry(geoName);
+  for (const [key, count] of Object.entries(stats)) {
+    if (normalizeCountry(key) === normGeo) {
+      return count;
+    }
+  }
+  return 0;
+};
 
 export const VisitorMapSection: React.FC = () => {
+  // Issue 4.3: Real initial state without fake 100 visitors or fake country counts
   const [data, setData] = useState<VisitorResponse>({
-    userCountry: 'YOUR COUNTRY',
-    userCountryCode: 'NG',
-    userCity: 'Lagos',
-    userCountryCount: 1,
-    totalVisitors: 1,
+    userCountry: 'LOCATING...',
+    userCountryCode: '',
+    userCity: '',
+    userCountryCount: 0,
+    totalVisitors: 0,
     topCountries: [],
-    countryStats: {}
+    countryStats: {},
+    locations: []
   });
 
-  const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'offline'>('connecting');
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
   // Terminal state
   const [terminalInput, setTerminalInput] = useState('');
@@ -59,80 +114,125 @@ export const VisitorMapSection: React.FC = () => {
   useEffect(() => {
     let isMounted = true;
 
-    // 1. Instant IP-based Geolocation (<100ms, NO device permission popups required)
-    const fetchFastIPLocation = async () => {
+    const initDynamicGeolocation = async () => {
+      const SESSION_KEY = 'portfolio_visitor_session_logged';
+      const CACHED_USER_GEO = 'portfolio_user_geo';
+
+      // 1. Client-side IP Geolocation cache check
+      let clientGeo: any = null;
+      const cachedGeoStr = sessionStorage.getItem(CACHED_USER_GEO);
+      if (cachedGeoStr) {
+        try {
+          clientGeo = JSON.parse(cachedGeoStr);
+        } catch {
+          // ignore corrupted cache
+        }
+      }
+
+      if (!clientGeo) {
+        try {
+          const geoRes = await fetch('https://get.geojs.io/v1/ip/geo.json', { signal: AbortSignal.timeout(3000) });
+          if (geoRes.ok) {
+            clientGeo = await geoRes.json();
+            if (clientGeo) {
+              sessionStorage.setItem(CACHED_USER_GEO, JSON.stringify(clientGeo));
+            }
+          }
+        } catch (err) {
+          console.warn('Client geolocation note:', err);
+        }
+      }
+
+      // Issue 4.1: Do NOT invent Lagos/Nigeria if lookup fails!
+      const country = clientGeo?.country ? clientGeo.country.toUpperCase() : '';
+      const countryCode = clientGeo?.country_code || '';
+      const city = clientGeo?.city || '';
+      const lat = clientGeo?.latitude ? parseFloat(clientGeo.latitude) : null;
+      const lon = clientGeo?.longitude ? parseFloat(clientGeo.longitude) : null;
+
+      if (isMounted && country) {
+        setData(prev => ({
+          ...prev,
+          userCountry: country,
+          userCountryCode: countryCode,
+          userCity: city
+        }));
+      }
+
+      // Issue 4.5: Deduplicate logging per session using sessionStorage
+      const isAlreadyLogged = sessionStorage.getItem(SESSION_KEY) === 'true';
+
       try {
-        const geoRes = await fetch('https://get.geojs.io/v1/ip/geo.json');
-        if (geoRes.ok) {
-          const geo = await geoRes.json();
-          const country = (geo.country || 'NIGERIA').toUpperCase();
-          const countryCode = geo.country_code || 'NG';
-          const city = geo.city || 'Lagos';
-          if (isMounted) {
-            setData(prev => ({
-              ...prev,
-              userCountry: country,
-              userCountryCode: countryCode,
-              userCity: city,
-              topCountries: prev.topCountries.length > 0 ? prev.topCountries : [
-                { rank: 1, name: country, code: countryCode, count: prev.userCountryCount || 1 }
-              ],
-              countryStats: Object.keys(prev.countryStats).length > 0 ? prev.countryStats : { [country]: 1 }
-            }));
+        if (isAlreadyLogged) {
+          // Already logged during this browser session; fetch current stats via GET /api/visitors
+          setConnectionStatus('connecting');
+          const res = await fetch(apiUrl('/api/visitors'), { signal: AbortSignal.timeout(5000) });
+          if (res.ok) {
+            const json = await res.json();
+            if (isMounted) {
+              setConnectionStatus('connected');
+              const countryCount = country ? (json.countryStats?.[country] || findCountryCount(country, json.countryStats) || 1) : 1;
+              setData(prev => ({
+                ...prev,
+                userCountry: country || prev.userCountry || 'UNKNOWN',
+                userCountryCode: countryCode || prev.userCountryCode,
+                userCity: city || prev.userCity,
+                userCountryCount: countryCount,
+                totalVisitors: typeof json.total === 'number' ? json.total : prev.totalVisitors,
+                topCountries: Array.isArray(json.topCountries) ? json.topCountries : prev.topCountries,
+                countryStats: json.countryStats || prev.countryStats,
+                locations: Array.isArray(json.locations) ? json.locations : prev.locations
+              }));
+            }
+          } else {
+            if (isMounted) setConnectionStatus('offline');
+          }
+        } else {
+          // First visit in this session: log visitor via POST /api/visitors/log
+          setConnectionStatus('connecting');
+          const logPayload = clientGeo ? {
+            country: clientGeo.country,
+            countryCode: clientGeo.country_code,
+            city: clientGeo.city,
+            lat,
+            lon
+          } : {};
+
+          const res = await fetch(apiUrl('/api/visitors/log'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(logPayload),
+            signal: AbortSignal.timeout(6000)
+          });
+
+          if (res.ok) {
+            const json = await res.json();
+            sessionStorage.setItem(SESSION_KEY, 'true');
+            if (isMounted && json.success) {
+              setConnectionStatus('connected');
+              setData(prev => ({
+                ...prev,
+                userCountry: json.userCountry || country || 'UNKNOWN',
+                userCountryCode: json.userCountryCode || countryCode,
+                userCity: json.userCity || city,
+                userCountryCount: json.userCountryCount || 1,
+                totalVisitors: json.totalVisitors || 1,
+                topCountries: Array.isArray(json.topCountries) ? json.topCountries : [],
+                countryStats: json.countryStats || {},
+                locations: Array.isArray(json.locations) ? json.locations : []
+              }));
+            }
+          } else {
+            if (isMounted) setConnectionStatus('offline');
           }
         }
       } catch (err) {
-        console.warn('Fast IP lookup active:', err);
+        console.warn('Visitor sync note:', err);
+        if (isMounted) setConnectionStatus('offline');
       }
     };
 
-    // 2. Background Backend Visitor Log Sync
-    const syncBackendVisitorStats = async () => {
-      try {
-        const endpoints = [
-          'http://localhost:5000/api/visitors/log',
-          'https://portfolio-backend-st78.onrender.com/api/visitors/log'
-        ];
-
-        for (const ep of endpoints) {
-          try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s max timeout to allow Render cold start
-
-            const res = await fetch(ep, {
-              method: 'POST',
-              signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-
-            if (res.ok) {
-              const json = await res.json();
-              if (json.success && isMounted) {
-                setData(prev => ({
-                  ...prev,
-                  userCountry: json.userCountry || prev.userCountry,
-                  userCountryCode: json.userCountryCode || prev.userCountryCode,
-                  userCity: json.userCity || prev.userCity,
-                  userCountryCount: json.userCountryCount || 1,
-                  totalVisitors: json.totalVisitors || 1,
-                  topCountries: Array.isArray(json.topCountries) ? json.topCountries : [],
-                  countryStats: json.countryStats || {}
-                }));
-                break;
-              }
-            }
-          } catch {
-            // try next endpoint in background
-          }
-        }
-      } catch {
-        // silent fallback
-      }
-    };
-
-    // Run both immediately in parallel
-    fetchFastIPLocation();
-    syncBackendVisitorStats();
+    initDynamicGeolocation();
 
     return () => {
       isMounted = false;
@@ -151,11 +251,9 @@ export const VisitorMapSection: React.FC = () => {
       return;
     }
 
-    // Add user input to terminal logs
     setTerminalLogs(prev => [...prev, { text: `GUEST ~ $ ${rawInput}`, type: 'input' }]);
     setTerminalInput('');
 
-    // Instant local static command responses
     if (command === 'help') {
       setTerminalLogs(prev => [...prev, { text: "AVAILABLE COMMANDS: help, about, skills, projects, contact, clear. Or ask me ANY natural question!", type: 'output' }]);
       return;
@@ -173,82 +271,33 @@ export const VisitorMapSection: React.FC = () => {
       return;
     }
 
-    // Temporary thinking log
-    setTerminalLogs(prev => [...prev, { text: "AI: THINKING...", type: 'output' }]);
+    setTerminalLogs(prev => [...prev, { text: "AI: PROCESSING...", type: 'output' }]);
 
     try {
-      const endpoints = [
-        'http://localhost:5000/api/chat',
-        'https://portfolio-backend-st78.onrender.com/api/chat'
-      ];
+      const res = await fetch(apiUrl('/api/chat'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: rawInput })
+      });
 
       let reply = '';
-      for (const ep of endpoints) {
-        try {
-          const res = await fetch(ep, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: rawInput })
-          });
-          if (res.ok) {
-            const json = await res.json();
-            if (json.reply) {
-              reply = json.reply;
-              break;
-            }
-          }
-        } catch {
-          // try next endpoint
-        }
+      if (res.ok) {
+        const json = await res.json();
+        reply = json.reply;
       }
 
       if (!reply) {
-        // Fallback local smart response engine if backend offline
-        const lower = command;
-
-        const isGreeting = /\b(yo|wassup|what's up|sup|hi|hello|hey|heyy|howdy|hola|good morning|good afternoon|good evening|how are you|how far|wagywan)\b/i.test(lower);
-
-        if (isGreeting && !/\b(study|studied|school|gpa|cgpa|education|degree|where|research|thesis|project|projects|skill|skills|job|experience|contact|email|phone|goal|goals|vision|aim|award|awards|who)\b/i.test(lower)) {
-          reply = "Yo! What's up? 👋 I'm Quadri's AI Assistant. I'm doing great! Ask me anything about Quadri's software engineering projects, AI research, 5.0/5.0 Major GPA, education, or how to get in touch!";
-        } else if (/\b(study|studied|where|education|degree|university|school|college|gpa|cgpa|major|french|entrepreneurship|diploma|honors|rank|class)\b/i.test(lower)) {
-          reply = "Quadri earned his B.Sc. in Software Engineering from Abiola Ajimobi Technical University (formerly First Technical University), Ibadan, graduating with First-Class Honors (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA, Top 10% of class). He also holds Diplomas in French (Lower Credit) and Entrepreneurship (Upper Credit).";
-        } else if (/\b(goal|goals|vision|future|career|aspire|aspirations|aim|msc|phd|postgraduate|scholarship|scholarships|next step)\b/i.test(lower)) {
-          reply = "Quadri's primary goal is to pursue M.Sc. and Ph.D. research in Artificial Intelligence, Software Engineering, and Natural Language Processing while engineering intelligent computing systems that solve high-impact, real-world problems.";
-        } else if (/\b(award|awards|honors|prizes|prize|best student|subject honors|recognition)\b/i.test(lower)) {
-          reply = "Quadri received 4 Best Graduating Student Subject Honors: Operating Systems I, Human Computer Interaction (HCI), Software Engineering Professional Practice, and Fundamentals of Data Structures. He was also in the Top 10% of his graduating class.";
-        } else if (/\b(who|bio|summary|background|identity|intro|overview)\b/i.test(lower)) {
-          reply = "Quadri Ayomikun Amoo is a Software Engineering Researcher & Full-Stack Engineer with a First-Class Honors degree (5.0/5.0 Major GPA, 4.45/5.00 CGPA) from Abiola Ajimobi Technical University. He specializes in AI for Software Engineering, intelligent web systems (React, TypeScript, PWA, Node.js), and data analytics.";
-        } else if (/\b(research|thesis|supervisor|supervisors|sinebe|akinsola|hotel|recommender|geospatial|lab|publication|publications|scholar)\b/i.test(lower)) {
-          reply = "Quadri's research focuses on AI for Software Engineering and Intelligent Systems. His B.Sc. thesis under Dr. J.E.T. Akinsola developed a location-based hotel management & recommendation engine. He also served as Research Assistant (NYSC) under Prof. Jude Sinebe at the Postgraduate Research Lab.";
-        } else if (/\b(experience|work|job|jobs|intern|internship|internships|company|companies|circo|orange|codealpha|coast)\b/i.test(lower)) {
-          reply = "Industrial Experience:\n• Frontend Intern @ Circo Digital / Orange Programme (built CleanReport PWA with offline sync & maps)\n• Full Stack Intern @ CodeAlpha (built React/TypeScript/Node.js web apps)\n• Data Analyst Intern @ Coast Research Tech (built 10 financial ML models in Python/SQL & Power BI dashboards)";
-        } else if (/\b(cleanreport|sanitation|civic|pwa|offline)\b/i.test(lower)) {
-          reply = "CleanReport is a civic-tech PWA built by Quadri during his Circo Digital / Orange internship. It enables citizens to report sanitation issues offline, automatically syncing reports to the cloud upon reconnection with interactive maps and admin management.";
-        } else if (/\b(kynda|pathly|lms|study assistant)\b/i.test(lower)) {
-          reply = "• KYNDA AI: An AI-powered study assistant delivering interactive learning, question generation, and real-time study feedback.\n• Pathly LMS: A modern learning management system streamlining online course delivery and student-instructor workflows.";
-        } else if (/\b(teach|teaching|tutor|tutoring|mentor|mentorship|nassa|students)\b/i.test(lower)) {
-          reply = "Teaching Experience:\n• Undergraduate Tutor: Tutored ~350 computer science students weekly in Data Structures, Algorithms, and OOP.\n• Asst. Academic Support Officer @ NASSA: Taught 100 lower-level students Mathematics and Python programming.";
-        } else if (/\b(skill|skills|stack|tech|technology|technologies|language|languages|python|react|typescript|javascript|node|sql|postgresql|tailwind|ml|machine learning)\b/i.test(lower)) {
-          reply = "Core Technical Stack:\n• Frontend: React, TypeScript, JavaScript, HTML5, Modern CSS, Tailwind CSS, PWA\n• Backend & Databases: Python, Node.js, Express.js, Django REST, SQL, PostgreSQL, MySQL, Supabase, Prisma\n• AI & Data Science: Machine Learning, Generative AI, NLP, Data Analytics, Power BI\n• Tools: Git, GitHub, Postman, Vite";
-        } else if (/\b(project|projects|portfolio|built|apps|systems)\b/i.test(lower)) {
-          reply = "Featured Projects:\n1. CleanReport PWA (Civic-tech offline sanitation platform)\n2. Location-Based Hotel Recommender System (B.Sc. Thesis)\n3. KYNDA AI Study Assistant\n4. Pathly LMS\n5. Financial Churn Prediction ML Models (10 models built with Python/SQL)";
-        } else if (/\b(contact|email|phone|hire|recruiter|reach|linkedin|github|address|location|where live|nigeria|ibadan)\b/i.test(lower)) {
-          reply = "Get in Touch with Quadri:\n• Email: amooquadri555@gmail.com\n• Phone: +234 9071812921\n• LinkedIn: linkedin.com/in/ayomikun-amoo-6b836428b\n• GitHub: github.com/amooquadri\n• Location: Ibadan, Oyo State, Nigeria (Available worldwide for research, engineering, and graduate positions!)";
-        } else {
-          reply = "I am Quadri's AI Portfolio Assistant! Quadri Amoo is a First-Class Software Engineering Graduate (5.0/5.0 Major GPA) specializing in AI, React, TypeScript, and Data Science.\n\nYou can ask me about:\n• Education & GPA (e.g., 'where did he study', 'awards')\n• Research & Thesis (e.g., 'tell me about his thesis')\n• Projects & Work Experience (e.g., 'what has he built', 'internships')\n• Technical Skills (e.g., 'what languages does he use')\n• Future Goals (e.g., 'what are his goals')\n• Contact Details (e.g., 'how can I hire or email Quadri')";
-        }
+        reply = "I am Quadri's AI Assistant! Quadri graduated with First-Class Honors (5.0/5.0 Major GPA) and is actively open to AI research positions, PhD/MSc opportunities, and senior engineering roles.";
       }
 
-      // Replace THINKING... with actual AI reply
       setTerminalLogs(prev => {
-        const filtered = prev.filter(l => l.text !== "AI: THINKING...");
+        const filtered = prev.filter(l => l.text !== "AI: PROCESSING...");
         return [...filtered, { text: reply, type: 'output' }];
       });
-
     } catch {
       setTerminalLogs(prev => {
-        const filtered = prev.filter(l => l.text !== "AI: THINKING...");
-        return [...filtered, { text: "Sorry, I couldn't process your request right now. Try 'help' for available commands!", type: 'output' }];
+        const filtered = prev.filter(l => l.text !== "AI: PROCESSING...");
+        return [...filtered, { text: "AI service offline. Type 'help' for quick reference commands!", type: 'output' }];
       });
     }
 
@@ -257,55 +306,80 @@ export const VisitorMapSection: React.FC = () => {
     }, 50);
   };
 
+  // Issue 4.3: Distinct visitor markers from real location data only
+  const activeMarkers = useMemo(() => {
+    const list = [...data.locations];
+    return list.filter(l => typeof l.lat === 'number' && typeof l.lon === 'number' && !isNaN(l.lat) && !isNaN(l.lon));
+  }, [data.locations]);
+
+  const isLocating = !data.userCountry || data.userCountry === 'LOCATING...';
+  const isUnknownLocation = data.userCountry === 'UNKNOWN';
+
+  const bannerHeadline = isLocating
+    ? 'CONNECTING TO GLOBAL VISITOR TELEMETRY...'
+    : isUnknownLocation
+    ? "WELCOME TO QUADRI'S RESEARCH PORTAL!"
+    : data.userCountryCount <= 1
+    ? `YOU'RE VISITING FROM ${data.userCity ? data.userCity.toUpperCase() + ', ' : ''}${data.userCountry}. WELCOME TO QUADRI'S RESEARCH PORTAL!`
+    : `YOU'RE IN ${data.userCity ? data.userCity.toUpperCase() + ', ' : ''}${data.userCountry}. ${data.userCountryCount.toLocaleString()} VISITOR SESSIONS RECORDED FROM YOUR REGION.`;
+
   return (
     <section className="py-16 bg-[#050505] text-white border-t border-neutral-900 font-mono relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Retro Header Section */}
-        <div className="mb-8 border-b border-neutral-900 pb-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-8 border-b border-neutral-900 pb-6"
+        >
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#C4FA4C] animate-pulse" />
-            <span className="text-xs uppercase tracking-widest text-[#C4FA4C] font-bold">
-              REAL-TIME VISITOR GEOLOCATION
+            <span className={`w-2.5 h-2.5 rounded-full ${connectionStatus === 'connected' ? 'bg-[#C4FA4C] animate-ping' : connectionStatus === 'connecting' ? 'bg-amber-400 animate-pulse' : 'bg-neutral-600'}`} />
+            <span className="text-xs uppercase tracking-widest text-[#C4FA4C] font-bold flex items-center gap-1.5">
+              <Radio className="w-3.5 h-3.5" /> REAL-TIME AUDIENCE TELEMETRY
             </span>
           </div>
 
-          {/* Title and Explanation matching Samuel Rizzon screenshot */}
           <h2 className="text-2xl sm:text-4xl font-serif font-bold tracking-tight text-white mb-2 uppercase">
-            VISITORS
+            GLOBAL VISITOR GEOLOCATION
           </h2>
           <p className="text-xs sm:text-sm text-neutral-400 max-w-3xl leading-relaxed mb-4 font-mono uppercase">
-            EVERY LIT BLOCK IS A COUNTRY SOMEONE OPENED THIS SITE FROM. THE BRIGHTER, THE MORE OF THEM.
+            EVERY LIT BLOCK IS A COUNTRY SOMEONE OPENED THIS SITE FROM. DYNAMIC PINGS PULSE IN REAL-TIME ACROSS ACTIVE REGIONS.
           </p>
 
-          {/* Quick Metrics Bar matching screenshot */}
+          {/* Dynamic Metrics Bar (Issue 4.3: dynamic verified metrics) */}
           <div className="flex flex-wrap items-center gap-6 sm:gap-10 text-xs sm:text-sm font-mono tracking-widest mb-6 border-y border-neutral-900/80 py-3">
             <div className="flex items-center gap-2">
-              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">{data.totalVisitors.toLocaleString()}</span>
-              <span className="text-neutral-400 uppercase font-semibold">VISITORS</span>
+              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">
+                {data.totalVisitors > 0 ? data.totalVisitors.toLocaleString() : '...'}
+              </span>
+              <span className="text-neutral-400 uppercase font-semibold">TOTAL VISITS</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">{Object.keys(data.countryStats).length || 1}</span>
-              <span className="text-neutral-400 uppercase font-semibold">COUNTRIES</span>
+              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">
+                {Object.keys(data.countryStats).length > 0
+                  ? Object.keys(data.countryStats).length
+                  : (!isLocating && !isUnknownLocation ? 1 : 0)}
+              </span>
+              <span className="text-neutral-400 uppercase font-semibold">COUNTRIES RECORDED</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#C4FA4C] animate-pulse" />
-              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">1</span>
-              <span className="text-[#C4FA4C] uppercase font-semibold">HERE NOW</span>
+              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">{activeMarkers.length}</span>
+              <span className="text-[#C4FA4C] uppercase font-semibold">ACTIVE NODES</span>
             </div>
           </div>
 
           {/* Dynamic Geolocation Banner */}
           <h3 className="text-lg sm:text-2xl font-bold tracking-tight text-[#C4FA4C] leading-snug mb-4 uppercase">
-            {data.userCountryCount <= 1
-              ? `YOU'RE IN ${data.userCountry}. YOU'RE THE FIRST VISITOR FROM THERE!`
-              : `YOU'RE IN ${data.userCountry}. ${data.userCountryCount.toLocaleString()} VISITORS HAVE VISITED FROM THERE.`}
+            {bannerHeadline}
           </h3>
 
-          {/* Top 5 Leaderboard Row */}
+          {/* Top Leaderboard Row */}
           {data.topCountries.length > 0 && (
             <div className="flex flex-wrap items-center gap-x-8 gap-y-2 text-xs sm:text-sm tracking-wider">
-              {data.topCountries.map((c) => (
+              {data.topCountries.slice(0, 5).map((c) => (
                 <div key={c.name} className="flex items-center gap-2">
                   <span className="text-neutral-500 font-bold">{c.rank}</span>
                   <span className="text-neutral-200 font-bold">{c.name}</span>
@@ -314,19 +388,25 @@ export const VisitorMapSection: React.FC = () => {
               ))}
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Grid Container: Retro Pixel World Map + Interactive Terminal */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Main Map Box */}
-          <div className="lg:col-span-7 bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl p-4 relative overflow-hidden">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="lg:col-span-7 bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl p-4 relative overflow-hidden shadow-2xl"
+          >
             <div className="flex justify-between items-center mb-3 px-2 text-xs text-neutral-400">
-              <span className="flex items-center gap-1.5">
-                <Globe className="w-4 h-4 text-[#C4FA4C]" /> Interactive Audience Map
+              <span className="flex items-center gap-1.5 font-bold">
+                <Globe className="w-4 h-4 text-[#C4FA4C]" /> Interactive Global Node Map
               </span>
-              <span className="text-neutral-500 text-[11px]">
-                {data.totalVisitors.toLocaleString()} Total Global Visits
+              <span className={`text-[11px] font-mono flex items-center gap-1.5 ${connectionStatus === 'connected' ? 'text-[#C4FA4C]' : connectionStatus === 'connecting' ? 'text-amber-400' : 'text-neutral-500'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${connectionStatus === 'connected' ? 'bg-[#C4FA4C] animate-pulse' : connectionStatus === 'connecting' ? 'bg-amber-400 animate-ping' : 'bg-neutral-600'}`} />
+                {connectionStatus === 'connected' ? 'Telemetry Active' : connectionStatus === 'connecting' ? 'Syncing Telemetry' : 'Offline'}
               </span>
             </div>
 
@@ -343,52 +423,89 @@ export const VisitorMapSection: React.FC = () => {
                 <Geographies geography={geoUrl}>
                   {({ geographies }) =>
                     geographies.map((geo) => {
-                      const isUserGeo = geo.properties?.name?.toUpperCase() === data.userCountry;
+                      const geoName = geo.properties?.name || '';
+                      const isUserGeo = Boolean(
+                        data.userCountry &&
+                        data.userCountry !== 'LOCATING...' &&
+                        data.userCountry !== 'UNKNOWN' &&
+                        normalizeCountry(geoName) === normalizeCountry(data.userCountry)
+                      );
+
+                      // Issue 4.4: Normalized country lookup so all recorded countries are lit up
+                      const visitorCount = findCountryCount(geoName, data.countryStats);
+                      const hasVisitors = visitorCount > 0 || isUserGeo;
+                      const count = isUserGeo ? Math.max(visitorCount, data.userCountryCount) : visitorCount;
+
+                      let fillColor = "#111111";
+                      let strokeColor = "#222222";
+                      let strokeWidth = 0.4;
+
+                      if (isUserGeo) {
+                        fillColor = "#2E680E";
+                        strokeColor = "#C4FA4C";
+                        strokeWidth = 1.2;
+                      } else if (hasVisitors) {
+                        fillColor = count >= 5 ? "#245209" : "#1B3B08";
+                        strokeColor = count >= 5 ? "#84CC16" : "#4D7C0F";
+                        strokeWidth = 0.75;
+                      }
+
                       return (
                         <Geography
                           key={geo.rsmKey}
                           geography={geo}
-                          fill={isUserGeo ? "#1C3505" : "#111111"}
-                          stroke={isUserGeo ? "#C4FA4C" : "#222222"}
-                          strokeWidth={0.5}
-                          // react-simple-maps accepts per-state styles at runtime;
-                          // @types/react-simple-maps types `style` as plain CSS.
+                          fill={fillColor}
+                          stroke={strokeColor}
+                          strokeWidth={strokeWidth}
+                          onMouseEnter={() => {
+                            if (hasVisitors) {
+                              setHoveredNode(`${geoName}: ${count} visitor${count > 1 ? 's' : ''}`);
+                            } else {
+                              setHoveredNode(geoName);
+                            }
+                          }}
+                          onMouseLeave={() => setHoveredNode(null)}
                           style={{
-                            default: { outline: "none" },
-                            hover: { fill: "#1F3B08", outline: "none", cursor: "pointer" },
+                            default: { outline: "none", transition: "fill 0.2s ease" },
+                            hover: {
+                              fill: hasVisitors ? "#3A7A12" : "#1F2913",
+                              stroke: "#C4FA4C",
+                              strokeWidth: 1.0,
+                              outline: "none",
+                              cursor: "pointer"
+                            },
                             pressed: { outline: "none" }
-                          } as unknown as React.ComponentProps<typeof Geography>['style']}
+                          } as any}
                         />
                       );
                     })
                   }
                 </Geographies>
 
-                {/* Country Markers */}
-                {COUNTRY_MARKERS.map((marker) => {
-                  const isUserCountry = marker.name === data.userCountry;
-                  const count = data.countryStats[marker.name] || (isUserCountry ? data.userCountryCount : 100);
+                {/* Dynamic Visitor Markers (Issue 4.3: Real locations only) */}
+                {activeMarkers.map((marker, idx) => {
+                  const isUserCountry = normalizeCountry(marker.country) === normalizeCountry(data.userCountry);
 
                   return (
                     <Marker 
-                      key={marker.name} 
-                      coordinates={marker.coordinates as [number, number]}
-                      onMouseEnter={() => setHoveredCountry(`${marker.name} (${marker.city}): ${count.toLocaleString()} Visitors`)}
-                      onMouseLeave={() => setHoveredCountry(null)}
+                      key={`${marker.city}-${marker.lat}-${marker.lon}-${idx}`} 
+                      coordinates={[marker.lon, marker.lat]}
+                      onMouseEnter={() => setHoveredNode(`${marker.city || 'Verified Location'}, ${marker.country}`)}
+                      onMouseLeave={() => setHoveredNode(null)}
                     >
-                      {/* Pulse effect for user country */}
+                      {/* Pulse effect for user location marker */}
                       {isUserCountry && (
-                        <circle r={12} fill="#C4FA4C" opacity={0.3}>
-                          <animate attributeName="r" values="6;16;6" dur="2s" repeatCount="indefinite" />
-                          <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite" />
+                        <circle r={14} fill="#C4FA4C" opacity={0.3}>
+                          <animate attributeName="r" values="6;18;6" dur="2s" repeatCount="indefinite" />
+                          <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite" />
                         </circle>
                       )}
 
                       <circle 
-                        r={isUserCountry ? 4.5 : 3} 
+                        r={isUserCountry ? 5 : 3.5} 
                         fill={isUserCountry ? "#C4FA4C" : "#A3E635"} 
                         stroke="#050505" 
-                        strokeWidth={1}
+                        strokeWidth={1.2}
                         className="cursor-pointer hover:scale-150 transition-transform"
                       />
                     </Marker>
@@ -397,23 +514,33 @@ export const VisitorMapSection: React.FC = () => {
               </ComposableMap>
 
               {/* Hover Tooltip overlay */}
-              {hoveredCountry && (
-                <div className="absolute top-4 left-4 bg-black/90 border border-[#C4FA4C] text-[#C4FA4C] px-3 py-1.5 rounded-lg text-xs font-mono shadow-lg pointer-events-none animate-fade-in">
-                  {hoveredCountry}
+              {hoveredNode && (
+                <div className="absolute top-4 left-4 bg-black/95 border border-[#C4FA4C] text-[#C4FA4C] px-3 py-1.5 rounded-lg text-xs font-mono shadow-xl pointer-events-none animate-fade-in flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C4FA4C] animate-ping" />
+                  <span>{hoveredNode}</span>
                 </div>
               )}
 
-              {/* Map Footer Metadata */}
-              <div className="absolute bottom-3 left-4 right-4 flex justify-between items-center text-[10px] text-neutral-500 font-mono bg-black/60 backdrop-blur-xs p-2 rounded-lg border border-neutral-900">
-                <span>ACTIVE NODE: {data.userCity.toUpperCase()}, {data.userCountry}</span>
-                <span className="text-[#C4FA4C]">LIVE STATS CONNECTED</span>
+              {/* Map Footer Metadata (Issue 4.3: Dynamic status instead of hardcoded strings) */}
+              <div className="absolute bottom-3 left-4 right-4 flex justify-between items-center text-[10px] text-neutral-400 font-mono bg-black/80 backdrop-blur-xs p-2 rounded-lg border border-neutral-800">
+                <span>
+                  CLIENT NODE: {data.userCity && data.userCity !== 'Unknown' ? `${data.userCity.toUpperCase()}, ` : ''}{data.userCountry}
+                </span>
+                <span className={`font-bold ${connectionStatus === 'connected' ? 'text-[#C4FA4C]' : connectionStatus === 'connecting' ? 'text-amber-400' : 'text-neutral-500'}`}>
+                  {connectionStatus === 'connected' ? 'TELEMETRY CONNECTED' : connectionStatus === 'connecting' ? 'SYNCING TELEMETRY...' : 'OFFLINE TELEMETRY'}
+                </span>
               </div>
             </div>
 
-          </div>
+          </motion.div>
 
           {/* Interactive Terminal Widget (Right Column) */}
-          <div className="lg:col-span-5 bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl p-5 shadow-xl flex flex-col h-[420px]">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="lg:col-span-5 bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl p-5 shadow-xl flex flex-col h-[420px]"
+          >
             {/* Terminal Top Window Bar */}
             <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-900 text-xs text-neutral-400">
               <div className="flex items-center gap-2">
@@ -426,7 +553,7 @@ export const VisitorMapSection: React.FC = () => {
             </div>
 
             {/* Terminal Logs Output Scroll View */}
-            <div className="flex-1 overflow-y-auto space-y-2 text-xs leading-relaxed scrollbar-none pr-1">
+            <div className="flex-1 overflow-y-auto space-y-2 text-xs leading-relaxed scrollbar-none pr-1 font-mono">
               {terminalLogs.map((log, i) => (
                 <div 
                   key={i} 
@@ -445,7 +572,7 @@ export const VisitorMapSection: React.FC = () => {
                   <button
                     key={cmd}
                     onClick={() => handleTerminalCommand(cmd)}
-                    className="px-2 py-1 bg-neutral-900 hover:bg-neutral-800 text-[#C4FA4C] text-[10px] font-mono rounded border border-neutral-800 transition-colors cursor-pointer"
+                    className="px-2 py-1 bg-neutral-900 hover:bg-neutral-800 text-[#C4FA4C] text-[10px] font-mono rounded border border-neutral-800 transition-colors cursor-pointer active:scale-95"
                   >
                     ${cmd}
                   </button>
@@ -465,7 +592,7 @@ export const VisitorMapSection: React.FC = () => {
                   type="text"
                   value={terminalInput}
                   onChange={(e) => setTerminalInput(e.target.value)}
-                  placeholder="TYPE A COMMAND..."
+                  placeholder="TYPE A COMMAND OR QUESTION..."
                   className="bg-transparent text-xs text-white placeholder-neutral-600 focus:outline-none w-full font-mono"
                 />
                 <button type="submit" aria-label="Send command" className="text-neutral-400 hover:text-[#C4FA4C]">
@@ -474,7 +601,7 @@ export const VisitorMapSection: React.FC = () => {
               </form>
             </div>
 
-          </div>
+          </motion.div>
 
         </div>
 
@@ -482,4 +609,3 @@ export const VisitorMapSection: React.FC = () => {
     </section>
   );
 };
-

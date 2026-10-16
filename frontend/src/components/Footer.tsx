@@ -20,16 +20,42 @@ const TwitterIcon: React.FC<{ className?: string }> = ({ className = "w-4 h-4" }
   </svg>
 )
 
+import { apiUrl } from '../lib/api'
+
 export const Footer: React.FC = () => {
   const [emailInput, setEmailInput] = useState('')
   const [subscribed, setSubscribed] = useState(false)
+  const [subscribing, setSubscribing] = useState(false)
+  const [subscribeMsg, setSubscribeMsg] = useState('')
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!emailInput) return
-    setSubscribed(true)
-    setEmailInput('')
-    setTimeout(() => setSubscribed(false), 4000)
+    if (!emailInput.trim()) return
+
+    setSubscribing(true)
+    setSubscribeMsg('')
+
+    try {
+      const res = await fetch(apiUrl('/api/subscribe'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput.trim() })
+      })
+
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setSubscribed(true)
+        setSubscribeMsg(data.message || 'Subscribed successfully!')
+        setEmailInput('')
+        setTimeout(() => setSubscribed(false), 5000)
+      } else {
+        setSubscribeMsg(data.error || 'Failed to subscribe. Please try again.')
+      }
+    } catch {
+      setSubscribeMsg('Subscription server offline. Please connect via direct email.')
+    } finally {
+      setSubscribing(false)
+    }
   }
 
   const scrollToTop = () => {
@@ -103,15 +129,17 @@ export const Footer: React.FC = () => {
                   />
                   <button
                     type="submit"
-                    className="absolute right-1 px-5 py-2 bg-white text-black font-mono font-bold text-xs rounded-full hover:bg-neutral-200 transition-colors cursor-pointer"
+                    disabled={subscribing}
+                    className="absolute right-1 px-5 py-2 bg-white text-black font-mono font-bold text-xs rounded-full hover:bg-neutral-200 transition-colors cursor-pointer disabled:opacity-75"
                   >
-                    {subscribed ? 'Sent!' : 'Subscribe'}
+                    {subscribing ? 'Sending...' : subscribed ? 'Subscribed!' : 'Subscribe'}
                   </button>
                 </form>
 
-                {subscribed && (
-                  <p className="text-xs font-mono text-black font-bold flex items-center gap-1.5 mt-2">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Subscribed successfully!
+                {subscribeMsg && (
+                  <p className={`text-xs font-mono font-bold flex items-center gap-1.5 mt-2 ${subscribed ? 'text-black' : 'text-red-700'}`}>
+                    {subscribed && <CheckCircle2 className="w-3.5 h-3.5" />}
+                    <span>{subscribeMsg}</span>
                   </p>
                 )}
               </div>

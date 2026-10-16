@@ -1,23 +1,40 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Lock, ArrowRight, ShieldCheck } from 'lucide-react'
+import { Lock, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react'
 import { Button } from '../components/Button'
+import { apiUrl, setAdminToken } from '../lib/api'
 
 export default function AdminLogin() {
   const [passphrase, setPassphrase] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // We do a simple client-side check, but true security is on the backend.
-    // The backend expects 'quadri2026' for operations.
-    if (passphrase === 'quadri2026') {
-      localStorage.setItem('admin_key', passphrase)
-      navigate('/admin/dashboard')
-    } else {
-      setError('Invalid admin passphrase. Access denied.')
+    if (!passphrase.trim()) return
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch(apiUrl('/api/admin/login'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: passphrase.trim() })
+      })
+
+      const data = await res.json()
+      if (res.ok && data.success && data.token) {
+        setAdminToken(data.token)
+        navigate('/admin/dashboard')
+      } else {
+        setError(data.error || 'Invalid admin passphrase. Access denied.')
+      }
+    } catch {
+      setError('Unable to reach server. Please ensure backend is active.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -65,8 +82,16 @@ export default function AdminLogin() {
             )}
           </div>
 
-          <Button type="submit" variant="primary" className="w-full justify-center">
-            Authenticate Access <ArrowRight className="w-4 h-4 ml-2" />
+          <Button type="submit" variant="primary" disabled={loading} className="w-full justify-center">
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Verifying...
+              </>
+            ) : (
+              <>
+                Authenticate Access <ArrowRight className="w-4 h-4 ml-2" />
+              </>
+            )}
           </Button>
         </form>
       </div>

@@ -11,11 +11,10 @@ export const handleAiChat = async (req: Request, res: Response): Promise<void> =
 
     const userPrompt = message.trim()
 
-    // If Gemini / OpenAI API Key is present in environment, call live LLM API
+    // If Gemini API Key is present in environment, call live Gemini LLM API
     if (process.env.GEMINI_API_KEY) {
       try {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`
-        const systemInstruction = `You are Quadri's AI Terminal Assistant on his portfolio website (amooquadri.dev).
+        const systemInstructionText = `You are Quadri's AI Terminal Assistant on his portfolio website (amooquadri.dev).
 Answer concisely, professionally, and enthusiastically using the following accurate details about Quadri Ayomikun Amoo:
 Full Name: ${cvData.personalInfo.fullName}
 Title: ${cvData.personalInfo.title}
@@ -29,30 +28,52 @@ Skills: ${cvData.skills.softwareAndWeb.join(', ')}, ${cvData.skills.aiAndData.jo
 Email: ${cvData.personalInfo.email} | Phone: ${cvData.personalInfo.phone} | LinkedIn: ${cvData.personalInfo.linkedIn} | GitHub: ${cvData.personalInfo.github}.
 Keep responses under 3-4 sentences, styled like a smart CLI output.`
 
-        const apiRes = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [
-                  { text: systemInstruction },
-                  { text: `User query: ${userPrompt}` }
-                ]
-              }
-            ],
-            generationConfig: { maxOutputTokens: 250, temperature: 0.7 }
-          })
-        })
+        // Try gemini-2.0-flash, fallback to gemini-2.5-flash
+        const models = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
+        let aiResponseText = ''
 
-        if (apiRes.ok) {
-          const json = await apiRes.json()
-          const aiResponse = json?.candidates?.[0]?.content?.parts?.[0]?.text
-          if (aiResponse) {
-            res.json({ reply: aiResponse.trim() })
-            return
+        for (const model of models) {
+          try {
+            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`
+            const apiRes = await fetch(geminiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                systemInstruction: {
+                  parts: [{ text: systemInstructionText }]
+                },
+                contents: [
+                  {
+                    role: 'user',
+                    parts: [{ text: userPrompt }]
+                  }
+                ],
+                generationConfig: {
+                  maxOutputTokens: 300,
+                  temperature: 0.7
+                }
+              })
+            })
+
+            if (apiRes.ok) {
+              const json = await apiRes.json() as any
+              const text = json?.candidates?.[0]?.content?.parts?.[0]?.text
+              if (text) {
+                aiResponseText = text
+                break
+              }
+            } else {
+              const errBody = await apiRes.text()
+              console.warn(`Gemini model ${model} response not ok: ${apiRes.status}`, errBody.slice(0, 150))
+            }
+          } catch (modelErr) {
+            console.warn(`Error querying model ${model}:`, modelErr)
           }
+        }
+
+        if (aiResponseText) {
+          res.json({ reply: aiResponseText.trim() })
+          return
         }
       } catch (geminiErr) {
         console.warn('Gemini API fetch error, using local smart assistant fallback:', geminiErr)

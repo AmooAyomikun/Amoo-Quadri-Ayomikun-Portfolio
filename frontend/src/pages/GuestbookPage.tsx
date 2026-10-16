@@ -4,6 +4,7 @@ import { Footer } from '../components/Footer'
 import gsap from 'gsap'
 import SignatureCanvas from 'react-signature-canvas'
 import { PenTool, CheckCircle, RefreshCw } from 'lucide-react'
+import { apiUrl } from '../lib/api'
 
 interface GuestbookEntry {
   id: string
@@ -54,10 +55,12 @@ export default function GuestbookPage() {
 
   const fetchEntries = async () => {
     try {
-      const res = await fetch(`https://portfolio-backend-st78.onrender.com/api/guestbook`)
+      const res = await fetch(apiUrl('/api/guestbook'))
       if (res.ok) {
         const data = await res.json()
-        setEntries(data)
+        if (Array.isArray(data)) {
+          setEntries(data)
+        }
       }
     } catch (err) {
       console.error('Failed to fetch guestbook entries', err)
@@ -81,10 +84,10 @@ export default function GuestbookPage() {
     setIsSubmitting(true)
     
     try {
-      const res = await fetch(`https://portfolio-backend-st78.onrender.com/api/guestbook`, {
+      const res = await fetch(apiUrl('/api/guestbook'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, message, signatureData })
+        body: JSON.stringify({ name: name.trim(), message: message.trim(), signatureData })
       })
 
       if (res.ok) {
@@ -97,10 +100,13 @@ export default function GuestbookPage() {
         setTimeout(() => {
           setSubmitted(false)
         }, 3000)
+      } else {
+        const errJson = await res.json().catch(() => ({}))
+        alert(errJson.error || 'Failed to submit signature.')
       }
     } catch (err) {
       console.error('Failed to submit entry', err)
-      alert('Error submitting entry. Is the backend running?')
+      alert('Error submitting entry. Please ensure backend is reachable.')
     } finally {
       setIsSubmitting(false)
     }

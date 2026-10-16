@@ -26,9 +26,17 @@ const getMarqueeItems = (row: typeof techRow1) => [...row, ...row, ...row, ...ro
 export const TechStackSection: React.FC = () => {
   return (
     <section className="pt-16 pb-4 md:pb-8 bg-[var(--color-surface-base)] relative overflow-hidden border-t border-[var(--color-border)]">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div className="mb-2">
-          <h2 className="text-3xl font-serif font-bold text-[var(--color-text-main)] tracking-tight">Core Technologies</h2>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-xs font-mono uppercase tracking-widest text-[var(--color-primary)] font-semibold">
+              // TECH ECOSYSTEM
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--color-text-main)] tracking-tight mt-0.5">Core Technologies</h2>
+          </div>
+          <span className="text-xs font-mono text-[var(--color-text-muted)] hidden sm:inline-block">
+            Hover to inspect
+          </span>
         </div>
       </div>
 
@@ -44,7 +52,7 @@ export const TechStackSection: React.FC = () => {
         <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-[var(--color-surface-base)] to-transparent z-10 pointer-events-none" />
 
         {/* Row 1 */}
-        <div className="flex animate-marquee space-x-4 whitespace-nowrap w-max">
+        <div className="flex animate-marquee space-x-4 whitespace-nowrap w-max group-hover:[animation-play-state:paused]">
           {getMarqueeItems(techRow1).map((tech, idx) => (
             <motion.div
               whileHover={{ scale: 1.1, y: -2 }}
@@ -58,7 +66,7 @@ export const TechStackSection: React.FC = () => {
         </div>
 
         {/* Row 2 (Delayed/Reversed direction or offset) */}
-        <div className="flex animate-marquee space-x-4 whitespace-nowrap w-max" style={{ animationDirection: 'reverse' }}>
+        <div className="flex animate-marquee space-x-4 whitespace-nowrap w-max group-hover:[animation-play-state:paused]" style={{ animationDirection: 'reverse' }}>
           {getMarqueeItems(techRow2).map((tech, idx) => (
             <motion.div
               whileHover={{ scale: 1.1, y: -2 }}

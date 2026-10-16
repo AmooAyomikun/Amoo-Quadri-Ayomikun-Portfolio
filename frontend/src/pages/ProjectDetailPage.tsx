@@ -6,6 +6,8 @@ import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { Badge } from '../components/Badge'
 
+import { apiUrl } from '../lib/api'
+
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
   const project = portfolioData.projects.find(p => p.id === id)
@@ -102,7 +104,7 @@ export default function ProjectDetailPage() {
                 {project.demoUrl && project.previewType !== 'image' ? (
                   <div className="absolute inset-0 w-full h-full overflow-hidden">
                     <iframe 
-                      src={`https://portfolio-backend-st78.onrender.com/api/proxy?url=${encodeURIComponent(project.demoUrl)}`}
+                      src={apiUrl(`/api/proxy?url=${encodeURIComponent(project.demoUrl)}`)}
                       title={project.title} 
                       className="absolute top-0 left-0 w-[150%] h-[150%] origin-top-left scale-[0.66] border-none"
                       allowFullScreen

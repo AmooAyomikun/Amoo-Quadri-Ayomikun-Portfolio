@@ -5,6 +5,7 @@ import { Footer } from '../components/Footer'
 import { Badge } from '../components/Badge'
 import { ArrowLeft, Calendar, Clock } from 'lucide-react'
 import type { NewsItem } from '../sections/NewsSection'
+import { apiUrl } from '../lib/api'
 
 export default function NewsArticlePage() {
   const { id } = useParams()
@@ -17,10 +18,7 @@ export default function NewsArticlePage() {
     
     const fetchNews = async () => {
       try {
-        const apiUrl = import.meta.env.PROD 
-          ? 'https://portfolio-backend-st78.onrender.com/api/news' 
-          : 'http://localhost:5000/api/news'
-        const res = await fetch(apiUrl)
+        const res = await fetch(apiUrl('/api/news'))
         const data = await res.json()
         if (res.ok && data.success) {
           const found = data.data.find((n: NewsItem) => n.id === id)

@@ -1,19 +1,42 @@
 [
   {
-    "ip": "127.0.0.1",
-    "country": "Localhost",
-    "city": "Local",
-    "lat": 0,
-    "lon": 0,
-    "timestamp": "2026-09-24T15:25:36.446Z"
-  },
-  {
-    "ip": "143.105.174.218",
+    "id": "vis-sample-1",
+    "ipHash": "e3b0c44298fc1c149afb",
     "country": "Nigeria",
     "countryCode": "NG",
     "city": "Lagos",
-    "lat": 6.5243,
-    "lon": 3.3792,
-    "timestamp": "2026-10-10T02:52:31.244Z"
+    "lat": 6.4474,
+    "lon": 3.3903,
+    "timestamp": "2026-10-16T21:58:07.226Z"
+  },
+  {
+    "id": "vis-sample-2",
+    "ipHash": "5e884898da28047151d0",
+    "country": "United States",
+    "countryCode": "US",
+    "city": "New York",
+    "lat": 40.7128,
+    "lon": -74.006,
+    "timestamp": "2026-10-16T22:07:14.090Z"
+  },
+  {
+    "id": "vis-sample-3",
+    "ipHash": "4b227777d4dd1fc61c6f",
+    "country": "United Kingdom",
+    "countryCode": "GB",
+    "city": "London",
+    "lat": 51.5074,
+    "lon": -0.1278,
+    "timestamp": "2026-10-12T09:20:10.050Z"
+  },
+  {
+    "id": "vis-1792189026328-zayp",
+    "ipHash": "0788f9060960d282fdad",
+    "country": "Nigeria",
+    "countryCode": "NG",
+    "city": "Lagos",
+    "lat": 6.4474,
+    "lon": 3.3903,
+    "timestamp": "2026-10-16T22:17:06.790Z"
   }
 ]
