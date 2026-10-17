@@ -254,23 +254,6 @@ export const VisitorMapSection: React.FC = () => {
     setTerminalLogs(prev => [...prev, { text: `GUEST ~ $ ${rawInput}`, type: 'input' }]);
     setTerminalInput('');
 
-    if (command === 'help') {
-      setTerminalLogs(prev => [...prev, { text: "AVAILABLE COMMANDS: help, about, skills, projects, contact, clear. Or ask me ANY natural question!", type: 'output' }]);
-      return;
-    } else if (command === 'about') {
-      setTerminalLogs(prev => [...prev, { text: "Quadri Ayomikun Amoo | Top-Ranking Software Engineering Graduate (5.0/5.0 Major GPA, 4.45/5.00 CGPA, Second-Class Upper Honors) @ Abiola Ajimobi Technical University | Full-Stack & AI Engineer.", type: 'output' }]);
-      return;
-    } else if (command === 'skills') {
-      setTerminalLogs(prev => [...prev, { text: "React, TypeScript, Node.js, Python, PWA, SQL, PostgreSQL, Machine Learning, Generative AI, Geospatial Recommender Systems.", type: 'output' }]);
-      return;
-    } else if (command === 'projects') {
-      setTerminalLogs(prev => [...prev, { text: "1. CleanReport PWA | 2. Location-Based Hotel Recommender | 3. KYNDA AI Assistant | 4. Pathly LMS | 5. Financial Churn ML Models", type: 'output' }]);
-      return;
-    } else if (command === 'contact') {
-      setTerminalLogs(prev => [...prev, { text: "Email: amooquadri555@gmail.com | Phone: +234 9071812921 | LinkedIn: linkedin.com/in/ayomikun-amoo-6b836428b | GitHub: github.com/AmooAyomikun", type: 'output' }]);
-      return;
-    }
-
     setTerminalLogs(prev => [...prev, { text: "AI: PROCESSING...", type: 'output' }]);
 
     try {
@@ -287,7 +270,7 @@ export const VisitorMapSection: React.FC = () => {
       }
 
       if (!reply) {
-        reply = "I am Quadri's AI Assistant! Quadri graduated in the Top 10% of his Software Engineering class with a 5.0/5.0 Major GPA (Second-Class Upper Honors) and is actively open to AI research positions, PhD/MSc opportunities, and senior engineering roles.";
+        reply = "I am Quadri's AI Assistant! Ask me anything about Quadri's software engineering projects, AI research, 5.0/5.0 Major GPA, or how to get in touch.";
       }
 
       setTerminalLogs(prev => {
@@ -297,7 +280,7 @@ export const VisitorMapSection: React.FC = () => {
     } catch {
       setTerminalLogs(prev => {
         const filtered = prev.filter(l => l.text !== "AI: PROCESSING...");
-        return [...filtered, { text: "AI service offline. Type 'help' for quick reference commands!", type: 'output' }];
+        return [...filtered, { text: "AI service temporarily unreachable. Type 'clear' to reset terminal or email amooquadri555@gmail.com.", type: 'output' }];
       });
     }
 

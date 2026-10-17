@@ -92,10 +92,15 @@ Keep responses under 3-4 sentences, styled like a smart CLI output.`
 export function getSmartPortfolioReply(userPrompt: string): string {
   const lower = userPrompt.trim().toLowerCase()
 
+  // 0. TERMINAL COMMANDS & HELP
+  if (/^(help|commands|options|usage|menu)$/i.test(lower) || /\b(available commands|what can you do|what commands)\b/i.test(lower)) {
+    return "AVAILABLE COMMANDS & TOPICS: 'about', 'skills', 'projects', 'education', 'research', 'experience', 'awards', 'contact', 'clear'. Or ask me ANY natural question about Quadri!"
+  }
+
   // 1. GREETINGS & CASUAL CONVERSATION
   const isGreeting = /\b(yo|wassup|what's up|sup|hi|hello|hey|heyy|howdy|hola|good morning|good afternoon|good evening|how are you|how far|wagywan)\b/i.test(lower)
   
-  if (isGreeting && !/\b(study|studied|school|gpa|cgpa|education|degree|where|research|thesis|project|projects|skill|skills|job|experience|contact|email|phone|goal|goals|vision|aim|award|awards|who)\b/i.test(lower)) {
+  if (isGreeting && !/\b(study|studied|school|gpa|cgpa|education|degree|where|research|thesis|project|projects|skill|skills|job|experience|contact|email|phone|goal|goals|vision|aim|award|awards|who|about)\b/i.test(lower)) {
     return "Yo! What's up? 👋 I'm Quadri's AI Assistant. I'm doing great! Ask me anything about Quadri's software engineering projects, AI research, 5.0/5.0 Major GPA, education, or how to get in touch!"
   }
 
@@ -114,8 +119,8 @@ export function getSmartPortfolioReply(userPrompt: string): string {
     return `Quadri received 4 Best Graduating Student Subject Honors: Operating Systems I, Human Computer Interaction (HCI), Software Engineering Professional Practice, and Fundamentals of Data Structures. He was also in the Top 10% of his graduating class.`
   }
 
-  // 5. IDENTITY / BIO / WHO IS QUADRI
-  if (/\b(who|bio|summary|background|identity|intro|overview)\b/i.test(lower)) {
+  // 5. IDENTITY / BIO / WHO IS QUADRI / ABOUT
+  if (/\b(who|bio|summary|background|identity|intro|overview|about)\b/i.test(lower)) {
     return `Quadri Ayomikun Amoo is a Software Engineering Researcher & Full-Stack Engineer with a 5.0/5.0 Major GPA (4.45/5.00 CGPA, Second-Class Upper Honors, Top 10%) from Abiola Ajimobi Technical University. He specializes in AI for Software Engineering, intelligent web systems (React, TypeScript, PWA, Node.js), and data analytics.`
   }
 

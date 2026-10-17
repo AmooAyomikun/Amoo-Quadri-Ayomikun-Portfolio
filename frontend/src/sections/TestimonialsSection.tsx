@@ -2,19 +2,34 @@ import React, { useState, useEffect, useRef } from 'react'
 import { portfolioData } from '../content/portfolioData'
 import { TestimonialCard } from '../components/TestimonialCard'
 import { Code, ChevronLeft, ChevronRight } from 'lucide-react'
+import { apiUrl } from '../lib/api'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
 export const TestimonialsSection: React.FC = () => {
+  const [testimonials, setTestimonials] = useState(portfolioData.testimonials)
   const [filter, setFilter] = useState<'all' | 'academic' | 'industry'>('all')
   const sectionRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  const filteredTestimonials = portfolioData.testimonials.filter(t => {
+  useEffect(() => {
+    fetch(apiUrl('/api/testimonials'))
+      .then(res => res.json())
+      .then(json => {
+        if (json?.success && Array.isArray(json.data) && json.data.length > 0) {
+          setTestimonials(json.data)
+        }
+      })
+      .catch(() => {
+        // Fallback cleanly to static portfolioData.testimonials
+      })
+  }, [])
+
+  const filteredTestimonials = testimonials.filter(t => {
     if (filter === 'all') return true
     return t.category === filter || t.category === 'both'
   })

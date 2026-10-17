@@ -5,9 +5,8 @@ import rateLimit from 'express-rate-limit'
 
 import { submitContact, getContactMessages, deleteContactMessage } from './controllers/contactController.js'
 import { getTestimonials } from './controllers/testimonialsController.js'
-import { getPortfolioData } from './controllers/portfolioController.js'
 import { getNews, publishNews, deleteNewsArticle } from './controllers/newsController.js'
-import { getGithubActivity, getGithubContributions } from './controllers/githubController.js'
+import { getGithubContributions } from './controllers/githubController.js'
 import { logVisitor, getVisitors } from './controllers/visitorsController.js'
 import { getSignatures, addSignature, deleteGuestbookEntry } from './controllers/guestbookController.js'
 import { handleAiChat } from './controllers/aiController.js'
@@ -111,8 +110,7 @@ app.delete('/api/admin/news/:id', requireAdmin, deleteNewsArticle)
 app.delete('/api/admin/guestbook/:id', requireAdmin, deleteGuestbookEntry)
 app.get('/api/admin/subscribers', requireAdmin, getSubscribers)
 
-// Portfolio & Testimonials
-app.get('/api/portfolio', getPortfolioData)
+// Testimonials
 app.get('/api/testimonials', getTestimonials)
 
 // News Routes (Issue 2.2 & 3.3 - Protected with requireAdmin)
@@ -124,7 +122,6 @@ app.post('/api/contact', contactLimiter, submitContact)
 app.post('/api/subscribe', contactLimiter, subscribeNewsletter)
 
 // GitHub Analytics
-app.get('/api/github-activity', getGithubActivity)
 app.get('/api/github-contributions', getGithubContributions)
 
 // Visitors & Geolocation (Issue 2.4 & Geolocation Fixes)
