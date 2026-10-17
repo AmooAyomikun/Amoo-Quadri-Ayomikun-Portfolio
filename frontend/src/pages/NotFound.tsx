@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { SEO } from '../components/SEO'
 
 /** 404 Not Found — Phase 8 will flesh this out with design */
 export default function NotFound() {
@@ -17,6 +18,7 @@ export default function NotFound() {
         gap: '1.5rem',
       }}
     >
+      <SEO title="Page Not Found (404)" description="The page you are looking for does not exist." />
       <p className="text-label" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}>
         404
       </p>

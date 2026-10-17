@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Lock, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react'
 import { Button } from '../components/Button'
 import { apiUrl, setAdminToken } from '../lib/api'
+import { SEO } from '../components/SEO'
 
 export default function AdminLogin() {
   const [passphrase, setPassphrase] = useState('')
@@ -40,6 +41,7 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] flex flex-col items-center justify-center p-4">
+      <SEO title="Admin Login" description="Portfolio administrator portal authentication." canonicalUrl="/admin" />
       <div className="w-full max-w-md bg-[var(--color-surface-card)] rounded-3xl p-8 border border-[var(--color-border)] shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-[var(--color-primary)]" />
         

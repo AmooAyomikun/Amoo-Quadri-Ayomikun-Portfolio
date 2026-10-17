@@ -18,6 +18,7 @@ import {
   SlidersHorizontal 
 } from 'lucide-react'
 import gsap from 'gsap'
+import { SEO } from '../components/SEO'
 
 type ViewMode = 'timeline' | 'grid' | 'carousel'
 
@@ -111,6 +112,11 @@ export default function EducationPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white flex flex-col justify-between">
+      <SEO 
+        title="Education & Academic Background" 
+        description="Academic credentials, certifications, coursework, and honors of Quadri Ayomikun Amoo. B.Sc. Software Engineering with 5.0/5.0 Major GPA."
+        canonicalUrl="/education"
+      />
       <Navbar />
       
       <main ref={containerRef} className="pt-28 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">

@@ -98,9 +98,9 @@ export const portfolioData = {
     googleScholar: "https://scholar.google.com/citations?hl=en&user=e9bX70kAAAAJ",
     linkedIn: "http://www.linkedin.com/in/ayomikun-amoo-6b836428b",
     twitter: "https://x.com/ayomhykun",
-    github: "https://github.com/amooquadri",
+    github: "https://github.com/AmooAyomikun",
     cvPdfUrl: "/Amoo_Quadri_CV.pdf",
-    bio: "I am a first-class Software Engineering graduate (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA) and dedicated Software Engineering & Applied AI Researcher. My work bridges academic research in intelligent computing, data-driven systems, and machine learning with production-grade full-stack and frontend engineering.",
+    bio: "I am a top-ranking Software Engineering graduate (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA, Second-Class Upper Honors, Top 10% of class) and dedicated Software Engineering & Applied AI Researcher. My work bridges academic research in intelligent computing, data-driven systems, and machine learning with production-grade full-stack and frontend engineering.",
     stats: [
       { label: "Major GPA", value: "5.0 / 5.0", detail: "Abiola Ajimobi Technical Univ" },
       { label: "Final CGPA", value: "4.45 / 5.00", detail: "89% Equivalent (3.56/4.00)" },
@@ -126,7 +126,7 @@ export const portfolioData = {
     {
       institution: "First Technical University (now Abiola Ajimobi Technical University), Ibadan",
       location: "Ibadan, Nigeria",
-      imageUrl: "/abiola ajumobi1.png",
+      imageUrl: "/abiola-ajimobi-1.png",
       degree: "Bachelor of Science (B.Sc.) in Software Engineering",
       period: "2021 – 2024",
       majorGpa: "5.0 / 5.0",
@@ -156,7 +156,7 @@ export const portfolioData = {
     {
       institution: "First Technical University, Ibadan",
       location: "Ibadan, Nigeria",
-      imageUrl: "/abiola ajumobi2.png",
+      imageUrl: "/abiola-ajimobi-2.png",
       degree: "Diploma in Entrepreneurship",
       period: "2021 – 2024",
       highlights: ["Upper Credit, Top 10% of Graduating Class."]
@@ -164,7 +164,7 @@ export const portfolioData = {
     {
       institution: "First Technical University, Ibadan",
       location: "Ibadan, Nigeria",
-      imageUrl: "/abiola ajumobi.png",
+      imageUrl: "/abiola-ajimobi.png",
       degree: "Diploma in French Language",
       period: "2021 – 2024",
       highlights: ["Lower Credit (Professional bilingual communication skills)."]
@@ -172,7 +172,7 @@ export const portfolioData = {
     {
       institution: "David Joel Model College, Ibadan",
       location: "Ibadan, Nigeria",
-      imageUrl: "/david joel.png",
+      imageUrl: "/david-joel.png",
       degree: "Secondary School Education",
       period: "2013 – 2019",
       highlights: ["Served as the Social Prefect.", "Graduated with excellent O-Level results."]

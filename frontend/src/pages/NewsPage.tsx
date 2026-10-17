@@ -5,6 +5,7 @@ import { NewsSection } from '../sections/NewsSection'
 import { portfolioData } from '../content/portfolioData'
 import { Badge } from '../components/Badge'
 import gsap from 'gsap'
+import { SEO } from '../components/SEO'
 
 export default function NewsPage() {
   const headerRef = useRef<HTMLDivElement>(null)
@@ -20,6 +21,11 @@ export default function NewsPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
+      <SEO 
+        title="News & Announcements" 
+        description="Latest research appointments, software launches, academic awards, and media updates from Quadri Ayomikun Amoo."
+        canonicalUrl="/news"
+      />
       <Navbar />
       <main id="main-content" className="pt-28 pb-16">
         

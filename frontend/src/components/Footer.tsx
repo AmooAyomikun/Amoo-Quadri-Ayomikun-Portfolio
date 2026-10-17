@@ -200,7 +200,7 @@ export const Footer: React.FC = () => {
 
             {/* Back to top row */}
             <div className="w-full flex justify-between items-center pt-6 text-xs font-mono text-black/80 font-medium">
-              <span className="uppercase">LAGOS, NIGERIA (GMT+1)</span>
+              <span className="uppercase">IBADAN, NIGERIA (GMT+1)</span>
               <button
                 onClick={scrollToTop}
                 className="flex items-center gap-1.5 text-black font-bold hover:opacity-75 transition-opacity cursor-pointer"

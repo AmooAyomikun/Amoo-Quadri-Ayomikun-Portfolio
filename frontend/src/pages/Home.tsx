@@ -9,10 +9,12 @@ import { ContactSection } from '../sections/ContactSection'
 import { GithubActivitySection } from '../sections/GithubActivitySection'
 import { VisitorMapSection } from '../sections/VisitorMapSection'
 import { TechStackSection } from '../sections/TechStackSection'
+import { SEO } from '../components/SEO'
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] transition-colors duration-200">
+      <SEO canonicalUrl="/" />
       <Navbar />
       <main id="main-content">
         <HeroSection />

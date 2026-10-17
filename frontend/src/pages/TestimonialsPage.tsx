@@ -3,6 +3,7 @@ import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { TestimonialsSection } from '../sections/TestimonialsSection'
 import gsap from 'gsap'
+import { SEO } from '../components/SEO'
 
 export default function TestimonialsPage() {
   const headerRef = useRef<HTMLDivElement>(null)
@@ -18,6 +19,11 @@ export default function TestimonialsPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
+      <SEO 
+        title="Endorsements & Testimonials" 
+        description="Recommendations and academic/professional feedback from professors, research mentors, and engineering leads for Quadri Ayomikun Amoo."
+        canonicalUrl="/testimonials"
+      />
       <Navbar />
       <main id="main-content" className="pt-28 pb-16">
         

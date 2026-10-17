@@ -6,6 +6,7 @@ import { Badge } from '../components/Badge'
 import { ArrowLeft, Calendar, Clock } from 'lucide-react'
 import type { NewsItem } from '../sections/NewsSection'
 import { apiUrl } from '../lib/api'
+import { SEO } from '../components/SEO'
 
 export default function NewsArticlePage() {
   const { id } = useParams()
@@ -86,6 +87,7 @@ export default function NewsArticlePage() {
   if (!news) {
     return (
       <div className="min-h-screen bg-[var(--color-surface-base)] flex items-center justify-center flex-col gap-4">
+        <SEO title="Article Not Found" canonicalUrl="/news" />
         <h1 className="text-2xl font-serif text-[var(--color-text-main)]">Article not found.</h1>
         <button onClick={() => navigate('/news')} className="text-[var(--color-primary)] hover:underline font-mono">
           Return to News
@@ -96,6 +98,12 @@ export default function NewsArticlePage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col">
+      <SEO 
+        title={news.title}
+        description={news.summary}
+        canonicalUrl={`/news/${news.id}`}
+        type="article"
+      />
       <Navbar />
       <main className="flex-grow pt-24 sm:pt-32 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
         <button 

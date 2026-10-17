@@ -6,6 +6,7 @@ import SignatureCanvas from 'react-signature-canvas'
 import { PenTool, CheckCircle, RefreshCw, AlertCircle } from 'lucide-react'
 import { apiUrl } from '../lib/api'
 import { useTheme } from '../lib/theme'
+import { SEO } from '../components/SEO'
 
 interface GuestbookEntry {
   id: string
@@ -139,6 +140,11 @@ export default function GuestbookPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
+      <SEO 
+        title="Interactive Guestbook" 
+        description="Leave your digital signature, greeting, or feedback on Quadri Ayomikun Amoo's portfolio guestbook."
+        canonicalUrl="/guestbook"
+      />
       <Navbar />
       
       <main className="pt-32 pb-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">

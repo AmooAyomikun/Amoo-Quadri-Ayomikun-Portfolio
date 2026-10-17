@@ -3,6 +3,7 @@ import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { ResearchSection } from '../sections/ResearchSection'
 import gsap from 'gsap'
+import { SEO } from '../components/SEO'
 
 export default function ResearchPage() {
   const headerRef = useRef<HTMLDivElement>(null)
@@ -18,6 +19,11 @@ export default function ResearchPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
+      <SEO 
+        title="Research & Publications" 
+        description="Published academic papers and ongoing scientific research in Machine Learning, Biometrics, and Automated Assessment by Quadri Ayomikun Amoo."
+        canonicalUrl="/research"
+      />
       <Navbar />
       <main id="main-content" className="pt-28 pb-16">
         

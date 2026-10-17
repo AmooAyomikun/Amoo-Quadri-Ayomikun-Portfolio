@@ -4,6 +4,7 @@ import { LogOut, Newspaper, Plus, ShieldCheck, Trash2, Mail, MessageSquare, Load
 import { Button } from '../components/Button'
 import { Badge } from '../components/Badge'
 import { apiUrl, getAdminToken, clearAdminToken } from '../lib/api'
+import { SEO } from '../components/SEO'
 
 interface ContactMessage {
   id: string
@@ -226,6 +227,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col md:flex-row">
+      <SEO title="Admin Dashboard" description="Portfolio content and telemetry management." canonicalUrl="/admin/dashboard" />
       {/* Sidebar (Issue 5.11: Fully responsive on mobile with toggleable drawer) */}
       <aside className="w-full md:w-64 bg-[var(--color-surface-card)] border-r border-[var(--color-border)] flex flex-col shrink-0">
         <div className="p-4 sm:p-6 border-b border-[var(--color-border)] flex items-center justify-between">

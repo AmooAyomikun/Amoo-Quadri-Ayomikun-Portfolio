@@ -4,6 +4,7 @@ import { Footer } from '../components/Footer'
 import { ExperienceSection } from '../sections/ExperienceSection'
 import { SkillsSection } from '../sections/SkillsSection'
 import gsap from 'gsap'
+import { SEO } from '../components/SEO'
 
 export default function ExperiencePage() {
   const headerRef = useRef<HTMLDivElement>(null)
@@ -19,6 +20,11 @@ export default function ExperiencePage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
+      <SEO 
+        title="Work Experience & History" 
+        description="Professional career timeline, software engineering roles, and leadership experience of Quadri Ayomikun Amoo."
+        canonicalUrl="/experience"
+      />
       <Navbar />
       <main id="main-content" className="pt-28 pb-16">
         

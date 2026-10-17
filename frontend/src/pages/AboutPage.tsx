@@ -4,6 +4,7 @@ import { Footer } from '../components/Footer'
 import { AboutSection } from '../sections/AboutSection'
 import profileImg from '../assets/profile.png'
 import gsap from 'gsap'
+import { SEO } from '../components/SEO'
 
 export default function AboutPage() {
   const headerRef = useRef<HTMLDivElement>(null)
@@ -19,6 +20,11 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
+      <SEO 
+        title="About & Biography" 
+        description="Learn about Quadri Ayomikun Amoo, his background in Software Engineering (5.0/5.0 Major GPA), research philosophy, and engineering mindset."
+        canonicalUrl="/about"
+      />
       <Navbar />
       <main id="main-content" className="pt-28 pb-16">
         
@@ -37,7 +43,7 @@ export default function AboutPage() {
                 Software Engineering Scholar & Research Assistant
               </p>
               <p className="text-base text-[var(--color-text-muted)] leading-relaxed max-w-2xl">
-                Graduated with a first-class B.Sc. in Software Engineering (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA). Currently focused on postgraduate research in applied artificial intelligence, software reliability, and intelligent computing.
+                Graduated in the Top 10% of class with a B.Sc. in Software Engineering (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA, Second-Class Upper Honors). Currently focused on postgraduate research in applied artificial intelligence, software reliability, and intelligent computing.
               </p>
             </div>
 

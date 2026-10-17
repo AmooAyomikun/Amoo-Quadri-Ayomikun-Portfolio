@@ -8,7 +8,7 @@ export const cvData = {
     address: "No.23, Gbadura str. Wofun, Olodo, Ibadan, Oyo State, Nigeria",
     googleScholar: "https://scholar.google.com/citations?hl=en&user=e9bX70kAAAAJ",
     linkedIn: "http://www.linkedin.com/in/ayomikun-amoo-6b836428b",
-    github: "https://github.com/amooquadri",
+    github: "https://github.com/AmooAyomikun",
     summary: "A highly motivated Software Engineering graduate with a 5.0/5.0 Major GPA and hands-on experience in software development, research, and industry projects. Committed to building an impactful career at the intersection of software engineering, artificial intelligence, data-driven systems, and intelligent computing.",
     researchInterests: [
       "Applied Data Science",

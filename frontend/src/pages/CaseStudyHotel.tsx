@@ -4,10 +4,16 @@ import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
+import { SEO } from '../components/SEO'
 
 export default function CaseStudyHotel() {
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
+      <SEO 
+        title="Hotel Recommendation Engine Case Study" 
+        description="B.Sc. Thesis Case Study: Location-Based Hotel Recommendation & Reservation System with collaborative filtering and distance metrics by Quadri Ayomikun Amoo."
+        canonicalUrl="/case-study/hotel-recommendation"
+      />
       <Navbar />
       <main id="main-content" className="pt-32 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -5,8 +5,8 @@ import { portfolioData } from '../content/portfolioData'
 import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { Badge } from '../components/Badge'
-
 import { apiUrl } from '../lib/api'
+import { SEO } from '../components/SEO'
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -19,6 +19,7 @@ export default function ProjectDetailPage() {
   if (!project) {
     return (
       <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col items-center justify-center">
+        <SEO title="Project Not Found" canonicalUrl="/projects" />
         <h1 className="text-3xl font-serif font-bold mb-4">Project Not Found</h1>
         <Link to="/projects" className="text-[var(--color-primary)] hover:underline flex items-center gap-2">
           <ArrowLeft className="w-4 h-4" /> Back to Projects
@@ -29,6 +30,11 @@ export default function ProjectDetailPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col">
+      <SEO 
+        title={`${project.title} — Project Case Study`}
+        description={project.summary}
+        canonicalUrl={`/projects/${project.id}`}
+      />
       <Navbar />
 
       <main className="flex-grow pt-32 pb-24">

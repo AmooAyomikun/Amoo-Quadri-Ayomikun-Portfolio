@@ -18,7 +18,7 @@ export const handleAiChat = async (req: Request, res: Response): Promise<void> =
 Answer concisely, professionally, and enthusiastically using the following accurate details about Quadri Ayomikun Amoo:
 Full Name: ${cvData.personalInfo.fullName}
 Title: ${cvData.personalInfo.title}
-Education: B.Sc. in Software Engineering (First-Class 5.0/5.0 Major GPA, 4.45/5.00 Final CGPA, Top 10%) from Abiola Ajimobi Technical University. Diplomas in French (Lower Credit) and Entrepreneurship (Upper Credit).
+Education: B.Sc. in Software Engineering (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA, Second-Class Upper Honors, Top 10% of class) from Abiola Ajimobi Technical University. Diplomas in French (Lower Credit) and Entrepreneurship (Upper Credit).
 Main Goal: Pursue M.Sc. and Ph.D. research in Artificial Intelligence, Software Engineering, and Natural Language Processing.
 Research: AI for Software Engineering, Geospatial Recommender Systems (B.Sc. Thesis under Dr. J.E.T. Akinsola), Research Assistant (NYSC) under Prof. Jude Sinebe at Postgraduate Research Lab.
 Experience: Frontend Intern @ Circo Digital / Orange (CleanReport PWA), Full Stack Intern @ CodeAlpha, Data Analyst Intern @ Coast Research Tech (10 ML models in Python/SQL & Power BI).
@@ -101,7 +101,7 @@ export function getSmartPortfolioReply(userPrompt: string): string {
 
   // 2. EDUCATION / DEGREE / SCHOOL / UNIVERSITY / GPA / CGPA / STUDY / WHERE
   if (/\b(study|studied|where|education|degree|university|school|college|gpa|cgpa|major|french|entrepreneurship|diploma|honors|rank|class)\b/i.test(lower)) {
-    return `Quadri earned his B.Sc. in Software Engineering from Abiola Ajimobi Technical University (formerly First Technical University), Ibadan, graduating with First-Class Honors (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA, Top 10% of class). He also holds Diplomas in French (Lower Credit) and Entrepreneurship (Upper Credit).`
+    return `Quadri earned his B.Sc. in Software Engineering from Abiola Ajimobi Technical University (formerly First Technical University), Ibadan, graduating with a 5.0/5.0 Major GPA and 4.45/5.00 Final CGPA (Second-Class Upper Honors, Top 10% of class). He also holds Diplomas in French (Lower Credit) and Entrepreneurship (Upper Credit).`
   }
 
   // 3. GOALS / VISION / FUTURE / CAREER / AIM / PHD / MSC / SCHOLARSHIPS
@@ -116,7 +116,7 @@ export function getSmartPortfolioReply(userPrompt: string): string {
 
   // 5. IDENTITY / BIO / WHO IS QUADRI
   if (/\b(who|bio|summary|background|identity|intro|overview)\b/i.test(lower)) {
-    return `Quadri Ayomikun Amoo is a Software Engineering Researcher & Full-Stack Engineer with a First-Class Honors degree (5.0/5.0 Major GPA, 4.45/5.00 CGPA) from Abiola Ajimobi Technical University. He specializes in AI for Software Engineering, intelligent web systems (React, TypeScript, PWA, Node.js), and data analytics.`
+    return `Quadri Ayomikun Amoo is a Software Engineering Researcher & Full-Stack Engineer with a 5.0/5.0 Major GPA (4.45/5.00 CGPA, Second-Class Upper Honors, Top 10%) from Abiola Ajimobi Technical University. He specializes in AI for Software Engineering, intelligent web systems (React, TypeScript, PWA, Node.js), and data analytics.`
   }
 
   // 6. RESEARCH / THESIS / SUPERVISORS / PROF SINEBE / DR AKINSOLA / HOTEL RECOMMENDER
@@ -156,10 +156,10 @@ export function getSmartPortfolioReply(userPrompt: string): string {
 
   // 13. CONTACT / EMAIL / PHONE / HIRE / LINKEDIN / GITHUB / LOCATION / ADDRESS
   if (/\b(contact|email|phone|hire|recruiter|reach|linkedin|github|address|location|where live|nigeria|ibadan)\b/i.test(lower)) {
-    return `Get in Touch with Quadri:\n• Email: amooquadri555@gmail.com\n• Phone: +234 9071812921\n• LinkedIn: linkedin.com/in/ayomikun-amoo-6b836428b\n• GitHub: github.com/amooquadri\n• Location: Ibadan, Oyo State, Nigeria (Available worldwide for research, engineering, and graduate positions!)`
+    return `Get in Touch with Quadri:\n• Email: amooquadri555@gmail.com\n• Phone: +234 9071812921\n• LinkedIn: linkedin.com/in/ayomikun-amoo-6b836428b\n• GitHub: github.com/AmooAyomikun\n• Location: Ibadan, Oyo State, Nigeria (Available worldwide for research, engineering, and graduate positions!)`
   }
 
   // 14. DEFAULT FALLBACK RESPONSE
-  return `I am Quadri's AI Portfolio Assistant! Quadri Amoo is a First-Class Software Engineering Graduate (5.0/5.0 Major GPA) specializing in AI, React, TypeScript, and Data Science.\n\nYou can ask me about:\n• Education & GPA (e.g., "where did he study", "awards")\n• Research & Thesis (e.g., "tell me about his thesis")\n• Projects & Work Experience (e.g., "what has he built", "internships")\n• Technical Skills (e.g., "what languages does he use")\n• Future Goals (e.g., "what are his goals")\n• Contact Details (e.g., "how can I hire or email Quadri")`
+  return `I am Quadri's AI Portfolio Assistant! Quadri Amoo is a top-ranking Software Engineering Graduate (5.0/5.0 Major GPA, Second-Class Upper Honors) specializing in AI, React, TypeScript, and Data Science.\n\nYou can ask me about:\n• Education & GPA (e.g., "where did he study", "awards")\n• Research & Thesis (e.g., "tell me about his thesis")\n• Projects & Work Experience (e.g., "what has he built", "internships")\n• Technical Skills (e.g., "what languages does he use")\n• Future Goals (e.g., "what are his goals")\n• Contact Details (e.g., "how can I hire or email Quadri")`
 }
 

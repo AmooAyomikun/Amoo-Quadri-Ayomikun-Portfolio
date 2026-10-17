@@ -3,6 +3,7 @@ import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { ContactSection } from '../sections/ContactSection'
 import gsap from 'gsap'
+import { SEO } from '../components/SEO'
 
 export default function ContactPage() {
   const headerRef = useRef<HTMLDivElement>(null)
@@ -18,6 +19,11 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
+      <SEO 
+        title="Contact & Collaboration" 
+        description="Get in touch with Quadri Ayomikun Amoo for software engineering opportunities, research collaborations, or technical consulting."
+        canonicalUrl="/contact"
+      />
       <Navbar />
       <main id="main-content" className="pt-28 pb-16">
         
