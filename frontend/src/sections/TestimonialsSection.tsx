@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { portfolioData } from '../content/portfolioData'
 import { TestimonialCard } from '../components/TestimonialCard'
+import { AnimatedWords } from '../components/AnimatedWords'
 import { Code, ChevronLeft, ChevronRight } from 'lucide-react'
 import { apiUrl } from '../lib/api'
 import gsap from 'gsap'
@@ -119,7 +120,7 @@ export const TestimonialsSection: React.FC = () => {
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-mono font-bold text-[var(--color-text-main)] tracking-tight">
-              &lt;Peer Recommendations /&gt;
+              <AnimatedWords text="<Peer Recommendations />" />
             </h2>
 
             <p className="mt-1 text-xs sm:text-sm text-[var(--color-text-muted)] leading-relaxed font-sans max-w-2xl">

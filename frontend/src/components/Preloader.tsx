@@ -170,37 +170,37 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[9999] bg-[#050505] text-white flex items-center justify-center overflow-hidden select-none"
+      className="fixed inset-0 z-[9999] bg-[#0a192f] text-[#ccd6f6] flex items-center justify-center overflow-hidden select-none"
     >
-      {/* 1. Base Revealed Dark Canvas (Clean Pure Black - Zero AI Glow Blobs) */}
+      {/* 1. Base Revealed Dark Canvas (Deep Brittany Navy) */}
       <div 
         ref={bgTextRef} 
-        className="absolute inset-0 flex flex-col items-center justify-center p-6 select-none pointer-events-none bg-[#050505] overflow-hidden"
+        className="absolute inset-0 flex flex-col items-center justify-center p-6 select-none pointer-events-none bg-[#0a192f] overflow-hidden"
       >
         {/* Minimalist Monogram & Typography Lockup */}
         <div className="flex flex-col items-center justify-center text-center max-w-2xl px-4 space-y-4 sm:space-y-6">
           
-          {/* Custom Monogram Emblem (QAA in Serif with Lime Accent) */}
+          {/* Custom Monogram Emblem (QAA in Serif with Teal Accent) */}
           <div className="flex items-center justify-center gap-1 sm:gap-2 font-serif text-6xl xs:text-7xl sm:text-9xl tracking-tighter leading-none select-none">
-            <span ref={letterQRef} className="text-neutral-100 font-light">Q</span>
-            <span ref={letterARef} className="text-[#C4FA4C] font-normal italic px-0.5">A</span>
-            <span ref={letterA2Ref} className="text-neutral-100 font-light">A</span>
+            <span ref={letterQRef} className="text-[#ccd6f6] font-light">Q</span>
+            <span ref={letterARef} className="text-[#64ffda] font-normal italic px-0.5">A</span>
+            <span ref={letterA2Ref} className="text-[#ccd6f6] font-light">A</span>
           </div>
 
           {/* Minimalist Divider Line with Accent Dot */}
           <div ref={dividerRef} className="flex items-center justify-center gap-3 w-32 sm:w-48 my-1 sm:my-2">
-            <span className="h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-800 to-transparent" />
-            <span className="w-1.5 h-1.5 rounded-full bg-[#C4FA4C] shrink-0" />
-            <span className="h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-800 to-transparent" />
+            <span className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#233554] to-transparent" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#64ffda] shrink-0" />
+            <span className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#233554] to-transparent" />
           </div>
 
           {/* Full Name in Spaced Serif */}
-          <h2 ref={nameTextRef} className="font-serif text-xs xs:text-sm sm:text-xl md:text-2xl text-neutral-200 tracking-[0.25em] xs:tracking-[0.3em] uppercase font-medium">
+          <h2 ref={nameTextRef} className="font-serif text-xs xs:text-sm sm:text-xl md:text-2xl text-[#ccd6f6] tracking-[0.25em] xs:tracking-[0.3em] uppercase font-medium">
             Quadri Ayomikun Amoo
           </h2>
 
           {/* Subtitle Role */}
-          <p ref={roleTextRef} className="font-mono text-[9px] xs:text-[10px] sm:text-xs text-neutral-400 tracking-[0.2em] uppercase font-normal">
+          <p ref={roleTextRef} className="font-mono text-[9px] xs:text-[10px] sm:text-xs text-[#8892b0] tracking-[0.2em] uppercase font-normal">
             Software Engineer & Researcher
           </p>
 
@@ -210,20 +210,20 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       {/* 2. Dark Curtain Overlay Panel */}
       <div
         ref={curtainRef}
-        className="absolute inset-0 z-10 bg-[#050505] text-white flex flex-col justify-between p-4 sm:p-8 md:p-14 shadow-[20px_0_50px_rgba(0,0,0,0.9)] border-r border-neutral-800/50 overflow-hidden"
+        className="absolute inset-0 z-10 bg-[#0a192f] text-[#ccd6f6] flex flex-col justify-between p-4 sm:p-8 md:p-14 shadow-[20px_0_50px_rgba(2,12,27,0.95)] border-r border-[#233554] overflow-hidden"
       >
         {/* Header Bar */}
         <div className="flex justify-between items-center w-full z-20 gap-2">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#C4FA4C] animate-pulse shrink-0 shadow-[0_0_8px_#C4FA4C]" />
-            <span className="font-mono text-[10px] xs:text-xs md:text-sm tracking-widest uppercase text-neutral-300 font-semibold truncate">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#64ffda] animate-pulse shrink-0 shadow-[0_0_8px_#64ffda]" />
+            <span className="font-mono text-[10px] xs:text-xs md:text-sm tracking-widest uppercase text-[#ccd6f6] font-semibold truncate">
               <span className="sm:hidden">Quadri Amoo</span>
               <span className="hidden sm:inline">Quadri Ayomikun Amoo</span> — Portfolio
             </span>
           </div>
           <button 
             onClick={handleSkip}
-            className="font-mono text-[10px] xs:text-xs uppercase tracking-widest text-neutral-400 hover:text-[#C4FA4C] transition-colors cursor-pointer border border-neutral-800 hover:border-[#C4FA4C]/40 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full shrink-0 whitespace-nowrap bg-neutral-950/60"
+            className="font-mono text-[10px] xs:text-xs uppercase tracking-widest text-[#8892b0] hover:text-[#64ffda] transition-colors cursor-pointer border border-[#233554] hover:border-[#64ffda]/40 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full shrink-0 whitespace-nowrap bg-[#020c1b]/60"
           >
             Skip Intro →
           </button>
@@ -234,23 +234,23 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           ref={counterTextRef}
           className="flex flex-col items-end justify-end my-auto sm:my-0 sm:mb-10 md:mb-16 z-20 self-end max-w-[210px] xs:max-w-[260px] sm:max-w-md w-full py-6 sm:py-0"
         >
-          <div className="font-mono text-4xl xs:text-6xl sm:text-8xl md:text-9xl font-black tracking-tighter text-white">
-            {count.toString().padStart(3, '0')}<span className="text-[#C4FA4C]">%</span>
+          <div className="font-mono text-4xl xs:text-6xl sm:text-8xl md:text-9xl font-black tracking-tighter text-[#ccd6f6]">
+            {count.toString().padStart(3, '0')}<span className="text-[#64ffda]">%</span>
           </div>
-          <div className="w-full h-1.5 bg-neutral-900 rounded-full mt-2 sm:mt-4 overflow-hidden border border-neutral-800/80">
+          <div className="w-full h-1.5 bg-[#112240] rounded-full mt-2 sm:mt-4 overflow-hidden border border-[#233554]">
             <div
               ref={progressLineRef}
-              className="h-full bg-[#C4FA4C] transition-all duration-100 ease-out rounded-full shadow-[0_0_12px_rgba(196,250,76,0.6)]"
+              className="h-full bg-[#64ffda] transition-all duration-100 ease-out rounded-full shadow-[0_0_12px_rgba(100,255,218,0.6)]"
               style={{ width: `${count}%` }}
             />
           </div>
-          <p className="font-mono text-[9px] xs:text-[10px] sm:text-[11px] md:text-xs text-neutral-400 uppercase tracking-wider mt-2 sm:mt-3">
+          <p className="font-mono text-[9px] xs:text-[10px] sm:text-[11px] md:text-xs text-[#8892b0] uppercase tracking-wider mt-2 sm:mt-3">
             {isPushing ? 'Revealing Portfolio...' : 'Loading Experience...'}
           </p>
         </div>
 
         {/* Footer Bar */}
-        <div className="flex justify-between items-center w-full font-mono text-[9px] xs:text-[10px] md:text-xs text-neutral-400 uppercase tracking-widest z-40 border-t border-neutral-900/80 pt-3 sm:pt-4 gap-2 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent">
+        <div className="flex justify-between items-center w-full font-mono text-[9px] xs:text-[10px] md:text-xs text-[#8892b0] uppercase tracking-widest z-40 border-t border-[#233554] pt-3 sm:pt-4 gap-2 bg-gradient-to-t from-[#0a192f] via-[#0a192f]/80 to-transparent">
           <span className="truncate">AI & Software Engineering</span>
           <span className="shrink-0">© 2026</span>
         </div>
@@ -266,7 +266,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       >
         <div className="relative">
           {/* Subtle ambient glow behind character body for contrast */}
-          <div className="absolute inset-0 bg-[#C4FA4C]/10 rounded-full blur-xl -z-10 scale-90" />
+          <div className="absolute inset-0 bg-[#64ffda]/10 rounded-full blur-xl -z-10 scale-90" />
           <img
             src="/character-push.png"
             alt="Character pushing curtain"

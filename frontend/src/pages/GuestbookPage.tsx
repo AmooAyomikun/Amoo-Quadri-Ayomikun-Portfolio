@@ -213,7 +213,7 @@ export default function GuestbookPage() {
                   <div ref={wrapperRef} className="bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-lg overflow-hidden h-32 relative group">
                     <SignatureCanvas 
                       ref={sigCanvas}
-                      penColor={theme === 'dark' ? '#F4F4F5' : '#09090B'}
+                      penColor={theme === 'dark' ? '#64ffda' : '#0a192f'}
                       canvasProps={{ 
                         width: canvasSize.width, 
                         height: canvasSize.height,
@@ -237,8 +237,8 @@ export default function GuestbookPage() {
                   disabled={isSubmitting || submitted}
                   className={`w-full py-3 rounded-lg text-sm font-bold tracking-wide transition-all ${
                     submitted 
-                      ? 'bg-green-500/20 text-green-400 border border-green-500/50 cursor-default'
-                      : 'bg-[var(--color-primary)] text-black hover:bg-lime-400 cursor-pointer'
+                      ? 'bg-teal-500/20 text-[#64ffda] border border-[#64ffda]/50 cursor-default'
+                      : 'bg-[var(--color-primary)] text-[#0a192f] hover:bg-[var(--color-primary-hover)] cursor-pointer'
                   } flex items-center justify-center gap-2`}
                 >
                   {isSubmitting ? 'Signing...' : submitted ? <><CheckCircle className="w-4 h-4" /> Signed Successfully</> : 'Sign Guestbook'}

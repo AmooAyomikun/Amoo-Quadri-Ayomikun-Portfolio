@@ -9,6 +9,7 @@ import {
   Code
 } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { AnimatedWords } from '../components/AnimatedWords'
 
 export const NumberedAboutFlow: React.FC = () => {
   const items = [
@@ -17,9 +18,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 01. IDENTITY',
       tabLabel: '01. IDENTITY',
       shortLabel: 'IDENTITY',
-      accentColor: '#C4FA4C',
-      tabBg: 'bg-[#C4FA4C]',
-      tabText: 'text-black',
+      accentColor: '#64ffda',
+      tabBg: 'bg-[#64ffda]',
+      tabText: 'text-[#0a192f]',
       title: 'Full-Stack Engineer & AI Enthusiast',
       icon: <Sparkles className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -34,9 +35,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 02. ACADEMICS',
       tabLabel: '02. ACADEMICS',
       shortLabel: 'ACADEMICS',
-      accentColor: '#C4FA4C',
-      tabBg: 'bg-[#C4FA4C]',
-      tabText: 'text-black',
+      accentColor: '#64ffda',
+      tabBg: 'bg-[#64ffda]',
+      tabText: 'text-[#0a192f]',
       title: 'Academic Milestones',
       icon: <GraduationCap className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -51,9 +52,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 03. RESEARCH',
       tabLabel: '03. RESEARCH',
       shortLabel: 'RESEARCH',
-      accentColor: '#C4FA4C',
-      tabBg: 'bg-[#C4FA4C]',
-      tabText: 'text-black',
+      accentColor: '#64ffda',
+      tabBg: 'bg-[#64ffda]',
+      tabText: 'text-[#0a192f]',
       title: 'Applied Research',
       icon: <BookOpen className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -68,9 +69,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 04. LEADERSHIP',
       tabLabel: '04. LEADERSHIP',
       shortLabel: 'LEADERSHIP',
-      accentColor: '#C4FA4C',
-      tabBg: 'bg-[#C4FA4C]',
-      tabText: 'text-black',
+      accentColor: '#64ffda',
+      tabBg: 'bg-[#64ffda]',
+      tabText: 'text-[#0a192f]',
       title: 'Mentorship & Impact',
       icon: <Users className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -85,9 +86,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 05. VISION',
       tabLabel: '05. VISION',
       shortLabel: 'VISION',
-      accentColor: '#C4FA4C',
-      tabBg: 'bg-[#C4FA4C]',
-      tabText: 'text-black',
+      accentColor: '#64ffda',
+      tabBg: 'bg-[#64ffda]',
+      tabText: 'text-[#0a192f]',
       title: 'Next Steps',
       icon: <Award className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -102,7 +103,8 @@ export const NumberedAboutFlow: React.FC = () => {
 
   return (
     <section
-      className="relative z-10 bg-[var(--color-surface-base)] pt-4 pb-10 sm:pt-8 sm:pb-16"
+      id="about"
+      className="relative z-10 bg-[var(--color-surface-base)] pt-4 pb-10 sm:pt-8 sm:pb-16 scroll-mt-24"
     >
       {/* Background Grid Pattern */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(var(--color-primary)_1px,transparent_1px)] [background-size:24px_24px]" />
@@ -111,7 +113,7 @@ export const NumberedAboutFlow: React.FC = () => {
       <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
         
         {/* Developer Styled Section Header: <About Me /> */}
-        <div className="sticky top-16 md:top-20 z-40 bg-[var(--color-surface-base)]/95 backdrop-blur-sm py-4 mb-4 sm:mb-8 border-b border-transparent">
+        <div className="sticky top-16 md:top-20 z-40 bg-[var(--color-surface-base)]/95 backdrop-blur-sm py-2 sm:py-3 mb-2 sm:mb-4 border-b border-transparent">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[var(--color-surface-card)] text-[var(--color-primary)] text-[10px] sm:text-xs font-mono font-bold border border-[var(--color-border)] mb-1 shadow-xs">
@@ -120,7 +122,7 @@ export const NumberedAboutFlow: React.FC = () => {
               </div>
               <div className="flex items-center gap-3">
                 <h2 className="text-2xl sm:text-4xl md:text-5xl font-mono font-bold text-[var(--color-text-main)] tracking-tight">
-                  &lt;About Me /&gt;
+                  <AnimatedWords text="<About Me />" />
                 </h2>
                 <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-[11px] font-mono font-bold border border-[var(--color-primary)]/30">
                   <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] animate-pulse" />
@@ -143,13 +145,13 @@ export const NumberedAboutFlow: React.FC = () => {
                 key={item.num} 
                 className="sticky w-full"
                 style={{
-                  top: `calc(150px + ${idx * 0.8}rem)`, // Safely below header
+                  top: `calc(170px + ${idx * 0.8}rem)`, // Safely below header
                   zIndex: 10 + idx
                 }}
               >
                 <motion.div 
                   whileHover={{ scale: 1.02 }}
-                  className="p-4 sm:p-5 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl shadow-[0_-10px_30px_rgba(0,0,0,0.4)] flex flex-col transition-all"
+                  className="p-4 sm:p-5 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl shadow-lg shadow-black/5 dark:shadow-[0_-10px_30px_rgba(0,0,0,0.4)] flex flex-col transition-all"
                   style={{
                     borderTopWidth: '4px',
                     borderTopColor: item.accentColor,
@@ -169,7 +171,7 @@ export const NumberedAboutFlow: React.FC = () => {
                         {item.num}
                       </span>
                       <h3 className="text-lg font-serif font-bold text-[var(--color-text-main)] leading-tight">
-                        {item.title}
+                        <AnimatedWords text={item.title} />
                       </h3>
                     </div>
                     <div className="p-1.5 rounded-xl shrink-0 border border-white/10" style={{ backgroundColor: `${item.accentColor}18`, color: item.accentColor }}>
@@ -192,7 +194,7 @@ export const NumberedAboutFlow: React.FC = () => {
                     {item.tags?.map((tag, tIdx) => (
                       <span
                         key={tIdx}
-                        className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider text-black"
+                        className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider text-[#0a192f]"
                         style={{ backgroundColor: item.accentColor }}
                       >
                         {tag}
@@ -221,23 +223,43 @@ export const NumberedAboutFlow: React.FC = () => {
                 viewport={{ once: true, margin: "-150px" }}
                 transition={{ duration: 0.6, type: 'spring', stiffness: 80 }}
                 key={item.num}
-                className="sticky w-full"
+                id={`about-card-${item.num}`}
+                className="sticky w-full scroll-mt-48"
                 style={{
-                  top: '180px', // Safely below the <About Me /> header
+                  top: '230px', // Comfortably below the <About Me /> header
                   zIndex: 10 + idx, // Ensure subsequent cards stack on top
                 }}
               >
-                {/* Tab Container */}
-                <div className="relative w-full h-[46px]">
+                {/* Tab Container - pointer-events-none allows clicks to pass through to underlying stacked tabs */}
+                <div className="relative w-full h-[46px] pointer-events-none">
                   <motion.div
-                    whileHover={{ y: -2 }}
-                    className="absolute top-0 flex items-center justify-center gap-2 px-4 h-[46px] font-mono text-sm font-extrabold tracking-wider uppercase transition-all duration-300 shadow-2xl cursor-pointer"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Jump to ${item.tabLabel}`}
+                    onClick={() => {
+                      const el = document.getElementById(`about-card-${item.num}`)
+                      if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        const el = document.getElementById(`about-card-${item.num}`)
+                        if (el) {
+                          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                        }
+                      }
+                    }}
+                    whileHover={{ y: -3 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="absolute top-0 flex items-center justify-center gap-2 px-4 h-[46px] font-mono text-xs md:text-sm font-extrabold tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-lg select-none pointer-events-auto outline-none focus-visible:ring-2 focus-visible:ring-black"
                     style={{
                       width: '175px',
                       left: `${idx * 153}px`,
                       clipPath: clipPolygon,
                       backgroundColor: item.accentColor,
-                      color: '#000' // Keeping text black for high contrast
+                      color: '#0a192f'
                     }}
                   >
                     <span className="shrink-0">{item.icon}</span>
@@ -247,7 +269,7 @@ export const NumberedAboutFlow: React.FC = () => {
 
                 {/* Card Body Container */}
                 <div 
-                  className="relative z-20 p-6 md:p-8 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.3)] flex flex-col transition-all duration-300"
+                  className="relative z-20 p-6 md:p-8 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl shadow-xl shadow-black/5 dark:shadow-[0_-10px_40px_rgba(0,0,0,0.4)] flex flex-col transition-all duration-300"
                   style={{
                     borderTopWidth: '3px',
                     borderTopColor: item.accentColor,
@@ -274,7 +296,7 @@ export const NumberedAboutFlow: React.FC = () => {
                         {item.num}
                       </span>
                       <h3 className="text-2xl md:text-3xl font-serif font-bold text-[var(--color-text-main)] leading-tight">
-                        {item.title}
+                        <AnimatedWords text={item.title} />
                       </h3>
                     </div>
                     <div
@@ -304,7 +326,7 @@ export const NumberedAboutFlow: React.FC = () => {
                         className="px-3 py-1.5 rounded-full text-xs font-mono font-bold tracking-wider"
                         style={{
                           backgroundColor: item.accentColor,
-                          color: '#000000'
+                          color: '#0a192f'
                         }}
                       >
                         {tag}

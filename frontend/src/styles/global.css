@@ -42,8 +42,17 @@
   background: var(--color-surface-base);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border-hover);
+  background: var(--color-surface-elevated);
   border-radius: var(--radius-full);
+  border: 2px solid var(--color-surface-base);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+::selection {
+  background-color: #233554;
+  color: #64ffda;
 }
 
 /* Utility Animations */

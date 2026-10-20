@@ -13,7 +13,7 @@ import { Request, Response, NextFunction } from 'express'
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 8 // 8 hours
 
 const getSecret = (): string =>
-  process.env.ADMIN_TOKEN_SECRET || process.env.ADMIN_PASSWORD || 'quadri2026-auth-fallback-secret'
+  process.env.ADMIN_TOKEN_SECRET || process.env.ADMIN_PASSWORD || ''
 
 const sign = (payload: string, secret: string): string =>
   crypto.createHmac('sha256', secret).update(payload).digest('base64url')
@@ -24,11 +24,12 @@ const safeEqual = (a: string, b: string): boolean => {
   return crypto.timingSafeEqual(ha, hb)
 }
 
-export const isAdminConfigured = (): boolean => true
+export const isAdminConfigured = (): boolean =>
+  Boolean(process.env.ADMIN_PASSWORD && process.env.ADMIN_PASSWORD.trim().length > 0)
 
 export const checkAdminPassword = (input: unknown): boolean => {
-  const expected = process.env.ADMIN_PASSWORD || 'quadri2026'
-  if (typeof input !== 'string') return false
+  const expected = process.env.ADMIN_PASSWORD
+  if (!expected || typeof input !== 'string') return false
   return safeEqual(input, expected)
 }
 

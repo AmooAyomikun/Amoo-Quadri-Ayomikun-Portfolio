@@ -40,12 +40,20 @@ const saveMessagesToFile = (messages: ContactSubmission[]): void => {
 }
 
 export const submitContact = async (req: Request, res: Response): Promise<void> => {
-  const { name, email, subject, message, lens } = req.body as Partial<ContactSubmission>
+  const { name, email, subject, message, lens } = req.body ?? {}
 
-  if (!name || !email || !message) {
+  // Explicit type checks for incoming required fields
+  if (
+    typeof name !== 'string' ||
+    typeof email !== 'string' ||
+    typeof message !== 'string' ||
+    !name.trim() ||
+    !email.trim() ||
+    !message.trim()
+  ) {
     res.status(400).json({
       success: false,
-      error: 'Missing required fields: name, email, and message are required.'
+      error: 'Missing or invalid fields: name, email, and message must be non-empty strings.'
     })
     return
   }
@@ -53,8 +61,14 @@ export const submitContact = async (req: Request, res: Response): Promise<void> 
   // Length limits and trimming
   const trimmedName = name.trim().slice(0, 80)
   const trimmedEmail = email.trim().slice(0, 100)
-  const trimmedSubject = (subject || 'Portfolio Contact Inquiry').trim().slice(0, 150)
+  const trimmedSubject = (typeof subject === 'string' && subject.trim() ? subject.trim() : 'Portfolio Contact Inquiry').slice(0, 150)
   const trimmedMessage = message.trim().slice(0, 3000)
+
+  // Safe lens sanitization
+  const validLenses = ['research', 'industry', 'general']
+  const safeLens = (typeof lens === 'string' && validLenses.includes(lens.toLowerCase()))
+    ? (lens.toLowerCase() as 'research' | 'industry' | 'general')
+    : 'general'
 
   // Basic email regex validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -72,7 +86,7 @@ export const submitContact = async (req: Request, res: Response): Promise<void> 
     email: trimmedEmail,
     subject: trimmedSubject,
     message: trimmedMessage,
-    lens: lens || 'general',
+    lens: safeLens,
     timestamp: new Date().toISOString(),
     read: false
   }

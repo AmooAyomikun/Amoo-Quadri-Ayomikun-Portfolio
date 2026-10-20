@@ -1,26 +1,60 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, GraduationCap, Briefcase, Download, Terminal, Sparkles, Award } from 'lucide-react'
-import { Button } from '../components/Button'
-import profileImg from '../assets/profile.png'
+import { ArrowRight, GraduationCap, Briefcase, Download } from 'lucide-react'
+import { AnimatedWords } from '../components/AnimatedWords'
 import gsap from 'gsap'
-import { motion } from 'framer-motion'
+
+const TYPEWRITER_PHRASES = [
+  'intelligent systems.',
+  'research applications.',
+  'accessible platforms.',
+  'scalable software.'
+]
 
 export const HeroSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null)
+
+  // Typewriter effect states
+  const [phraseIndex, setPhraseIndex] = useState(0)
+  const [currentText, setCurrentText] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  // Typewriter animation loop
+  useEffect(() => {
+    const targetPhrase = TYPEWRITER_PHRASES[phraseIndex]
+    const typingSpeed = isDeleting ? 35 : 70
+
+    if (!isDeleting && currentText === targetPhrase) {
+      // Pause at full phrase before deleting
+      const pauseTimer = setTimeout(() => setIsDeleting(true), 1800)
+      return () => clearTimeout(pauseTimer)
+    }
+
+    if (isDeleting && currentText === '') {
+      // Completed backspacing, advance to next phrase
+      setIsDeleting(false)
+      setPhraseIndex((prev) => (prev + 1) % TYPEWRITER_PHRASES.length)
+      return
+    }
+
+    const charTimer = setTimeout(() => {
+      setCurrentText((prev) =>
+        isDeleting
+          ? targetPhrase.substring(0, prev.length - 1)
+          : targetPhrase.substring(0, prev.length + 1)
+      )
+    }, typingSpeed)
+
+    return () => clearTimeout(charTimer)
+  }, [currentText, isDeleting, phraseIndex])
 
   useEffect(() => {
     if (!containerRef.current) return
     const ctx = gsap.context(() => {
       gsap.fromTo(
         '.gsap-hero-item',
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.9, stagger: 0.12, ease: 'power3.out' }
-      )
-      gsap.fromTo(
-        '.gsap-profile-cutout',
-        { opacity: 0, scale: 0.95, y: 20 },
-        { opacity: 1, scale: 1, y: 0, duration: 1.1, delay: 0.2, ease: 'power3.out' }
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' }
       )
     }, containerRef)
 
@@ -28,90 +62,68 @@ export const HeroSection: React.FC = () => {
   }, [])
 
   return (
-    <section ref={containerRef} className="relative pt-28 pb-12 md:pt-36 md:pb-14 bg-[var(--color-surface-base)] overflow-hidden">
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-6 items-center">
+    <section
+      ref={containerRef}
+      className="relative min-h-[100dvh] md:h-screen flex flex-col justify-center pt-20 pb-8 sm:pt-24 sm:pb-10 bg-[#0a192f] overflow-hidden"
+    >
+      <div className="max-w-5xl mx-auto px-6 sm:px-12 lg:px-16 w-full flex flex-col justify-center h-full">
+        <div className="flex flex-col items-start text-left space-y-3 sm:space-y-4 md:space-y-4 max-w-4xl">
           
-          {/* Left Text Column */}
-          <div className="lg:col-span-7 space-y-6">
-            
-            <div className="gsap-hero-item text-[var(--color-text-subtle)] font-sans uppercase tracking-widest text-xs font-semibold mb-2">
-              Hello, I am
-            </div>
-
-            {/* Hero Main Name Header */}
-            <h1 className="gsap-hero-item text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-[var(--color-text-main)] tracking-tight leading-[1.15] break-words">
-              Quadri Ayomikun Amoo
-            </h1>
-
-            <div className="gsap-hero-item text-lg sm:text-2xl text-[var(--color-primary)] font-serif italic font-semibold mt-1 mb-4">
-              Software Engineer & Researcher
-            </div>
-
-            <p className="gsap-hero-item text-sm sm:text-lg text-[var(--color-text-muted)] leading-relaxed max-w-2xl font-sans mb-6">
-              I build modern web applications with a strong focus on creating fast, intuitive, and accessible user experiences. While frontend is where I do my best work, I also enjoy building complete full-stack applications that solve real problems.
-              <br className="hidden sm:block" />
-              Beyond software engineering, I am deeply involved in academic research, focusing on machine learning, data-driven systems, and intelligent computing.
-            </p>
-
-            {/* CTA Buttons: Primary Projects + Download CV */}
-            <div className="gsap-hero-item pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
-                <Button
-                  href="/projects"
-                  variant="primary"
-                  size="lg"
-                  className="w-full sm:w-auto text-center justify-center"
-                >
-                  View My Work
-                </Button>
-              </motion.div>
-
-              <motion.a
-                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                href="/Amoo_Quadri_CV.pdf"
-                download="Amoo_Quadri_CV.pdf"
-                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full font-sans text-sm font-semibold bg-[var(--color-surface-card)] text-[var(--color-text-main)] border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all shadow-sm w-full sm:w-auto"
-              >
-                <Download className="w-4 h-4 text-[var(--color-primary)]" />
-                Download CV (PDF)
-              </motion.a>
-            </div>
-
-            {/* Quick Links */}
-            <div className="gsap-hero-item pt-6 border-t border-[var(--color-border)] flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm font-sans text-[var(--color-text-muted)]">
-              <Link to="/about" className="hover:text-[var(--color-text-main)] transition-colors flex items-center gap-1.5">
-                <GraduationCap className="w-4 h-4 text-[var(--color-primary)]" /> Read Biography
-              </Link>
-              <Link to="/experience" className="hover:text-[var(--color-text-main)] transition-colors flex items-center gap-1.5">
-                <Briefcase className="w-4 h-4 text-[var(--color-primary)]" /> Experience
-              </Link>
-              <Link to="/contact" className="hover:text-[var(--color-text-main)] transition-colors">
-                Contact Form →
-              </Link>
-            </div>
-
+          {/* Subtitle / Intro Greeting */}
+          <div className="gsap-hero-item font-mono text-[#64ffda] text-xs sm:text-sm tracking-wide font-normal">
+            Hi, my name is
           </div>
 
-          {/* Right Portrait Image */}
-          <div className="lg:col-span-5 flex justify-center lg:justify-end relative">
-            <motion.div 
-              whileHover={{ y: -10 }}
-              transition={{ type: 'spring', stiffness: 100 }}
-              className="gsap-profile-cutout relative w-full max-w-xs sm:max-w-md"
-            >
-              <div className="relative p-1 sm:p-4">
-                <div className="relative bg-[var(--color-surface-card)] rounded-[2rem] p-2 shadow-xl border border-[var(--color-border)] overflow-hidden">
-                  <img
-                    src={profileImg}
-                    alt="Quadri Ayomikun Amoo"
-                    className="w-full h-auto object-cover object-top rounded-[1.5rem]"
-                  />
+          {/* Huge Main Name Header */}
+          <h1 className="gsap-hero-item text-3xl sm:text-5xl lg:text-6xl font-sans font-bold text-[#ccd6f6] tracking-tight leading-tight break-words">
+            <AnimatedWords text="Quadri Ayomikun Amoo." />
+          </h1>
 
-                </div>
-              </div>
-            </motion.div>
+          {/* Second Headline with Synchronized Typewriter Effect */}
+          <h2 className="gsap-hero-item text-2xl sm:text-3xl lg:text-4xl font-sans font-bold text-[#8892b0] tracking-tight leading-snug">
+            <span>I build things for the web &amp;&nbsp;</span>
+            <span className="text-[#64ffda] inline">{currentText}</span>
+            <span className="inline-block w-[3px] h-[0.85em] bg-[#64ffda] ml-1 align-baseline animate-pulse" />
+          </h2>
+
+          {/* Subtitle / Bio Paragraph */}
+          <p className="gsap-hero-item text-[#8892b0] text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl font-sans pt-1">
+            I am a software engineer specializing in building high-performance web applications with a strong focus on creating fast, intuitive, and accessible user experiences. While frontend is where I do my best work, I also build complete full-stack applications and engage in applied academic research in machine learning, data-driven systems, and intelligent computing.
+          </p>
+
+          {/* CTA Buttons - Outlined Teal Button style */}
+          <div className="gsap-hero-item pt-2 sm:pt-3 flex flex-wrap items-center gap-3.5">
+            <Link
+              to="/projects"
+              className="inline-flex items-center justify-center px-5 py-2.5 sm:px-6 sm:py-3 rounded border border-[#64ffda] text-[#64ffda] font-mono text-xs sm:text-sm font-medium hover:bg-[rgba(100,255,218,0.1)] transition-all duration-200 group text-center"
+            >
+              <span>Check out my work!</span>
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Link>
+
+            <a
+              href="/Amoo_Quadri_CV.pdf"
+              download="Amoo_Quadri_CV.pdf"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded border border-[#233554] text-[#ccd6f6] font-mono text-xs sm:text-sm font-medium hover:border-[#64ffda] hover:text-[#64ffda] hover:bg-[#112240] transition-all duration-200"
+            >
+              <Download className="w-4 h-4 text-[#64ffda]" />
+              <span>Download CV (PDF)</span>
+            </a>
+          </div>
+
+          {/* Quick Links in font-mono */}
+          <div className="gsap-hero-item pt-4 sm:pt-5 border-t border-[#233554]/60 w-full flex flex-wrap items-center gap-5 sm:gap-7 font-mono text-[11px] sm:text-xs text-[#8892b0]">
+            <a href="#about" className="hover:text-[#64ffda] transition-colors flex items-center gap-1.5 cursor-pointer">
+              <GraduationCap className="w-3.5 h-3.5 text-[#64ffda]" />
+              <span>Read Biography</span>
+            </a>
+            <Link to="/experience" className="hover:text-[#64ffda] transition-colors flex items-center gap-1.5">
+              <Briefcase className="w-3.5 h-3.5 text-[#64ffda]" />
+              <span>Experience</span>
+            </Link>
+            <a href="#contact" className="hover:text-[#64ffda] transition-colors">
+              <span>Get in Touch →</span>
+            </a>
           </div>
 
         </div>

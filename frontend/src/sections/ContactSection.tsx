@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Send, CheckCircle2, AlertCircle, GraduationCap, ExternalLink, Loader2 } from 'lucide-react'
 import { portfolioData } from '../content/portfolioData'
 import { Button } from '../components/Button'
+import { AnimatedWords } from '../components/AnimatedWords'
 import { apiUrl } from '../lib/api'
 
 export const ContactSection: React.FC = () => {
@@ -74,7 +75,7 @@ export const ContactSection: React.FC = () => {
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-mono font-bold text-[var(--color-text-main)] tracking-tight">
-            &lt;Get In Touch /&gt;
+            <AnimatedWords text="<Get In Touch />" />
           </h2>
 
           <p className="mt-3 text-sm sm:text-base text-[var(--color-text-muted)] leading-relaxed font-sans">

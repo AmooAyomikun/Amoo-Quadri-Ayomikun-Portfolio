@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Newspaper, Calendar, Clock, PlusCircle, X, CheckCircle2, ArrowRight, Loader2, BookOpen } from 'lucide-react'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
+import { AnimatedWords } from '../components/AnimatedWords'
 import { apiUrl, getAdminToken, setAdminToken } from '../lib/api'
 import { initialNewsData, type NewsItem } from '../content/newsData'
 
@@ -130,7 +131,7 @@ export const NewsSection: React.FC = () => {
               <Newspaper className="w-4 h-4" /> Latest Updates & Articles
             </span>
             <h2 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--color-text-main)] mt-1">
-              News & Announcements
+              <AnimatedWords text="News & Announcements" />
             </h2>
           </div>
 

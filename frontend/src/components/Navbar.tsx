@@ -1,140 +1,250 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Sun, Moon, Menu, X, Download, FileText } from 'lucide-react'
+import { Sun, Moon, Menu, X } from 'lucide-react'
 import { useTheme } from '../lib/theme'
-import profileImg from '../assets/profile.png'
+import { motion, AnimatePresence } from 'framer-motion'
+import { AQALogo } from './AQALogo'
 
 export const Navbar: React.FC = () => {
   const { theme, toggleTheme } = useTheme()
   const location = useLocation()
+  
+  // Smart Sticky state: hide on scroll down, show on scroll up
+  const [isVisible, setIsVisible] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [lastScrollY, setLastScrollY] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const isHome = location.pathname === '/'
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
+      const currentScrollY = window.scrollY
+      
+      // Determine if scrolled past initial threshold
+      setIsScrolled(currentScrollY > 50)
+
+      // Only toggle smart hide/reveal once past 100px
+      if (currentScrollY > 100) {
+        if (currentScrollY > lastScrollY && !mobileMenuOpen) {
+          // Scrolling down -> hide navbar
+          setIsVisible(false)
+        } else {
+          // Scrolling up -> show navbar
+          setIsVisible(true)
+        }
+      } else {
+        // At top -> always visible
+        setIsVisible(true)
+      }
+
+      setLastScrollY(currentScrollY)
     }
-    window.addEventListener('scroll', handleScroll)
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [lastScrollY, mobileMenuOpen])
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Education', path: '/education' },
-    { name: 'Research', path: '/research' },
-    { name: 'Experience', path: '/experience' },
-    { name: 'Projects', path: '/projects' },
-    { name: 'News', path: '/news' },
-    { name: 'Guestbook', path: '/guestbook' },
-    { name: 'Contact', path: '/contact' },
-  ]
+  // Brittany Chiang inspired navigation items with numbering (Home is accessed via the AQA logo)
+  const navLinks = isHome
+    ? [
+        { num: '01.', name: 'About', path: '/#about', isHash: true },
+        { num: '02.', name: 'Research', path: '/research', isHash: false },
+        { num: '03.', name: 'Projects', path: '/projects', isHash: false },
+        { num: '04.', name: 'Experience', path: '/experience', isHash: false },
+        { num: '05.', name: 'News', path: '/news', isHash: false },
+        { num: '06.', name: 'Contact', path: '/#contact', isHash: true },
+      ]
+    : [
+        { num: '01.', name: 'About', path: '/#about', isHash: true },
+        { num: '02.', name: 'Education', path: '/education', isHash: false },
+        { num: '03.', name: 'Research', path: '/research', isHash: false },
+        { num: '04.', name: 'Experience', path: '/experience', isHash: false },
+        { num: '05.', name: 'Projects', path: '/projects', isHash: false },
+        { num: '06.', name: 'Contact', path: '/contact', isHash: false },
+      ]
 
-  const isActive = (path: string) => {
-    if (path === '/') return location.pathname === '/'
-    return location.pathname.startsWith(path)
+  const handleLinkClick = (isHash: boolean, path: string) => {
+    setMobileMenuOpen(false)
+    if (isHash && isHome) {
+      const hash = path.replace('/#', '').replace('#', '')
+      const elem = document.getElementById(hash)
+      if (elem) {
+        const headerOffset = 80
+        const elementPosition = elem.getBoundingClientRect().top
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        })
+      }
+    }
   }
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 transform ${
+        isVisible ? 'translate-y-0' : '-translate-y-full shadow-none'
+      } ${
         isScrolled
-          ? 'bg-[var(--color-surface-card)]/90 backdrop-blur-md border-b border-[var(--color-border)] shadow-xs py-3'
-          : 'bg-transparent py-5'
+          ? 'bg-[#0a192f]/85 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(2,12,27,0.7)] py-4'
+          : 'bg-transparent py-6'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 flex items-center justify-between">
         
-        {/* Brand Logo with Quadri's Profile Image */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--color-primary)] shadow-sm group-hover:scale-105 transition-transform duration-300">
-            <img
-              src={profileImg}
-              alt="Quadri Ayomikun Amoo"
-              className="w-full h-full object-cover object-top"
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-serif font-bold text-lg text-[var(--color-text-main)] tracking-tight leading-tight group-hover:text-[var(--color-primary)] transition-colors">
-              Quadri Amoo
-            </span>
-            <span className="text-[11px] font-sans text-[var(--color-text-muted)] uppercase tracking-wide font-medium">
-              Software Engineer & Researcher
-            </span>
-          </div>
+        {/* Creative Monogram Logo for AQA (Amoo Quadri Ayomikun) */}
+        <Link
+          to="/"
+          className="focus:outline-none"
+          aria-label="Home - Quadri Ayomikun Amoo (AQA)"
+        >
+          <AQALogo />
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1 bg-[var(--color-surface-elevated)] p-1.5 rounded-full border border-[var(--color-border)]">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all ${
-                isActive(link.path)
-                  ? 'bg-[var(--color-primary)] !text-black font-extrabold shadow-xs'
-                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] hover:bg-[var(--color-surface-card)] font-medium'
-              }`}
+        {/* Desktop Nav Items */}
+        <div className="hidden md:flex items-center gap-7">
+          <nav className="flex items-center gap-6">
+            {navLinks.map((link) => {
+              if (link.isHash) {
+                return (
+                  <a
+                    key={link.name}
+                    href={link.path}
+                    onClick={(e) => {
+                      if (isHome) {
+                        e.preventDefault()
+                        handleLinkClick(true, link.path)
+                      }
+                    }}
+                    className="font-mono text-xs text-[#ccd6f6] hover:text-[#64ffda] transition-colors flex items-center gap-1.5 group cursor-pointer"
+                  >
+                    <span className="text-[#64ffda] text-[11px] font-normal">{link.num}</span>
+                    <span className="group-hover:text-[#64ffda]">{link.name}</span>
+                  </a>
+                )
+              }
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className="font-mono text-xs text-[#ccd6f6] hover:text-[#64ffda] transition-colors flex items-center gap-1.5 group"
+                >
+                  <span className="text-[#64ffda] text-[11px] font-normal">{link.num}</span>
+                  <span className="group-hover:text-[#64ffda]">{link.name}</span>
+                </Link>
+              )
+            })}
+          </nav>
+
+          {/* Brittany Chiang Style Outlined Resume Button */}
+          <div className="flex items-center gap-4">
+            <a
+              href="/Amoo_Quadri_CV.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 rounded border border-[#64ffda] text-[#64ffda] font-mono text-xs font-medium hover:bg-[rgba(100,255,218,0.1)] transition-all duration-200"
             >
-              {link.name}
-            </Link>
-          ))}
-        </nav>
+              Resume
+            </a>
 
-        {/* Right Controls: Theme Toggle & Direct CV Button */}
-        <div className="hidden md:flex items-center gap-3">
-
-          <button
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            className="p-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] hover:border-[var(--color-primary)] transition-colors cursor-pointer"
-          >
-            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
-          </button>
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="p-2 rounded border border-[#233554] text-[#8892b0] hover:text-[#64ffda] hover:border-[#64ffda] transition-colors cursor-pointer"
+            >
+              {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-[#ccd6f6]" />}
+            </button>
+          </div>
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <div className="flex items-center gap-2 lg:hidden">
-
+        {/* Mobile Hamburger Button */}
+        <div className="flex items-center gap-3 md:hidden">
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            className="p-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-card)] text-[var(--color-text-muted)]"
+            className="p-2 rounded border border-[#233554] text-[#8892b0]"
           >
-            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+            {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-[#ccd6f6]" />}
           </button>
+
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Open Navigation Menu"
-            className="p-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-card)] text-[var(--color-text-main)]"
+            aria-label="Toggle Menu"
+            className="p-2 text-[#64ffda] focus:outline-none cursor-pointer"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-[var(--color-surface-card)] border-b border-[var(--color-border)] px-4 pt-4 pb-6 space-y-3">
-          <div className="grid grid-cols-2 gap-2">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-2.5 rounded-lg text-xs font-mono font-medium transition-colors ${
-                  isActive(link.path)
-                    ? 'bg-[var(--color-primary)] !text-black font-extrabold'
-                    : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+      {/* Mobile Drawer Overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            transition={{ type: 'tween', duration: 0.3 }}
+            className="fixed inset-y-0 right-0 w-[min(75vw,360px)] h-screen bg-[#112240] shadow-2xl z-50 flex flex-col justify-center items-center px-8 border-l border-[#233554] md:hidden"
+          >
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="absolute top-6 right-6 p-2 text-[#64ffda]"
+              aria-label="Close Menu"
+            >
+              <X className="w-7 h-7" />
+            </button>
 
-          </div>
-        </div>
-      )}
+            <nav className="flex flex-col items-center gap-7 text-center w-full">
+              {navLinks.map((link) => {
+                if (link.isHash) {
+                  return (
+                    <a
+                      key={link.name}
+                      href={link.path}
+                      onClick={(e) => {
+                        if (isHome) {
+                          e.preventDefault()
+                          handleLinkClick(true, link.path)
+                        } else {
+                          setMobileMenuOpen(false)
+                        }
+                      }}
+                      className="font-mono text-base text-[#ccd6f6] hover:text-[#64ffda] transition-colors flex flex-col items-center gap-1"
+                    >
+                      <span className="text-[#64ffda] text-xs">{link.num}</span>
+                      <span>{link.name}</span>
+                    </a>
+                  )
+                }
+                return (
+                  <Link
+                    key={link.name}
+                    to={link.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="font-mono text-base text-[#ccd6f6] hover:text-[#64ffda] transition-colors flex flex-col items-center gap-1"
+                  >
+                    <span className="text-[#64ffda] text-xs">{link.num}</span>
+                    <span>{link.name}</span>
+                  </Link>
+                )
+              })}
+
+              <a
+                href="/Amoo_Quadri_CV.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-4 px-8 py-3 rounded border border-[#64ffda] text-[#64ffda] font-mono text-sm font-medium hover:bg-[rgba(100,255,218,0.1)] transition-all"
+              >
+                Resume
+              </a>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }
-

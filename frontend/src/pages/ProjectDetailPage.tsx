@@ -84,7 +84,7 @@ export default function ProjectDetailPage() {
                 {project.caseStudyPath && (
                   <Link
                     to={project.caseStudyPath}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[var(--color-primary)] !text-black font-bold rounded-xl hover:bg-lime-400 transition-colors shadow-md text-sm"
+                    className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[var(--color-primary)] !text-[var(--color-primary-text)] font-bold rounded-xl hover:bg-[var(--color-primary-hover)] transition-colors shadow-md text-sm"
                   >
                     Read Detailed Case Study <ExternalLink className="w-4 h-4" />
                   </Link>

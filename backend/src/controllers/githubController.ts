@@ -6,7 +6,10 @@ const cache = new NodeCache({ stdTTL: 60 }); // 1 minute cache to allow live upd
 export const getGithubContributions = async (req: Request, res: Response): Promise<void> => {
   const username = process.env.GITHUB_USERNAME || 'AmooAyomikun';
   const currentYear = new Date().getFullYear().toString();
-  const year = (req.query.year as string) || currentYear;
+  const rawYear = req.query.year;
+  const year = typeof rawYear === 'string' && /^\d{4}$/.test(rawYear.trim())
+    ? rawYear.trim()
+    : currentYear;
   const cacheKey = `github_contributions_${username}_${year}`;
 
   const cached = cache.get(cacheKey);
@@ -40,9 +43,9 @@ export const getGithubContributions = async (req: Request, res: Response): Promi
         }
 
         const query = `
-          query($userName:String!) {
+          query($userName: String!, $from: DateTime, $to: DateTime) {
             user(login: $userName){
-              contributionsCollection(from: "${fromDate}", to: "${toDate}") {
+              contributionsCollection(from: $from, to: $to) {
                 contributionCalendar {
                   totalContributions
                   weeks {
@@ -64,7 +67,14 @@ export const getGithubContributions = async (req: Request, res: Response): Promi
             'Content-Type': 'application/json',
             'User-Agent': 'Portfolio-App'
           },
-          body: JSON.stringify({ query, variables: { userName: username } })
+          body: JSON.stringify({
+            query,
+            variables: {
+              userName: username,
+              from: fromDate,
+              to: toDate
+            }
+          })
         });
 
         if (graphqlRes.ok) {

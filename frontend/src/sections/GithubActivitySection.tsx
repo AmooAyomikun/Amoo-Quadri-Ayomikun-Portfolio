@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { Terminal, ExternalLink, ChevronDown, Check, Settings, Sparkles, SlidersHorizontal, X } from 'lucide-react';
 import { format, subDays, startOfYear, endOfYear, eachDayOfInterval } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatedWords } from '../components/AnimatedWords';
 import { apiUrl } from '../lib/api';
 
 interface ContributionDay {
@@ -187,12 +188,12 @@ export const GithubActivitySection: React.FC = () => {
 
     if (colorTheme === 'cyberpunk') {
       switch (level) {
-        case 0: return 'bg-[#161B22] border border-neutral-900/60';
-        case 1: return 'bg-[#2B3F00] border border-[#3A5600]';
-        case 2: return 'bg-[#5C8500] border border-[#6E9E00]';
-        case 3: return 'bg-[#98CB05] border border-[#A6DE05]';
-        case 4: return 'bg-[#C4FA4C] border border-[#D5FF66] shadow-[0_0_8px_rgba(196,250,76,0.5)]';
-        default: return 'bg-[#161B22]';
+        case 0: return 'bg-[#112240] border border-[#233554]';
+        case 1: return 'bg-[#0d3b43] border border-[#134e56]';
+        case 2: return 'bg-[#165a65] border border-[#1f7583]';
+        case 3: return 'bg-[#299d95] border border-[#37b8af]';
+        case 4: return 'bg-[#64ffda] border border-[#9bfce5] shadow-[0_0_8px_rgba(100,255,218,0.5)]';
+        default: return 'bg-[#112240]';
       }
     }
 
@@ -230,7 +231,7 @@ export const GithubActivitySection: React.FC = () => {
   };
 
   return (
-    <section className="py-16 bg-[#050505] text-white border-t border-neutral-900 font-mono relative overflow-hidden">
+    <section className="py-16 bg-[var(--color-surface-base)] text-[var(--color-text-main)] border-t border-[var(--color-border)] font-mono relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Retro Command Section Header */}
@@ -240,18 +241,20 @@ export const GithubActivitySection: React.FC = () => {
           viewport={{ once: true }}
           className="mb-6"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-neutral-900 text-[#C4FA4C] text-xs font-mono font-bold border border-neutral-800 mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[var(--color-surface-card)] text-[#64ffda] text-xs font-mono font-bold border border-[var(--color-border)] mb-3">
             <Terminal className="w-3.5 h-3.5" />
             <span>github_activity.ts</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-sans font-bold text-white tracking-tight mb-2">GitHub Activity</h2>
-          <p className="text-neutral-400 font-mono text-xs sm:text-sm">
+          <h2 className="text-2xl sm:text-4xl font-sans font-bold text-[var(--color-text-main)] tracking-tight mb-2">
+            <AnimatedWords text="GitHub Activity" />
+          </h2>
+          <p className="text-[var(--color-text-muted)] font-mono text-xs sm:text-sm">
             Latest contributions, pull requests, and code activity from{' '}
             <a 
               href={`https://github.com/${username}`} 
               target="_blank" 
               rel="noreferrer" 
-              className="text-[#C4FA4C] font-bold hover:underline inline-flex items-center gap-1"
+              className="text-[#64ffda] font-bold hover:underline inline-flex items-center gap-1"
             >
               @{username} <ExternalLink className="w-3 h-3 inline" />
             </a>
@@ -262,11 +265,11 @@ export const GithubActivitySection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* Main 52-Week Contribution Heatmap Box */}
-          <div className="lg:col-span-10 bg-[#0D1117] border border-[#21262D] rounded-2xl p-5 shadow-2xl relative">
+          <div className="lg:col-span-10 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl p-5 shadow-2xl relative">
             
             {/* Header: Total count & Contribution settings */}
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-[#21262D]">
-              <h3 className="text-base sm:text-lg font-sans font-semibold text-neutral-100">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-[var(--color-border)]">
+              <h3 className="text-base sm:text-lg font-sans font-semibold text-[var(--color-text-main)]">
                 <span className="font-bold text-white">{totalContributions.toLocaleString()}</span> contributions in {selectedYear === currentYear ? 'the last year' : selectedYear}
               </h3>
 
@@ -274,9 +277,9 @@ export const GithubActivitySection: React.FC = () => {
               <div className="relative" ref={settingsRef}>
                 <button
                   onClick={() => setSettingsOpen(prev => !prev)}
-                  className="px-3 py-1.5 bg-[#21262D] hover:bg-[#30363D] text-xs text-neutral-300 font-sans rounded-md border border-neutral-700/60 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                  className="px-3 py-1.5 bg-[var(--color-surface-elevated)] hover:bg-[#233554] text-xs text-[var(--color-text-muted)] font-sans rounded-md border border-[var(--color-border)] transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
                 >
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#C4FA4C]" />
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#64ffda]" />
                   <span>Contribution settings</span>
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform ${settingsOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -288,11 +291,11 @@ export const GithubActivitySection: React.FC = () => {
                       initial={{ opacity: 0, scale: 0.95, y: 5 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: 5 }}
-                      className="absolute right-0 top-full mt-2 w-72 bg-[#161B22] border border-[#30363D] rounded-xl p-4 shadow-2xl z-50 text-xs font-sans text-neutral-200 space-y-4"
+                      className="absolute right-0 top-full mt-2 w-72 bg-[#112240] border border-[#233554] rounded-xl p-4 shadow-2xl z-50 text-xs font-sans text-neutral-200 space-y-4"
                     >
-                      <div className="flex items-center justify-between pb-2 border-b border-[#30363D]">
+                      <div className="flex items-center justify-between pb-2 border-b border-[#233554]">
                         <span className="font-bold text-white flex items-center gap-1.5 font-mono text-[11px]">
-                          <Settings className="w-3.5 h-3.5 text-[#C4FA4C]" /> HEATMAP SETTINGS
+                          <Settings className="w-3.5 h-3.5 text-[#64ffda]" /> HEATMAP SETTINGS
                         </span>
                         <button onClick={() => setSettingsOpen(false)} className="text-neutral-400 hover:text-white">
                           <X className="w-3.5 h-3.5" />
@@ -307,7 +310,7 @@ export const GithubActivitySection: React.FC = () => {
                             type="checkbox"
                             checked={includePrivate}
                             onChange={(e) => setIncludePrivate(e.target.checked)}
-                            className="rounded accent-[#39D353] w-4 h-4 cursor-pointer"
+                            className="rounded accent-[#64ffda] w-4 h-4 cursor-pointer"
                           />
                         </label>
                         <p className="text-[10px] text-neutral-400 mt-1">
@@ -323,7 +326,7 @@ export const GithubActivitySection: React.FC = () => {
                         <div className="grid grid-cols-2 gap-1.5 font-mono text-[11px]">
                           {[
                             { key: 'classic', label: 'Classic Green', color: '#39D353' },
-                            { key: 'cyberpunk', label: 'Neon Lime', color: '#C4FA4C' },
+                            { key: 'cyberpunk', label: 'Neon Teal', color: '#64ffda' },
                             { key: 'ocean', label: 'Ocean Blue', color: '#54AEFF' },
                             { key: 'sunset', label: 'Sunset Orange', color: '#FA8900' }
                           ].map(t => (
@@ -332,28 +335,28 @@ export const GithubActivitySection: React.FC = () => {
                               onClick={() => setColorTheme(t.key as ColorTheme)}
                               className={`p-2 rounded-lg border text-left flex items-center justify-between transition-colors cursor-pointer ${
                                 colorTheme === t.key
-                                  ? 'border-[#C4FA4C] bg-white/5 font-bold text-white'
-                                  : 'border-[#30363D] text-neutral-400 hover:border-neutral-500'
+                                  ? 'border-[#64ffda] bg-white/5 font-bold text-white'
+                                  : 'border-[#233554] text-neutral-400 hover:border-neutral-500'
                               }`}
                             >
                               <div className="flex items-center gap-2">
                                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: t.color }} />
                                 <span>{t.label}</span>
                               </div>
-                              {colorTheme === t.key && <Check className="w-3 h-3 text-[#C4FA4C]" />}
+                              {colorTheme === t.key && <Check className="w-3 h-3 text-[#64ffda]" />}
                             </button>
                           ))}
                         </div>
                       </div>
 
                       {/* External profile link */}
-                      <div className="pt-2 border-t border-[#30363D] flex justify-between items-center text-[11px] text-neutral-400">
+                      <div className="pt-2 border-t border-[#233554] flex justify-between items-center text-[11px] text-neutral-400">
                         <span>Profile activity overview</span>
                         <a
                           href="https://github.com/settings/profile"
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[#C4FA4C] hover:underline flex items-center gap-1"
+                          className="text-[#64ffda] hover:underline flex items-center gap-1"
                         >
                           GitHub Settings ↗
                         </a>
@@ -428,12 +431,12 @@ export const GithubActivitySection: React.FC = () => {
                 </div>
 
                 {/* Footer Legend Row matching GitHub */}
-                <div className="flex flex-wrap items-center justify-between text-[11px] font-mono text-neutral-400 pt-4 mt-2 border-t border-[#21262D]/60">
+                <div className="flex flex-wrap items-center justify-between text-[11px] font-mono text-[var(--color-text-muted)] pt-4 mt-2 border-t border-[var(--color-border)]/60">
                   <a 
                     href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/managing-contribution-settings-on-your-profile/showing-an-overview-of-your-activity-on-your-profile" 
                     target="_blank" 
                     rel="noreferrer" 
-                    className="hover:text-[#C4FA4C] hover:underline"
+                    className="hover:text-[#64ffda] hover:underline"
                   >
                     Learn how we count contributions
                   </a>
@@ -464,12 +467,12 @@ export const GithubActivitySection: React.FC = () => {
                   onClick={() => setSelectedYear(yr)}
                   className={`shrink-0 lg:w-full py-2 px-4 rounded-xl text-xs sm:text-sm font-sans font-semibold transition-all cursor-pointer text-left flex items-center justify-between gap-2 ${
                     isActive
-                      ? 'bg-[#1F6FEB] text-white shadow-lg font-bold'
-                      : 'bg-[#0D1117] hover:bg-[#161B22] text-neutral-400 border border-[#21262D]'
+                      ? 'bg-[#64ffda] text-[#0a192f] shadow-lg font-bold'
+                      : 'bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] border border-[var(--color-border)]'
                   }`}
                 >
                   <span>{yr}</span>
-                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#0a192f] animate-pulse" />}
                 </button>
               );
             })}
@@ -480,10 +483,10 @@ export const GithubActivitySection: React.FC = () => {
         {/* Hover Tooltip display */}
         {hoveredDay && (
           <div
-            className="fixed z-50 transform -translate-x-1/2 -translate-y-full bg-black/90 text-white text-[11px] font-mono px-3 py-1.5 rounded-lg border border-[#39D353] shadow-xl pointer-events-none animate-fade-in"
+            className="fixed z-50 transform -translate-x-1/2 -translate-y-full bg-[#020c1b]/95 text-[#ccd6f6] text-[11px] font-mono px-3 py-1.5 rounded-lg border border-[#64ffda] shadow-xl pointer-events-none animate-fade-in"
             style={{ left: `${hoveredDay.x}px`, top: `${hoveredDay.y}px` }}
           >
-            <span className="font-bold text-[#C4FA4C]">
+            <span className="font-bold text-[#64ffda]">
               {hoveredDay.day.count === 0 ? 'No' : hoveredDay.day.count} contribution{hoveredDay.day.count === 1 ? '' : 's'}
             </span>{' '}
             on {format(hoveredDay.day.date, 'MMM d, yyyy')}

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { Terminal, Globe, CornerDownLeft, Radio } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { AnimatedWords } from '../components/AnimatedWords';
 import { apiUrl } from '../lib/api';
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -307,7 +308,7 @@ export const VisitorMapSection: React.FC = () => {
     : `YOU'RE IN ${data.userCity ? data.userCity.toUpperCase() + ', ' : ''}${data.userCountry}. ${data.userCountryCount.toLocaleString()} VISITOR SESSIONS RECORDED FROM YOUR REGION.`;
 
   return (
-    <section className="py-16 bg-[#050505] text-white border-t border-neutral-900 font-mono relative overflow-hidden">
+    <section className="py-16 bg-[var(--color-surface-base)] text-[var(--color-text-main)] border-t border-[var(--color-border)] font-mono relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Retro Header Section */}
@@ -315,47 +316,47 @@ export const VisitorMapSection: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-8 border-b border-neutral-900 pb-6"
+          className="mb-8 border-b border-[var(--color-border)] pb-6"
         >
           <div className="flex items-center gap-2 mb-3">
-            <span className={`w-2.5 h-2.5 rounded-full ${connectionStatus === 'connected' ? 'bg-[#C4FA4C] animate-ping' : connectionStatus === 'connecting' ? 'bg-amber-400 animate-pulse' : 'bg-neutral-600'}`} />
-            <span className="text-xs uppercase tracking-widest text-[#C4FA4C] font-bold flex items-center gap-1.5">
+            <span className={`w-2.5 h-2.5 rounded-full ${connectionStatus === 'connected' ? 'bg-[#64ffda] animate-ping' : connectionStatus === 'connecting' ? 'bg-amber-400 animate-pulse' : 'bg-neutral-600'}`} />
+            <span className="text-xs uppercase tracking-widest text-[#64ffda] font-bold flex items-center gap-1.5">
               <Radio className="w-3.5 h-3.5" /> REAL-TIME AUDIENCE TELEMETRY
             </span>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-serif font-bold tracking-tight text-white mb-2 uppercase">
-            GLOBAL VISITOR GEOLOCATION
+          <h2 className="text-2xl sm:text-4xl font-serif font-bold tracking-tight text-[var(--color-text-main)] mb-2 uppercase">
+            <AnimatedWords text="GLOBAL VISITOR GEOLOCATION" />
           </h2>
-          <p className="text-xs sm:text-sm text-neutral-400 max-w-3xl leading-relaxed mb-4 font-mono uppercase">
+          <p className="text-xs sm:text-sm text-[var(--color-text-muted)] max-w-3xl leading-relaxed mb-4 font-mono uppercase">
             EVERY LIT BLOCK IS A COUNTRY SOMEONE OPENED THIS SITE FROM. DYNAMIC PINGS PULSE IN REAL-TIME ACROSS ACTIVE REGIONS.
           </p>
 
           {/* Dynamic Metrics Bar (Issue 4.3: dynamic verified metrics) */}
-          <div className="flex flex-wrap items-center gap-6 sm:gap-10 text-xs sm:text-sm font-mono tracking-widest mb-6 border-y border-neutral-900/80 py-3">
+          <div className="flex flex-wrap items-center gap-6 sm:gap-10 text-xs sm:text-sm font-mono tracking-widest mb-6 border-y border-[var(--color-border)]/80 py-3">
             <div className="flex items-center gap-2">
-              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">
+              <span className="text-[#64ffda] font-bold text-base sm:text-lg">
                 {data.totalVisitors > 0 ? data.totalVisitors.toLocaleString() : '...'}
               </span>
-              <span className="text-neutral-400 uppercase font-semibold">TOTAL VISITS</span>
+              <span className="text-[var(--color-text-muted)] uppercase font-semibold">TOTAL VISITS</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">
+              <span className="text-[#64ffda] font-bold text-base sm:text-lg">
                 {Object.keys(data.countryStats).length > 0
                   ? Object.keys(data.countryStats).length
                   : (!isLocating && !isUnknownLocation ? 1 : 0)}
               </span>
-              <span className="text-neutral-400 uppercase font-semibold">COUNTRIES RECORDED</span>
+              <span className="text-[var(--color-text-muted)] uppercase font-semibold">COUNTRIES RECORDED</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#C4FA4C] animate-pulse" />
-              <span className="text-[#C4FA4C] font-bold text-base sm:text-lg">{activeMarkers.length}</span>
-              <span className="text-[#C4FA4C] uppercase font-semibold">ACTIVE NODES</span>
+              <span className="w-2 h-2 rounded-full bg-[#64ffda] animate-pulse" />
+              <span className="text-[#64ffda] font-bold text-base sm:text-lg">{activeMarkers.length}</span>
+              <span className="text-[#64ffda] uppercase font-semibold">ACTIVE NODES</span>
             </div>
           </div>
 
           {/* Dynamic Geolocation Banner */}
-          <h3 className="text-lg sm:text-2xl font-bold tracking-tight text-[#C4FA4C] leading-snug mb-4 uppercase">
+          <h3 className="text-lg sm:text-2xl font-bold tracking-tight text-[#64ffda] leading-snug mb-4 uppercase">
             {bannerHeadline}
           </h3>
 
@@ -364,9 +365,9 @@ export const VisitorMapSection: React.FC = () => {
             <div className="flex flex-wrap items-center gap-x-8 gap-y-2 text-xs sm:text-sm tracking-wider">
               {data.topCountries.slice(0, 5).map((c) => (
                 <div key={c.name} className="flex items-center gap-2">
-                  <span className="text-neutral-500 font-bold">{c.rank}</span>
-                  <span className="text-neutral-200 font-bold">{c.name}</span>
-                  <span className="text-[#C4FA4C] font-bold">{c.count.toLocaleString()}</span>
+                  <span className="text-[var(--color-text-subtle)] font-bold">{c.rank}</span>
+                  <span className="text-[var(--color-text-muted)] font-bold">{c.name}</span>
+                  <span className="text-[#64ffda] font-bold">{c.count.toLocaleString()}</span>
                 </div>
               ))}
             </div>
@@ -381,20 +382,20 @@ export const VisitorMapSection: React.FC = () => {
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="lg:col-span-7 bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl p-4 relative overflow-hidden shadow-2xl"
+            className="lg:col-span-7 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl p-4 relative overflow-hidden shadow-2xl"
           >
-            <div className="flex justify-between items-center mb-3 px-2 text-xs text-neutral-400">
+            <div className="flex justify-between items-center mb-3 px-2 text-xs text-[var(--color-text-muted)]">
               <span className="flex items-center gap-1.5 font-bold">
-                <Globe className="w-4 h-4 text-[#C4FA4C]" /> Interactive Global Node Map
+                <Globe className="w-4 h-4 text-[#64ffda]" /> Interactive Global Node Map
               </span>
-              <span className={`text-[11px] font-mono flex items-center gap-1.5 ${connectionStatus === 'connected' ? 'text-[#C4FA4C]' : connectionStatus === 'connecting' ? 'text-amber-400' : 'text-neutral-500'}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${connectionStatus === 'connected' ? 'bg-[#C4FA4C] animate-pulse' : connectionStatus === 'connecting' ? 'bg-amber-400 animate-ping' : 'bg-neutral-600'}`} />
+              <span className={`text-[11px] font-mono flex items-center gap-1.5 ${connectionStatus === 'connected' ? 'text-[#64ffda]' : connectionStatus === 'connecting' ? 'text-amber-400' : 'text-neutral-500'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${connectionStatus === 'connected' ? 'bg-[#64ffda] animate-pulse' : connectionStatus === 'connecting' ? 'bg-amber-400 animate-ping' : 'bg-neutral-600'}`} />
                 {connectionStatus === 'connected' ? 'Telemetry Active' : connectionStatus === 'connecting' ? 'Syncing Telemetry' : 'Offline'}
               </span>
             </div>
 
             {/* Map Canvas / ComposableMap */}
-            <div className="relative w-full h-[320px] sm:h-[400px] bg-[#050505] rounded-xl border border-neutral-900 overflow-hidden">
+            <div className="relative w-full h-[320px] sm:h-[400px] bg-[#0a192f] rounded-xl border border-[var(--color-border)] overflow-hidden">
               
               <ComposableMap
                 projection="geoEqualEarth"
@@ -419,17 +420,17 @@ export const VisitorMapSection: React.FC = () => {
                       const hasVisitors = visitorCount > 0 || isUserGeo;
                       const count = isUserGeo ? Math.max(visitorCount, data.userCountryCount) : visitorCount;
 
-                      let fillColor = "#111111";
-                      let strokeColor = "#222222";
+                      let fillColor = "#112240";
+                      let strokeColor = "#233554";
                       let strokeWidth = 0.4;
 
                       if (isUserGeo) {
-                        fillColor = "#2E680E";
-                        strokeColor = "#C4FA4C";
+                        fillColor = "#134e4a";
+                        strokeColor = "#64ffda";
                         strokeWidth = 1.2;
                       } else if (hasVisitors) {
-                        fillColor = count >= 5 ? "#245209" : "#1B3B08";
-                        strokeColor = count >= 5 ? "#84CC16" : "#4D7C0F";
+                        fillColor = count >= 5 ? "#115e59" : "#0f3e3a";
+                        strokeColor = count >= 5 ? "#64ffda" : "#2dd4bf";
                         strokeWidth = 0.75;
                       }
 
@@ -451,8 +452,8 @@ export const VisitorMapSection: React.FC = () => {
                           style={{
                             default: { outline: "none", transition: "fill 0.2s ease" },
                             hover: {
-                              fill: hasVisitors ? "#3A7A12" : "#1F2913",
-                              stroke: "#C4FA4C",
+                              fill: hasVisitors ? "#0d9488" : "#1e3a5f",
+                              stroke: "#64ffda",
                               strokeWidth: 1.0,
                               outline: "none",
                               cursor: "pointer"
@@ -478,7 +479,7 @@ export const VisitorMapSection: React.FC = () => {
                     >
                       {/* Pulse effect for user location marker */}
                       {isUserCountry && (
-                        <circle r={14} fill="#C4FA4C" opacity={0.3}>
+                        <circle r={14} fill="#64ffda" opacity={0.3}>
                           <animate attributeName="r" values="6;18;6" dur="2s" repeatCount="indefinite" />
                           <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite" />
                         </circle>
@@ -486,8 +487,8 @@ export const VisitorMapSection: React.FC = () => {
 
                       <circle 
                         r={isUserCountry ? 5 : 3.5} 
-                        fill={isUserCountry ? "#C4FA4C" : "#A3E635"} 
-                        stroke="#050505" 
+                        fill={isUserCountry ? "#64ffda" : "#38bdf8"} 
+                        stroke="#0a192f" 
                         strokeWidth={1.2}
                         className="cursor-pointer hover:scale-150 transition-transform"
                       />
@@ -498,18 +499,18 @@ export const VisitorMapSection: React.FC = () => {
 
               {/* Hover Tooltip overlay */}
               {hoveredNode && (
-                <div className="absolute top-4 left-4 bg-black/95 border border-[#C4FA4C] text-[#C4FA4C] px-3 py-1.5 rounded-lg text-xs font-mono shadow-xl pointer-events-none animate-fade-in flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#C4FA4C] animate-ping" />
+                <div className="absolute top-4 left-4 bg-[#020c1b]/95 border border-[#64ffda] text-[#64ffda] px-3 py-1.5 rounded-lg text-xs font-mono shadow-xl pointer-events-none animate-fade-in flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#64ffda] animate-ping" />
                   <span>{hoveredNode}</span>
                 </div>
               )}
 
               {/* Map Footer Metadata (Issue 4.3: Dynamic status instead of hardcoded strings) */}
-              <div className="absolute bottom-3 left-4 right-4 flex justify-between items-center text-[10px] text-neutral-400 font-mono bg-black/80 backdrop-blur-xs p-2 rounded-lg border border-neutral-800">
+              <div className="absolute bottom-3 left-4 right-4 flex justify-between items-center text-[10px] text-[var(--color-text-muted)] font-mono bg-[#020c1b]/80 backdrop-blur-xs p-2 rounded-lg border border-[var(--color-border)]">
                 <span>
                   CLIENT NODE: {data.userCity && data.userCity !== 'Unknown' ? `${data.userCity.toUpperCase()}, ` : ''}{data.userCountry}
                 </span>
-                <span className={`font-bold ${connectionStatus === 'connected' ? 'text-[#C4FA4C]' : connectionStatus === 'connecting' ? 'text-amber-400' : 'text-neutral-500'}`}>
+                <span className={`font-bold ${connectionStatus === 'connected' ? 'text-[#64ffda]' : connectionStatus === 'connecting' ? 'text-amber-400' : 'text-neutral-500'}`}>
                   {connectionStatus === 'connected' ? 'TELEMETRY CONNECTED' : connectionStatus === 'connecting' ? 'SYNCING TELEMETRY...' : 'OFFLINE TELEMETRY'}
                 </span>
               </div>
@@ -522,17 +523,17 @@ export const VisitorMapSection: React.FC = () => {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="lg:col-span-5 bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl p-5 shadow-xl flex flex-col h-[420px]"
+            className="lg:col-span-5 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl p-5 shadow-xl flex flex-col h-[420px]"
           >
             {/* Terminal Top Window Bar */}
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-900 text-xs text-neutral-400">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--color-border)] text-xs text-[var(--color-text-muted)]">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-red-500/80 inline-block" />
                 <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
                 <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
-                <span className="ml-2 font-bold text-neutral-300">GUEST@AMOOQUADRI.DEV</span>
+                <span className="ml-2 font-bold text-[var(--color-text-main)]">GUEST@AMOOQUADRI.DEV</span>
               </div>
-              <Terminal className="w-4 h-4 text-[#C4FA4C]" />
+              <Terminal className="w-4 h-4 text-[#64ffda]" />
             </div>
 
             {/* Terminal Logs Output Scroll View */}
@@ -540,7 +541,7 @@ export const VisitorMapSection: React.FC = () => {
               {terminalLogs.map((log, i) => (
                 <div 
                   key={i} 
-                  className={log.type === 'input' ? 'text-[#C4FA4C] font-bold' : 'text-neutral-300'}
+                  className={log.type === 'input' ? 'text-[#64ffda] font-bold' : 'text-[var(--color-text-muted)]'}
                 >
                   {log.text}
                 </div>
@@ -549,13 +550,13 @@ export const VisitorMapSection: React.FC = () => {
             </div>
 
             {/* Quick Action Button Shortcuts */}
-            <div className="pt-3 border-t border-neutral-900 mt-2">
+            <div className="pt-3 border-t border-[var(--color-border)] mt-2">
               <div className="flex flex-wrap gap-1.5 mb-3">
                 {['help', 'about', 'skills', 'projects', 'contact', 'clear'].map(cmd => (
                   <button
                     key={cmd}
                     onClick={() => handleTerminalCommand(cmd)}
-                    className="px-2 py-1 bg-neutral-900 hover:bg-neutral-800 text-[#C4FA4C] text-[10px] font-mono rounded border border-neutral-800 transition-colors cursor-pointer active:scale-95"
+                    className="px-2 py-1 bg-[var(--color-surface-elevated)] hover:bg-[#233554] text-[#64ffda] text-[10px] font-mono rounded border border-[var(--color-border)] transition-colors cursor-pointer active:scale-95"
                   >
                     ${cmd}
                   </button>
@@ -568,17 +569,17 @@ export const VisitorMapSection: React.FC = () => {
                   e.preventDefault();
                   handleTerminalCommand();
                 }}
-                className="flex items-center gap-2 bg-neutral-950 px-3 py-2 rounded-xl border border-neutral-800 focus-within:border-[#C4FA4C]"
+                className="flex items-center gap-2 bg-[#0a192f] px-3 py-2 rounded-xl border border-[var(--color-border)] focus-within:border-[#64ffda]"
               >
-                <span className="text-[#C4FA4C] font-bold">GUEST ~ $</span>
+                <span className="text-[#64ffda] font-bold">GUEST ~ $</span>
                 <input
                   type="text"
                   value={terminalInput}
                   onChange={(e) => setTerminalInput(e.target.value)}
                   placeholder="TYPE A COMMAND OR QUESTION..."
-                  className="bg-transparent text-xs text-white placeholder-neutral-600 focus:outline-none w-full font-mono"
+                  className="bg-transparent text-xs text-[var(--color-text-main)] placeholder-slate-500 focus:outline-none w-full font-mono"
                 />
-                <button type="submit" aria-label="Send command" className="text-neutral-400 hover:text-[#C4FA4C]">
+                <button type="submit" aria-label="Send command" className="text-[var(--color-text-muted)] hover:text-[#64ffda]">
                   <CornerDownLeft className="w-3.5 h-3.5" />
                 </button>
               </form>

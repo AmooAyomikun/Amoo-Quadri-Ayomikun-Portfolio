@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { AnimatedWords } from '../components/AnimatedWords';
 
 const techRow1 = [
   { name: 'TypeScript', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg' },
@@ -25,61 +26,75 @@ const getMarqueeItems = (row: typeof techRow1) => [...row, ...row, ...row, ...ro
 
 export const TechStackSection: React.FC = () => {
   return (
-    <section className="pt-16 pb-4 md:pb-8 bg-[var(--color-surface-base)] relative overflow-hidden border-t border-[var(--color-border)]">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-        <div className="flex items-center justify-between">
+    <section className="py-14 sm:py-16 bg-[#0a192f] relative overflow-hidden">
+      {/* Contained border that does not clash with the sidebars */}
+      <div className="max-w-6xl mx-auto px-6 sm:px-12 lg:px-16 mb-8">
+        <div className="border-t border-[#233554] pt-8 flex items-center justify-between">
           <div>
-            <span className="text-xs font-mono uppercase tracking-widest text-[var(--color-primary)] font-semibold">
+            <span className="text-xs font-mono uppercase tracking-widest text-[#64ffda] font-semibold">
               // TECH ECOSYSTEM
             </span>
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--color-text-main)] tracking-tight mt-0.5">Core Technologies</h2>
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#ccd6f6] tracking-tight mt-0.5">
+              <AnimatedWords text="Core Technologies" />
+            </h2>
           </div>
-          <span className="text-xs font-mono text-[var(--color-text-muted)] hidden sm:inline-block">
+          <span className="text-xs font-mono text-[#8892b0] hidden sm:inline-block">
             Hover to inspect
           </span>
         </div>
       </div>
 
-      <motion.div 
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.6 }}
-        className="relative w-full flex flex-col gap-4 overflow-hidden group"
-      >
-        {/* Left/Right Fade Gradients for a seamless effect */}
-        <div className="absolute top-0 bottom-0 left-0 w-24 bg-gradient-to-r from-[var(--color-surface-base)] to-transparent z-10 pointer-events-none" />
-        <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-[var(--color-surface-base)] to-transparent z-10 pointer-events-none" />
+      {/* Marquee constrained within content container to stay inside the borders and clear sidebars */}
+      <div className="max-w-6xl mx-auto px-6 sm:px-12 lg:px-16">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.6 }}
+          className="relative w-full flex flex-col gap-2 overflow-hidden group py-2"
+        >
+          {/* Left/Right Fade Gradients contained cleanly within the section */}
+          <div className="absolute top-0 bottom-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-[#0a192f] to-transparent z-10 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 right-0 w-16 sm:w-24 bg-gradient-to-l from-[#0a192f] to-transparent z-10 pointer-events-none" />
 
-        {/* Row 1 */}
-        <div className="flex animate-marquee space-x-4 whitespace-nowrap w-max group-hover:[animation-play-state:paused]">
-          {getMarqueeItems(techRow1).map((tech, idx) => (
-            <motion.div
-              whileHover={{ scale: 1.1, y: -2 }}
-              key={`r1-${idx}`}
-              className="flex items-center gap-2.5 px-6 py-3 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-full shadow-sm hover:border-[var(--color-primary)] transition-colors cursor-default"
-            >
-              <img src={tech.iconUrl} alt={tech.name} className="w-5 h-5" style={{ filter: tech.name === 'Next.js' ? 'invert(1)' : 'none' }} />
-              <span className="text-[var(--color-text-main)] font-medium text-sm">{tech.name}</span>
-            </motion.div>
-          ))}
-        </div>
+          {/* Row 1 - with vertical padding (py-3) so hover scale never clips the top border */}
+          <div className="flex animate-marquee space-x-4 whitespace-nowrap w-max py-3 group-hover:[animation-play-state:paused]">
+            {getMarqueeItems(techRow1).map((tech, idx) => (
+              <motion.div
+                whileHover={{ scale: 1.06, y: -2 }}
+                key={`r1-${idx}`}
+                className="flex items-center gap-2.5 px-5 py-2.5 sm:px-6 sm:py-3 bg-[#112240] border border-[#233554] rounded-full shadow-sm hover:border-[#64ffda] hover:shadow-[0_0_12px_rgba(100,255,218,0.25)] transition-all cursor-default"
+              >
+                <img 
+                  src={tech.iconUrl} 
+                  alt={tech.name} 
+                  className="w-5 h-5 shrink-0" 
+                  style={{ filter: tech.name === 'Next.js' ? 'invert(1)' : 'none' }} 
+                />
+                <span className="text-[#ccd6f6] font-medium text-xs sm:text-sm">{tech.name}</span>
+              </motion.div>
+            ))}
+          </div>
 
-        {/* Row 2 (Delayed/Reversed direction or offset) */}
-        <div className="flex animate-marquee space-x-4 whitespace-nowrap w-max group-hover:[animation-play-state:paused]" style={{ animationDirection: 'reverse' }}>
-          {getMarqueeItems(techRow2).map((tech, idx) => (
-            <motion.div
-              whileHover={{ scale: 1.1, y: -2 }}
-              key={`r2-${idx}`}
-              className="flex items-center gap-2.5 px-6 py-3 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-full shadow-sm hover:border-[var(--color-primary)] transition-colors cursor-default"
-            >
-              <img src={tech.iconUrl} alt={tech.name} className="w-5 h-5" />
-              <span className="text-[var(--color-text-main)] font-medium text-sm">{tech.name}</span>
-            </motion.div>
-          ))}
-        </div>
+          {/* Row 2 (Reversed direction) - with py-3 padding so hover scale never clips */}
+          <div 
+            className="flex animate-marquee space-x-4 whitespace-nowrap w-max py-3 group-hover:[animation-play-state:paused]" 
+            style={{ animationDirection: 'reverse' }}
+          >
+            {getMarqueeItems(techRow2).map((tech, idx) => (
+              <motion.div
+                whileHover={{ scale: 1.06, y: -2 }}
+                key={`r2-${idx}`}
+                className="flex items-center gap-2.5 px-5 py-2.5 sm:px-6 sm:py-3 bg-[#112240] border border-[#233554] rounded-full shadow-sm hover:border-[#64ffda] hover:shadow-[0_0_12px_rgba(100,255,218,0.25)] transition-all cursor-default"
+              >
+                <img src={tech.iconUrl} alt={tech.name} className="w-5 h-5 shrink-0" />
+                <span className="text-[#ccd6f6] font-medium text-xs sm:text-sm">{tech.name}</span>
+              </motion.div>
+            ))}
+          </div>
 
-      </motion.div>
+        </motion.div>
+      </div>
     </section>
   );
 };

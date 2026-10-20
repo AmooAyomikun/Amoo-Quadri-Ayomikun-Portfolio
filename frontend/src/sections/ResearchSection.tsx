@@ -74,7 +74,7 @@ export const ResearchSection: React.FC = () => {
               href={portfolioData.personal.googleScholar}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1a1a2e] text-white rounded-xl text-sm font-bold hover:bg-[#111122] transition-colors shadow-sm self-start"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-surface-elevated)] border border-[var(--color-border)] text-[var(--color-text-main)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] rounded-xl text-sm font-bold transition-colors shadow-sm self-start"
             >
               Google Scholar
               <ExternalLink className="w-4 h-4" />
