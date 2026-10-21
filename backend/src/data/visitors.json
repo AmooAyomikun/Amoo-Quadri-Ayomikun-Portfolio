@@ -37,6 +37,16 @@
     "city": "Lagos",
     "lat": 6.4474,
     "lon": 3.3903,
-    "timestamp": "2026-10-20T02:13:46.572Z"
+    "timestamp": "2026-10-21T10:36:46.499Z"
+  },
+  {
+    "id": "vis-1792577757540-ha4p",
+    "ipHash": "016fade439d730ea03c2",
+    "country": "Unknown",
+    "countryCode": "UN",
+    "city": "Unknown",
+    "lat": null,
+    "lon": null,
+    "timestamp": "2026-10-21T10:15:57.595Z"
   }
 ]

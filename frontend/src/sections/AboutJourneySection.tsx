@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
+import { motion, useScroll, useMotionValueEvent, useSpring } from 'framer-motion'
 import profileImg from '../assets/profile.png'
 import aboutWebImg from '../assets/about-web.jpg'
 import aboutTutoringImg from '../assets/about-tutoring.jpg'
@@ -14,9 +14,9 @@ interface PhotoCardProps {
 const PhotoCard: React.FC<PhotoCardProps> = ({ imgSrc, alt, tilt }) => {
   const isLeft = tilt === 'left'
   return (
-    <div className="relative mx-auto w-fit group cursor-pointer select-none">
+    <div className="relative w-fit group cursor-pointer select-none">
       {/* Background sleeve/holder slot */}
-      <div className="rounded-[22px] border border-[#233554] p-2 w-[210px] h-[300px] bg-[#112240]/40 backdrop-blur-sm shadow-xl transition-all duration-300 group-hover:border-[#64ffda]/30">
+      <div className="rounded-[22px] border border-[#233554] p-2 w-[210px] h-[295px] bg-[#112240]/40 backdrop-blur-sm shadow-xl transition-all duration-300 group-hover:border-[#64ffda]/40">
         <div className="w-full h-full rounded-xl border border-[#233554]/50 bg-[#0a192f]/60 flex items-center justify-center">
           <span className="font-mono text-[10px] tracking-widest text-[#495670] uppercase">
             AQA • ARCHIVE
@@ -28,8 +28,8 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imgSrc, alt, tilt }) => {
       <img
         src={imgSrc}
         alt={alt}
-        className={`absolute left-0 top-0 w-[202px] h-[292px] rounded-xl object-cover shadow-2xl border border-[#233554] transition-all duration-500 ease-out filter contrast-[1.05] group-hover:rotate-0 group-hover:scale-[1.02] group-hover:border-[#64ffda]/50 ${
-          isLeft ? 'rotate-[-8deg]' : 'rotate-[8deg]'
+        className={`absolute left-0 top-0 w-[202px] h-[287px] rounded-xl object-cover shadow-2xl border border-[#233554] transition-all duration-500 ease-out filter contrast-[1.05] group-hover:rotate-0 group-hover:scale-[1.02] group-hover:border-[#64ffda]/50 ${
+          isLeft ? 'rotate-[-6deg]' : 'rotate-[6deg]'
         }`}
       />
     </div>
@@ -42,17 +42,23 @@ export const AboutJourneySection: React.FC = () => {
 
   // Interactive dot coordinates calculated along the serpentine SVG path
   const [dotPos, setDotPos] = useState<{ x: number; y: number }>({ x: 145, y: 0.5 })
-  const [scrollPercent, setScrollPercent] = useState<number>(0)
 
-  // Track scroll progress through this section
+  // Track scroll progress through this section with a natural, measured scroll range
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start 65%', 'end 85%']
+    offset: ['start 35%', 'end 85%']
+  })
+
+  // Calibrated smooth spring physics for a graceful, measured scroll dot movement
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 45,
+    damping: 24,
+    mass: 0.5,
+    restDelta: 0.001
   })
 
   // Synchronize dot movement with user scroll along the winding SVG path
-  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    setScrollPercent(latest)
+  useMotionValueEvent(smoothProgress, 'change', (latest: number) => {
     if (pathRef.current) {
       try {
         const totalLength = pathRef.current.getTotalLength()
@@ -70,7 +76,6 @@ export const AboutJourneySection: React.FC = () => {
     const timer = setTimeout(() => {
       if (pathRef.current) {
         try {
-          const totalLength = pathRef.current.getTotalLength()
           const point = pathRef.current.getPointAtLength(0)
           setDotPos({ x: point.x, y: point.y })
         } catch {
@@ -81,20 +86,25 @@ export const AboutJourneySection: React.FC = () => {
     return () => clearTimeout(timer)
   }, [])
 
-  // Exact serpentine path from braydoncoyer.dev/about (width: 380, height: 1787)
-  const serpentinePathD = `M145 0.5 L145 43 C145 51.8 137.8 59 129 59 L20 59 C11.2 59 4 66.2 4 75 L4 515 C4 523.8 11.2 531 20 531 L256 531 C264.8 531 272 538.2 272 547 L272 830.4 C272 834.6 270.3 838.7 267.3 841.7 L78.7 1030.3 C75.7 1033.3 71.6 1035 67.4 1035 L20 1035 C11.2 1035 4 1042.2 4 1051 L4 1471 C4 1479.8 11.2 1487 20 1487 L256 1487 C264.8 1487 272 1494.2 272 1503 L272 1757 C272 1765.8 279.2 1773 288 1773 L380 1773`
+  // Braydon Coyer Serpentine Circuit Path:
+  // Left track is at x = 4, Right track is at x = 272. Midpoint is at x = 138 (container center 50%).
+  // M1 Center: y = 318 (runs at x = 4, text ends at y = 448, crossover at y = 556 -> 108px clearance)
+  // M2 Center: y = 818 (runs at x = 272)
+  // M3 Center: y = 1368 (runs at x = 4, text ends at y = 1528, crossover at y = 1626 -> 98px clearance)
+  // M4 Center: y = 1898 (terminal wire docks into card sleeve at x = 325, y = 1898)
+  const serpentinePathD = `M145 0.5 L145 10 C145 14.4 141.4 18 137 18 L20 18 C11.2 18 4 25.2 4 34 L4 540 C4 548.8 11.2 556 20 556 L256 556 C264.8 556 272 563.2 272 572 L272 1040 C272 1044.2 270.3 1048.3 267.3 1051.3 L180.7 1137.9 C177.7 1140.9 173.6 1142.6 169.4 1142.6 L20 1142.6 C11.2 1142.6 4 1149.8 4 1158.6 L4 1610 C4 1618.8 11.2 1626 20 1626 L256 1626 C264.8 1626 272 1633.2 272 1642 L272 1883 C272 1891.8 279.2 1898 288 1898 L325 1898`
 
   return (
     <section 
       id="about" 
       ref={containerRef}
-      className="relative py-24 sm:py-32 bg-[#0a192f] text-[#ccd6f6] scroll-mt-24 overflow-hidden"
+      className="relative pt-20 sm:pt-28 pb-12 sm:pb-14 bg-[#0a192f] text-[#ccd6f6] scroll-mt-24 overflow-hidden"
     >
       {/* Subtle Ambient Background Grid */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#64ffda_1px,transparent_1px)] [background-size:28px_28px]" />
 
-      {/* Top Header - Exact Braydon Coyer Headline Style */}
-      <div className="max-w-4xl mx-auto px-6 text-center mb-16 sm:mb-24 relative z-20">
+      {/* Top Header */}
+      <div className="max-w-4xl mx-auto px-6 text-center mb-16 sm:mb-20 relative z-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -110,99 +120,77 @@ export const AboutJourneySection: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* Main Journey Container */}
-      <div className="max-w-5xl mx-auto px-6 sm:px-10 lg:px-12 relative z-10">
+      {/* Main Journey Container (Centered: max-w-4xl ~ 896px) with generous top space */}
+      <div className="max-w-4xl mx-auto px-6 lg:px-8 relative z-10 pt-32">
 
         {/* =========================================================================
             DESKTOP INTERACTIVE SERPENTINE SVG WIRE WITH SCROLL-TRACKING MOVING DOT
-            (Centered spine between columns, exactly like braydoncoyer.dev)
+            (Rendered at z-30 with pointer-events-none so wire & terminal dot cleanly join with the cards)
         ========================================================================= */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[1787px] hidden lg:flex justify-center z-10">
-          <div className="relative w-[380px] h-[1787px]">
-            <svg
-              className="w-[380px] h-[1787px]"
-              viewBox="-10 -10 400 1800"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <filter id="tealGlow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-                  <feMerge>
-                    <feMergeNode in="coloredBlur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
+        <div 
+          className="pointer-events-none absolute top-0 h-[1980px] w-[380px] hidden lg:block z-30"
+          style={{ left: 'calc(50% - 138px)' }}
+        >
+          <svg
+            className="w-[380px] h-[1980px]"
+            viewBox="-10 -10 400 2000"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <filter id="tealGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
 
-              {/* Base Background Track (Faint Circuit Wire) */}
-              <path
-                d={serpentinePathD}
-                stroke="#233554"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {/* Base Background Track (Faint Circuit Wire) */}
+            <path
+              d={serpentinePathD}
+              stroke="#233554"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+
+            {/* Active Highlight Stroke (Fills progressively as user scrolls) */}
+            <motion.path
+              ref={pathRef}
+              d={serpentinePathD}
+              stroke="#64ffda"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{
+                pathLength: smoothProgress,
+                filter: 'drop-shadow(0 0 6px rgba(100,255,218,0.6))'
+              }}
+            />
+
+            {/* Terminal Docking Junction onto the final Photo Card */}
+            <circle cx="325" cy="1898" r="5" className="fill-[#64ffda]" />
+            <circle cx="325" cy="1898" r="8" fill="none" stroke="#233554" strokeWidth="2" />
+
+            {/* THE INTERACTIVE MOVING GLOWING DOT (Single solid traveling dot like Braydon Coyer) */}
+            <g transform={`translate(${dotPos.x}, ${dotPos.y})`}>
+              {/* Outer Soft Halo Glow */}
+              <circle
+                r="11"
+                fill="#64ffda"
+                opacity="0.25"
+                filter="url(#tealGlow)"
               />
-
-              {/* Active Highlight Stroke (Fills progressively as user scrolls) */}
-              <motion.path
-                ref={pathRef}
-                d={serpentinePathD}
-                stroke="#64ffda"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{
-                  pathLength: scrollYProgress,
-                  filter: 'drop-shadow(0 0 6px rgba(100,255,218,0.6))'
-                }}
+              {/* Core Solid Radiant Dot */}
+              <circle
+                r="7.5"
+                fill="#64ffda"
+                filter="url(#tealGlow)"
               />
-
-              {/* Milestone Checkpoint Nodes along the wire */}
-              {/* Start Node at (145, 0.5) */}
-              <circle cx="145" cy="0.5" r="7" className="fill-[#0a192f] stroke-[#233554]" strokeWidth="2.5" />
-              <circle cx="145" cy="0.5" r="3.5" className="fill-[#64ffda]" />
-
-              {/* Milestone 1 Node at (4, 75) */}
-              <circle cx="4" cy="75" r="7" className="fill-[#0a192f] stroke-[#233554]" strokeWidth="2.5" />
-              <circle cx="4" cy="75" r="3.5" className={scrollPercent > 0.08 ? "fill-[#64ffda]" : "fill-[#233554]"} />
-
-              {/* Milestone 2 Node at (272, 547) */}
-              <circle cx="272" cy="547" r="7" className="fill-[#0a192f] stroke-[#233554]" strokeWidth="2.5" />
-              <circle cx="272" cy="547" r="3.5" className={scrollPercent > 0.32 ? "fill-[#64ffda]" : "fill-[#233554]"} />
-
-              {/* Milestone 3 Node at (4, 1051) */}
-              <circle cx="4" cy="1051" r="7" className="fill-[#0a192f] stroke-[#233554]" strokeWidth="2.5" />
-              <circle cx="4" cy="1051" r="3.5" className={scrollPercent > 0.62 ? "fill-[#64ffda]" : "fill-[#233554]"} />
-
-              {/* Milestone 4 Node at (272, 1503) */}
-              <circle cx="272" cy="1503" r="7" className="fill-[#0a192f] stroke-[#233554]" strokeWidth="2.5" />
-              <circle cx="272" cy="1503" r="3.5" className={scrollPercent > 0.88 ? "fill-[#64ffda]" : "fill-[#233554]"} />
-
-              {/* THE INTERACTIVE MOVING DOT - Rides smoothly along the winding path as user scrolls */}
-              <g transform={`translate(${dotPos.x}, ${dotPos.y})`}>
-                {/* Outer Pulsing Glow */}
-                <circle
-                  r="12"
-                  fill="none"
-                  stroke="#64ffda"
-                  strokeWidth="1.5"
-                  opacity="0.6"
-                  className="animate-ping"
-                />
-                {/* Core Glowing Dot */}
-                <circle
-                  r="8"
-                  fill="#64ffda"
-                  filter="url(#tealGlow)"
-                />
-                <circle
-                  r="3"
-                  fill="#0a192f"
-                />
-              </g>
-            </svg>
-          </div>
+            </g>
+          </svg>
         </div>
 
         {/* Mobile Linear Vertical Wire */}
@@ -210,18 +198,18 @@ export const AboutJourneySection: React.FC = () => {
 
         {/* =========================================================================
             MILESTONE 1: My Programming Origins & Academic Foundation
-            (Left: Tilted Photo Card, Right: Story)
+            (Left: Tilted Photo Card, Right: Story Text — 65px intimate spacing)
         ========================================================================= */}
-        <div className="relative z-20 min-h-[480px] flex items-center mb-16 sm:mb-24 lg:mb-0">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+        <div className="relative z-20 h-auto lg:h-[380px] flex items-center mb-16 lg:mb-0">
+          <div className="w-full relative lg:flex lg:items-center">
             
-            {/* Left Column: Tilted Photo Card */}
+            {/* Left Column: Photo Card (right edge at 50% - 155px, 21px from Left Track) */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.6 }}
-              className="flex justify-center lg:justify-end lg:pr-12"
+              className="flex justify-center lg:justify-end lg:w-1/2 lg:pr-[155px]"
             >
               <PhotoCard 
                 imgSrc={profileImg} 
@@ -230,13 +218,13 @@ export const AboutJourneySection: React.FC = () => {
               />
             </motion.div>
 
-            {/* Right Column: Story Text */}
+            {/* Right Column: Story Text (left edge at 50% - 90px, 44px from Left Track) */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.6 }}
-              className="space-y-4 lg:pl-10 text-left"
+              className="mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
             >
               <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[#ccd6f6] tracking-tight">
                 My programming origins
@@ -252,20 +240,24 @@ export const AboutJourneySection: React.FC = () => {
           </div>
         </div>
 
+        {/* TRANSITION GAP 1 -> 2:
+            Horizontal connector line crosses cleanly at y = 556 from x = 20 to x = 256 (108px below text). */}
+        <div className="hidden lg:block h-[120px]" />
+
         {/* =========================================================================
             MILESTONE 2: Finding My Way to Web
-            (Left: Story, Right: Tilted Photo Card)
+            (Left: Story Text, Right: Tilted Photo Card — 65px intimate spacing)
         ========================================================================= */}
-        <div className="relative z-20 min-h-[440px] flex items-center mb-16 sm:mb-24 lg:mb-0">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+        <div className="relative z-20 h-auto lg:h-[380px] flex items-center mb-16 lg:mb-0">
+          <div className="w-full relative lg:flex lg:items-center">
             
-            {/* Left Column: Story Text */}
+            {/* Left Column: Story Text (right edge at 50% + 90px, 44px from Right Track) */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.6 }}
-              className="space-y-4 order-2 lg:order-1 lg:pr-10 text-left"
+              className="order-2 lg:order-1 mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:right-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
             >
               <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[#ccd6f6] tracking-tight">
                 Finding My Way to Web
@@ -278,13 +270,13 @@ export const AboutJourneySection: React.FC = () => {
               </p>
             </motion.div>
 
-            {/* Right Column: Tilted Photo Card */}
+            {/* Right Column: Photo Card (left edge at 50% + 155px, 21px from Right Track) */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.6 }}
-              className="flex justify-center lg:justify-start order-1 lg:order-2 lg:pl-12"
+              className="order-1 lg:order-2 flex justify-center lg:justify-start lg:w-1/2 lg:ml-auto lg:pl-[155px]"
             >
               <PhotoCard 
                 imgSrc={aboutWebImg} 
@@ -296,20 +288,24 @@ export const AboutJourneySection: React.FC = () => {
           </div>
         </div>
 
+        {/* TRANSITION GAP 2 -> 3:
+            Braydon Coyer 45-degree diagonal line from Right Track to Left Track */}
+        <div className="hidden lg:block h-[160px]" />
+
         {/* =========================================================================
             MILESTONE 3: Life Beyond Code
-            (Left: Tilted Photo Card, Right: Story)
+            (Left: Tilted Photo Card, Right: Story Text — 65px intimate spacing)
         ========================================================================= */}
-        <div className="relative z-20 min-h-[480px] flex items-center mb-16 sm:mb-24 lg:mb-0">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+        <div className="relative z-20 h-auto lg:h-[400px] flex items-center mb-16 lg:mb-0">
+          <div className="w-full relative lg:flex lg:items-center">
             
-            {/* Left Column: Tilted Photo Card */}
+            {/* Left Column: Photo Card (right edge at 50% - 155px, 21px from Left Track) */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.6 }}
-              className="flex justify-center lg:justify-end lg:pr-12"
+              className="flex justify-center lg:justify-end lg:w-1/2 lg:pr-[155px]"
             >
               <PhotoCard 
                 imgSrc={aboutTutoringImg} 
@@ -318,13 +314,13 @@ export const AboutJourneySection: React.FC = () => {
               />
             </motion.div>
 
-            {/* Right Column: Story Text */}
+            {/* Right Column: Story Text (left edge at 50% - 90px, 44px from Left Track) */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.6 }}
-              className="space-y-4 lg:pl-10 text-left"
+              className="mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
             >
               <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[#ccd6f6] tracking-tight">
                 Life Beyond Code
@@ -340,20 +336,24 @@ export const AboutJourneySection: React.FC = () => {
           </div>
         </div>
 
+        {/* TRANSITION GAP 3 -> 4:
+            Horizontal connector line crosses cleanly at y = 1626 from x = 20 to x = 256 (over 98px below text). */}
+        <div className="hidden lg:block h-[140px]" />
+
         {/* =========================================================================
             MILESTONE 4: These Days
-            (Left: Story, Right: Tilted Photo Card)
+            (Left: Story Text, Right: Tilted Photo Card directly joined with terminal dot)
         ========================================================================= */}
-        <div className="relative z-20 min-h-[400px] flex items-center">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+        <div className="relative z-20 h-auto lg:h-[380px] flex items-center">
+          <div className="w-full relative lg:flex lg:items-center">
             
-            {/* Left Column: Story Text */}
+            {/* Left Column: Story Text (right edge at 50% + 90px, 44px from Right Track) */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.6 }}
-              className="space-y-4 order-2 lg:order-1 lg:pr-10 text-left"
+              className="order-2 lg:order-1 mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:right-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
             >
               <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[#ccd6f6] tracking-tight">
                 These Days
@@ -366,13 +366,13 @@ export const AboutJourneySection: React.FC = () => {
               </p>
             </motion.div>
 
-            {/* Right Column: Tilted Photo Card */}
+            {/* Right Column: Photo Card (left edge at 50% + 155px, terminal dot joins at x=310, y=1560) */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.6 }}
-              className="flex justify-center lg:justify-start order-1 lg:order-2 lg:pl-12"
+              className="order-1 lg:order-2 flex justify-center lg:justify-start lg:w-1/2 lg:ml-auto lg:pl-[155px]"
             >
               <PhotoCard 
                 imgSrc={aboutConferenceImg} 

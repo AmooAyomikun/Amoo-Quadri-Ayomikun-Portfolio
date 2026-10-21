@@ -231,8 +231,9 @@ export const GithubActivitySection: React.FC = () => {
   };
 
   return (
-    <section className="py-16 bg-[var(--color-surface-base)] text-[var(--color-text-main)] border-t border-[var(--color-border)] font-mono relative overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-12 sm:py-16 bg-[var(--color-surface-base)] text-[var(--color-text-main)] font-mono relative overflow-hidden">
+      <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20">
+        <div className="border-t border-[#233554] pt-12">
         
         {/* Retro Command Section Header */}
         <motion.div 
@@ -492,7 +493,7 @@ export const GithubActivitySection: React.FC = () => {
             on {format(hoveredDay.day.date, 'MMM d, yyyy')}
           </div>
         )}
-
+        </div>
       </div>
     </section>
   );

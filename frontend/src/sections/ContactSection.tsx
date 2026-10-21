@@ -59,8 +59,9 @@ export const ContactSection: React.FC = () => {
   const mailtoFallbackUrl = `mailto:${portfolioData.personal.email}?subject=${encodeURIComponent(formData.subject || 'Portfolio Inquiry')}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nLens: ${formData.lens}\n\n${formData.message}`)}`
 
   return (
-    <section id="contact" className="py-20 bg-[var(--color-surface-card)] border-t border-[var(--color-border)] relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <section id="contact" className="py-16 sm:py-20 bg-[var(--color-surface-card)] relative overflow-hidden">
+      <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20 relative z-10">
+        <div className="border-t border-[#233554] pt-12 sm:pt-16">
         
         {/* Header with animation */}
         <motion.div 
@@ -291,7 +292,7 @@ export const ContactSection: React.FC = () => {
           </motion.div>
 
         </div>
-
+        </div>
       </div>
     </section>
   )

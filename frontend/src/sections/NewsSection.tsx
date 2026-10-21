@@ -121,8 +121,9 @@ export const NewsSection: React.FC = () => {
   }
 
   return (
-    <section id="news" className="py-20 bg-[var(--color-surface-base)] border-t border-[var(--color-border)] relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="news" className="py-12 sm:py-16 bg-[var(--color-surface-base)] relative">
+      <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20">
+        <div className="border-t border-[#233554] pt-12">
         
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
@@ -203,7 +204,7 @@ export const NewsSection: React.FC = () => {
             </motion.div>
           ))}
         </motion.div>
-
+        </div>
       </div>
 
       {/* Reader Modal (Issue 3.9) */}

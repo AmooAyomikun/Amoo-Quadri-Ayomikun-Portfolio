@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
-import { Terminal, Globe, CornerDownLeft, Radio } from 'lucide-react';
+import { CornerDownLeft, MapPin, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AnimatedWords } from '../components/AnimatedWords';
 import { apiUrl } from '../lib/api';
@@ -68,11 +68,6 @@ const normalizeCountry = (name: string): string => {
   if (COUNTRY_ALIASES[s]) {
     return COUNTRY_ALIASES[s];
   }
-  for (const [alias, canonical] of Object.entries(COUNTRY_ALIASES)) {
-    if (s === alias || s.includes(alias) || alias.includes(s)) {
-      return canonical;
-    }
-  }
   return s;
 };
 
@@ -107,10 +102,73 @@ export const VisitorMapSection: React.FC = () => {
   // Terminal state
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalLogs, setTerminalLogs] = useState<Array<{ text: string; type: 'input' | 'output' }>>([
-    { text: "HI. THIS IS QUADRI'S TERMINAL.", type: 'output' },
-    { text: "TYPE A COMMAND AND PRESS ENTER, OR JUST USE THE BUTTONS BELOW.", type: 'output' }
+    { text: "Hi, this is Quadri's terminal.", type: 'output' },
+    { text: "Type a command and press enter, or pick one below.", type: 'output' }
   ]);
   const terminalEndRef = useRef<HTMLDivElement>(null);
+
+  // Voluntary, user-initiated city pinpointing (zero popups on site entry)
+  const [pinpointLoading, setPinpointLoading] = useState(false);
+  const [pinpointedData, setPinpointedData] = useState<{ city: string; lat: number; lon: number } | null>(() => {
+    try {
+      const stored = localStorage.getItem('portfolio_user_pinpoint_geo');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handlePinpointCity = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    setPinpointLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        try {
+          const res = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
+          if (res.ok) {
+            const geo = await res.json();
+            const city = geo.city || geo.locality || 'Verified City';
+            const country = geo.countryName || data.userCountry || 'Nigeria';
+            const countryCode = geo.countryCode || data.userCountryCode || 'NG';
+
+            const newPinpoint = { city, lat: latitude, lon: longitude };
+            setPinpointedData(newPinpoint);
+            localStorage.setItem('portfolio_user_pinpoint_geo', JSON.stringify(newPinpoint));
+
+            // Sync with backend database so it updates visitors.json / Firebase
+            fetch(apiUrl('/api/visitors/log'), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                country,
+                countryCode,
+                city,
+                lat: latitude,
+                lon: longitude
+              })
+            }).catch(() => {});
+          }
+        } catch (err) {
+          console.warn('Reverse geocoding error:', err);
+        } finally {
+          setPinpointLoading(false);
+        }
+      },
+      (err) => {
+        console.warn('Geolocation permission error:', err);
+        setPinpointLoading(false);
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -252,7 +310,20 @@ export const VisitorMapSection: React.FC = () => {
       return;
     }
 
-    setTerminalLogs(prev => [...prev, { text: `GUEST ~ $ ${rawInput}`, type: 'input' }]);
+    if (command === 'guestbook') {
+      setTerminalLogs(prev => [
+        ...prev,
+        { text: `$ guestbook`, type: 'input' },
+        { text: "Opening digital guestbook at /guestbook...", type: 'output' }
+      ]);
+      setTerminalInput('');
+      setTimeout(() => {
+        window.location.href = '/guestbook';
+      }, 500);
+      return;
+    }
+
+    setTerminalLogs(prev => [...prev, { text: `$ ${rawInput}`, type: 'input' }]);
     setTerminalInput('');
 
     setTerminalLogs(prev => [...prev, { text: "AI: PROCESSING...", type: 'output' }]);
@@ -293,255 +364,326 @@ export const VisitorMapSection: React.FC = () => {
   // Issue 4.3: Distinct visitor markers from real location data only
   const activeMarkers = useMemo(() => {
     const list = [...data.locations];
+    if (pinpointedData && data.userCountry) {
+      const userNorm = normalizeCountry(data.userCountry);
+      const userMarkerIdx = list.findIndex(l => normalizeCountry(l.country) === userNorm);
+      if (userMarkerIdx >= 0) {
+        list[userMarkerIdx] = {
+          ...list[userMarkerIdx],
+          city: pinpointedData.city,
+          lat: pinpointedData.lat,
+          lon: pinpointedData.lon
+        };
+      } else {
+        list.push({
+          city: pinpointedData.city,
+          country: data.userCountry,
+          countryCode: data.userCountryCode,
+          lat: pinpointedData.lat,
+          lon: pinpointedData.lon
+        });
+      }
+    }
     return list.filter(l => typeof l.lat === 'number' && typeof l.lon === 'number' && !isNaN(l.lat) && !isNaN(l.lon));
-  }, [data.locations]);
+  }, [data.locations, data.userCountry, data.userCountryCode, pinpointedData]);
 
   const isLocating = !data.userCountry || data.userCountry === 'LOCATING...';
   const isUnknownLocation = data.userCountry === 'UNKNOWN';
 
-  const bannerHeadline = isLocating
-    ? 'CONNECTING TO GLOBAL VISITOR TELEMETRY...'
-    : isUnknownLocation
-    ? "WELCOME TO QUADRI'S RESEARCH PORTAL!"
-    : data.userCountryCount <= 1
-    ? `YOU'RE VISITING FROM ${data.userCity ? data.userCity.toUpperCase() + ', ' : ''}${data.userCountry}. WELCOME TO QUADRI'S RESEARCH PORTAL!`
-    : `YOU'RE IN ${data.userCity ? data.userCity.toUpperCase() + ', ' : ''}${data.userCountry}. ${data.userCountryCount.toLocaleString()} VISITOR SESSIONS RECORDED FROM YOUR REGION.`;
+  const titleCase = (s: string) =>
+    s.toLowerCase().replace(/(^|[\s-])(\S)/g, (_m, sep: string, ch: string) => sep + ch.toUpperCase());
+
+  const hasLocation = !isLocating && !isUnknownLocation;
+  const isPinpointed = Boolean(pinpointedData?.city);
+
+  const userPlace = isPinpointed
+    ? `${titleCase(pinpointedData!.city)}, ${titleCase(data.userCountry)}`
+    : hasLocation
+    ? titleCase(data.userCountry)
+    : '';
+
+  const countriesCount = Object.keys(data.countryStats).length > 0
+    ? Object.keys(data.countryStats).length
+    : (hasLocation ? 1 : 0);
+
+  const leaderboard = data.topCountries.slice(0, 5);
+  const maxCount = Math.max(1, ...leaderboard.map((c) => c.count));
+
+  const statusLabel = connectionStatus === 'connected' ? 'Live' : connectionStatus === 'connecting' ? 'Connecting' : 'Offline';
+  const statusDot = connectionStatus === 'connected' ? 'bg-[#64ffda]' : connectionStatus === 'connecting' ? 'bg-amber-400' : 'bg-[#495670]';
+
+  const stats = [
+    { label: 'Total visits', value: data.totalVisitors > 0 ? data.totalVisitors.toLocaleString() : '—' },
+    { label: 'Countries', value: countriesCount.toString() },
+    { label: 'Cities mapped', value: activeMarkers.length.toString() },
+  ];
+
+  const greeting = isLocating ? (
+    <>Finding where you&apos;re reading from…</>
+  ) : !hasLocation ? (
+    <>Thanks for stopping by.</>
+  ) : (
+    <span className="flex flex-wrap items-center gap-y-1">
+      <span>
+        You&apos;re reading from <span className="text-[#ccd6f6] font-semibold">{userPlace}</span>
+        {data.userCountryCount > 1
+          ? <> — one of <span className="text-[#ccd6f6] tabular-nums">{data.userCountryCount.toLocaleString()}</span> visits from there.</>
+          : <>. Welcome.</>}
+      </span>
+      {isPinpointed ? (
+        <span className="inline-flex items-center gap-1 text-[11px] font-mono text-[#64ffda] ml-2 px-2 py-0.5 rounded-full bg-[#112240] border border-[#64ffda]/30">
+          <MapPin className="w-3 h-3 text-[#64ffda]" />
+          <span>Exact city</span>
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={handlePinpointCity}
+          disabled={pinpointLoading}
+          className="inline-flex items-center gap-1.5 ml-2.5 px-2.5 py-0.5 rounded-full border border-[#233554] hover:border-[#64ffda] text-[#8892b0] hover:text-[#64ffda] text-xs font-mono transition-all cursor-pointer active:scale-95 disabled:opacity-60 bg-[#0a192f]"
+          title="Optional: Detect your exact city using device GPS/Wi-Fi"
+        >
+          {pinpointLoading ? (
+            <>
+              <Loader2 className="w-3 h-3 animate-spin text-[#64ffda]" />
+              <span>Pinpointing…</span>
+            </>
+          ) : (
+            <>
+              <MapPin className="w-3 h-3 text-[#64ffda]" />
+              <span>Pinpoint city</span>
+            </>
+          )}
+        </button>
+      )}
+    </span>
+  );
 
   return (
-    <section className="py-16 bg-[var(--color-surface-base)] text-[var(--color-text-main)] border-t border-[var(--color-border)] font-mono relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Retro Header Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-8 border-b border-[var(--color-border)] pb-6"
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <span className={`w-2.5 h-2.5 rounded-full ${connectionStatus === 'connected' ? 'bg-[#64ffda] animate-ping' : connectionStatus === 'connecting' ? 'bg-amber-400 animate-pulse' : 'bg-neutral-600'}`} />
-            <span className="text-xs uppercase tracking-widest text-[#64ffda] font-bold flex items-center gap-1.5">
-              <Radio className="w-3.5 h-3.5" /> REAL-TIME AUDIENCE TELEMETRY
-            </span>
-          </div>
+    <section id="visitors" className="pt-12 sm:pt-16 pb-4 sm:pb-6 bg-[var(--color-surface-base)] text-[#ccd6f6] relative">
+      <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20">
+        <div className="border-t border-[#233554] pt-12">
 
-          <h2 className="text-2xl sm:text-4xl font-serif font-bold tracking-tight text-[var(--color-text-main)] mb-2 uppercase">
-            <AnimatedWords text="GLOBAL VISITOR GEOLOCATION" />
-          </h2>
-          <p className="text-xs sm:text-sm text-[var(--color-text-muted)] max-w-3xl leading-relaxed mb-4 font-mono uppercase">
-            EVERY LIT BLOCK IS A COUNTRY SOMEONE OPENED THIS SITE FROM. DYNAMIC PINGS PULSE IN REAL-TIME ACROSS ACTIVE REGIONS.
+          {/* Header */}
+          <motion.header
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-14 items-end"
+          >
+            <div className="lg:col-span-7">
+              <span className="text-xs font-mono uppercase tracking-widest text-[#64ffda] font-semibold">
+                // Visitors
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-[#ccd6f6] mt-1">
+                <AnimatedWords text="Readers around the world" />
+              </h2>
+            </div>
+            <p className="lg:col-span-5 text-sm leading-relaxed text-[#8892b0]">
+              Each highlighted country is somewhere this site has been opened from.
+              The numbers update as new people drop by.
+            </p>
+          </motion.header>
+
+          {/* Figures */}
+          <dl className="mt-10 grid grid-cols-3 border-y border-[#233554] divide-x divide-[#233554]">
+            {stats.map((s) => (
+              <div key={s.label} className="py-5 px-4 sm:px-8 first:pl-0">
+                <dt className="text-xs font-mono text-[#8892b0]">{s.label}</dt>
+                <dd className="mt-1.5 text-2xl sm:text-[2rem] leading-none font-serif font-bold text-[#ccd6f6] tabular-nums">
+                  {s.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          {/* Personal line */}
+          <p className="mt-6 text-sm sm:text-[15px] text-[#8892b0] flex items-center gap-2.5">
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusDot}`} />
+            <span>{greeting}</span>
           </p>
 
-          {/* Dynamic Metrics Bar (Issue 4.3: dynamic verified metrics) */}
-          <div className="flex flex-wrap items-center gap-6 sm:gap-10 text-xs sm:text-sm font-mono tracking-widest mb-6 border-y border-[var(--color-border)]/80 py-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[#64ffda] font-bold text-base sm:text-lg">
-                {data.totalVisitors > 0 ? data.totalVisitors.toLocaleString() : '...'}
-              </span>
-              <span className="text-[var(--color-text-muted)] uppercase font-semibold">TOTAL VISITS</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[#64ffda] font-bold text-base sm:text-lg">
-                {Object.keys(data.countryStats).length > 0
-                  ? Object.keys(data.countryStats).length
-                  : (!isLocating && !isUnknownLocation ? 1 : 0)}
-              </span>
-              <span className="text-[var(--color-text-muted)] uppercase font-semibold">COUNTRIES RECORDED</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#64ffda] animate-pulse" />
-              <span className="text-[#64ffda] font-bold text-base sm:text-lg">{activeMarkers.length}</span>
-              <span className="text-[#64ffda] uppercase font-semibold">ACTIVE NODES</span>
-            </div>
+          {/* Map + leaderboard */}
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+
+            <motion.figure
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-8"
+            >
+              <div className="relative w-full h-[260px] sm:h-[360px] rounded-lg border border-[#233554] bg-[#0b1d36] overflow-hidden">
+                <ComposableMap
+                  projection="geoEqualEarth"
+                  projectionConfig={{ scale: 145, center: [10, 10] }}
+                  width={800}
+                  height={420}
+                  style={{ width: '100%', height: '100%' }}
+                >
+                  <Geographies geography={geoUrl}>
+                    {({ geographies }) =>
+                      geographies.map((geo) => {
+                        const geoName = geo.properties?.name || '';
+                        const isUserGeo = Boolean(
+                          hasLocation &&
+                          normalizeCountry(geoName) === normalizeCountry(data.userCountry)
+                        );
+
+                        const visitorCount = findCountryCount(geoName, data.countryStats);
+                        const hasVisitors = visitorCount > 0 || isUserGeo;
+                        const count = isUserGeo ? Math.max(visitorCount, data.userCountryCount) : visitorCount;
+
+                        let fillColor = '#122a4a';
+                        let strokeColor = '#0b1d36';
+                        let strokeWidth = 0.5;
+
+                        if (isUserGeo) {
+                          fillColor = '#2a8f80';
+                          strokeColor = '#64ffda';
+                          strokeWidth = 0.9;
+                        } else if (hasVisitors) {
+                          fillColor = count >= 5 ? '#237468' : '#1b5650';
+                          strokeColor = '#0b1d36';
+                          strokeWidth = 0.5;
+                        }
+
+                        return (
+                          <Geography
+                            key={geo.rsmKey}
+                            geography={geo}
+                            fill={fillColor}
+                            stroke={strokeColor}
+                            strokeWidth={strokeWidth}
+                            onMouseEnter={() => {
+                              setHoveredNode(
+                                hasVisitors
+                                  ? `${geoName} · ${count} visit${count === 1 ? '' : 's'}`
+                                  : geoName
+                              );
+                            }}
+                            onMouseLeave={() => setHoveredNode(null)}
+                            style={{
+                              default: { outline: 'none', transition: 'fill 0.15s ease' },
+                              hover: {
+                                fill: hasVisitors ? '#2fa392' : '#1a3760',
+                                outline: 'none',
+                                cursor: 'default',
+                              },
+                              pressed: { outline: 'none' },
+                            } as any}
+                          />
+                        );
+                      })
+                    }
+                  </Geographies>
+
+                  {activeMarkers.map((marker, idx) => {
+                    const isUserCountry = normalizeCountry(marker.country) === normalizeCountry(data.userCountry);
+                    return (
+                      <Marker
+                        key={`${marker.city}-${marker.lat}-${marker.lon}-${idx}`}
+                        coordinates={[marker.lon, marker.lat]}
+                        onMouseEnter={() => setHoveredNode(`${marker.city || 'Unknown city'}, ${titleCase(marker.country)}`)}
+                        onMouseLeave={() => setHoveredNode(null)}
+                      >
+                        {isUserCountry && (
+                          <circle r={9} fill="none" stroke="#64ffda" strokeWidth={1} opacity={0.6} />
+                        )}
+                        <circle
+                          r={isUserCountry ? 3.5 : 2.5}
+                          fill={isUserCountry ? '#64ffda' : '#ccd6f6'}
+                          stroke="#0b1d36"
+                          strokeWidth={1}
+                        />
+                      </Marker>
+                    );
+                  })}
+                </ComposableMap>
+
+                {hoveredNode && (
+                  <div className="absolute top-3 left-3 bg-[#0a192f] border border-[#233554] text-[#ccd6f6] px-2.5 py-1 rounded text-xs font-mono pointer-events-none">
+                    {hoveredNode}
+                  </div>
+                )}
+              </div>
+
+              <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#8892b0]">
+                <span className="flex items-center gap-5">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-[2px] bg-[#1b5650]" /> Visited
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-[2px] bg-[#2a8f80] ring-1 ring-[#64ffda]" /> You
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ccd6f6]" /> City
+                  </span>
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className={`w-1.5 h-1.5 rounded-full ${statusDot}`} /> {statusLabel}
+                </span>
+              </figcaption>
+            </motion.figure>
+
+            <aside className="lg:col-span-4">
+              <h3 className="text-sm font-semibold text-[#ccd6f6]">Top countries</h3>
+              <p className="text-xs font-mono text-[#8892b0]/70 mt-0.5">By number of visits</p>
+
+              {leaderboard.length > 0 ? (
+                <ol className="mt-5 border-t border-[#233554]">
+                  {leaderboard.map((c) => (
+                    <li key={c.name} className="py-3.5 border-b border-[#233554]">
+                      <div className="flex items-baseline justify-between gap-3 text-sm">
+                        <span className="flex items-baseline gap-3 min-w-0">
+                          <span className="font-mono text-xs text-[#495670] w-5 shrink-0">
+                            {String(c.rank).padStart(2, '0')}
+                          </span>
+                          <span className="text-[#a8b2d1] truncate">{titleCase(c.name)}</span>
+                        </span>
+                        <span className="font-mono text-xs text-[#ccd6f6] tabular-nums">
+                          {c.count.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="mt-2 ml-8 h-[3px] bg-[#112240] rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${(c.count / maxCount) * 100}%` }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.7, ease: 'easeOut' }}
+                          className="h-full bg-[#64ffda]/70 rounded-full"
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="mt-5 pt-5 border-t border-[#233554] text-sm text-[#8892b0]">
+                  {connectionStatus === 'connecting' ? 'Loading…' : 'No visits recorded yet.'}
+                </p>
+              )}
+            </aside>
           </div>
 
-          {/* Dynamic Geolocation Banner */}
-          <h3 className="text-lg sm:text-2xl font-bold tracking-tight text-[#64ffda] leading-snug mb-4 uppercase">
-            {bannerHeadline}
-          </h3>
-
-          {/* Top Leaderboard Row */}
-          {data.topCountries.length > 0 && (
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-2 text-xs sm:text-sm tracking-wider">
-              {data.topCountries.slice(0, 5).map((c) => (
-                <div key={c.name} className="flex items-center gap-2">
-                  <span className="text-[var(--color-text-subtle)] font-bold">{c.rank}</span>
-                  <span className="text-[var(--color-text-muted)] font-bold">{c.name}</span>
-                  <span className="text-[#64ffda] font-bold">{c.count.toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </motion.div>
-
-        {/* Grid Container: Retro Pixel World Map + Interactive Terminal */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Main Map Box */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.98 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+          {/* Console */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="lg:col-span-7 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl p-4 relative overflow-hidden shadow-2xl"
+            transition={{ duration: 0.5 }}
+            className="mt-12 rounded-lg border border-[#233554] bg-[#0b1d36]"
           >
-            <div className="flex justify-between items-center mb-3 px-2 text-xs text-[var(--color-text-muted)]">
-              <span className="flex items-center gap-1.5 font-bold">
-                <Globe className="w-4 h-4 text-[#64ffda]" /> Interactive Global Node Map
-              </span>
-              <span className={`text-[11px] font-mono flex items-center gap-1.5 ${connectionStatus === 'connected' ? 'text-[#64ffda]' : connectionStatus === 'connecting' ? 'text-amber-400' : 'text-neutral-500'}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${connectionStatus === 'connected' ? 'bg-[#64ffda] animate-pulse' : connectionStatus === 'connecting' ? 'bg-amber-400 animate-ping' : 'bg-neutral-600'}`} />
-                {connectionStatus === 'connected' ? 'Telemetry Active' : connectionStatus === 'connecting' ? 'Syncing Telemetry' : 'Offline'}
-              </span>
+            <div className="flex items-center justify-between px-5 py-3 border-b border-[#233554]">
+              <span className="font-mono text-xs text-[#8892b0]">guest@amooquadri.dev</span>
+              <span className="text-xs text-[#495670] hidden sm:inline">Ask about my work, or pick a command</span>
             </div>
 
-            {/* Map Canvas / ComposableMap */}
-            <div className="relative w-full h-[320px] sm:h-[400px] bg-[#0a192f] rounded-xl border border-[var(--color-border)] overflow-hidden">
-              
-              <ComposableMap
-                projection="geoEqualEarth"
-                projectionConfig={{ scale: 145, center: [10, 10] }}
-                width={800}
-                height={420}
-                style={{ width: "100%", height: "100%" }}
-              >
-                <Geographies geography={geoUrl}>
-                  {({ geographies }) =>
-                    geographies.map((geo) => {
-                      const geoName = geo.properties?.name || '';
-                      const isUserGeo = Boolean(
-                        data.userCountry &&
-                        data.userCountry !== 'LOCATING...' &&
-                        data.userCountry !== 'UNKNOWN' &&
-                        normalizeCountry(geoName) === normalizeCountry(data.userCountry)
-                      );
-
-                      // Issue 4.4: Normalized country lookup so all recorded countries are lit up
-                      const visitorCount = findCountryCount(geoName, data.countryStats);
-                      const hasVisitors = visitorCount > 0 || isUserGeo;
-                      const count = isUserGeo ? Math.max(visitorCount, data.userCountryCount) : visitorCount;
-
-                      let fillColor = "#112240";
-                      let strokeColor = "#233554";
-                      let strokeWidth = 0.4;
-
-                      if (isUserGeo) {
-                        fillColor = "#134e4a";
-                        strokeColor = "#64ffda";
-                        strokeWidth = 1.2;
-                      } else if (hasVisitors) {
-                        fillColor = count >= 5 ? "#115e59" : "#0f3e3a";
-                        strokeColor = count >= 5 ? "#64ffda" : "#2dd4bf";
-                        strokeWidth = 0.75;
-                      }
-
-                      return (
-                        <Geography
-                          key={geo.rsmKey}
-                          geography={geo}
-                          fill={fillColor}
-                          stroke={strokeColor}
-                          strokeWidth={strokeWidth}
-                          onMouseEnter={() => {
-                            if (hasVisitors) {
-                              setHoveredNode(`${geoName}: ${count} visitor${count > 1 ? 's' : ''}`);
-                            } else {
-                              setHoveredNode(geoName);
-                            }
-                          }}
-                          onMouseLeave={() => setHoveredNode(null)}
-                          style={{
-                            default: { outline: "none", transition: "fill 0.2s ease" },
-                            hover: {
-                              fill: hasVisitors ? "#0d9488" : "#1e3a5f",
-                              stroke: "#64ffda",
-                              strokeWidth: 1.0,
-                              outline: "none",
-                              cursor: "pointer"
-                            },
-                            pressed: { outline: "none" }
-                          } as any}
-                        />
-                      );
-                    })
-                  }
-                </Geographies>
-
-                {/* Dynamic Visitor Markers (Issue 4.3: Real locations only) */}
-                {activeMarkers.map((marker, idx) => {
-                  const isUserCountry = normalizeCountry(marker.country) === normalizeCountry(data.userCountry);
-
-                  return (
-                    <Marker 
-                      key={`${marker.city}-${marker.lat}-${marker.lon}-${idx}`} 
-                      coordinates={[marker.lon, marker.lat]}
-                      onMouseEnter={() => setHoveredNode(`${marker.city || 'Verified Location'}, ${marker.country}`)}
-                      onMouseLeave={() => setHoveredNode(null)}
-                    >
-                      {/* Pulse effect for user location marker */}
-                      {isUserCountry && (
-                        <circle r={14} fill="#64ffda" opacity={0.3}>
-                          <animate attributeName="r" values="6;18;6" dur="2s" repeatCount="indefinite" />
-                          <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite" />
-                        </circle>
-                      )}
-
-                      <circle 
-                        r={isUserCountry ? 5 : 3.5} 
-                        fill={isUserCountry ? "#64ffda" : "#38bdf8"} 
-                        stroke="#0a192f" 
-                        strokeWidth={1.2}
-                        className="cursor-pointer hover:scale-150 transition-transform"
-                      />
-                    </Marker>
-                  );
-                })}
-              </ComposableMap>
-
-              {/* Hover Tooltip overlay */}
-              {hoveredNode && (
-                <div className="absolute top-4 left-4 bg-[#020c1b]/95 border border-[#64ffda] text-[#64ffda] px-3 py-1.5 rounded-lg text-xs font-mono shadow-xl pointer-events-none animate-fade-in flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#64ffda] animate-ping" />
-                  <span>{hoveredNode}</span>
-                </div>
-              )}
-
-              {/* Map Footer Metadata (Issue 4.3: Dynamic status instead of hardcoded strings) */}
-              <div className="absolute bottom-3 left-4 right-4 flex justify-between items-center text-[10px] text-[var(--color-text-muted)] font-mono bg-[#020c1b]/80 backdrop-blur-xs p-2 rounded-lg border border-[var(--color-border)]">
-                <span>
-                  CLIENT NODE: {data.userCity && data.userCity !== 'Unknown' ? `${data.userCity.toUpperCase()}, ` : ''}{data.userCountry}
-                </span>
-                <span className={`font-bold ${connectionStatus === 'connected' ? 'text-[#64ffda]' : connectionStatus === 'connecting' ? 'text-amber-400' : 'text-neutral-500'}`}>
-                  {connectionStatus === 'connected' ? 'TELEMETRY CONNECTED' : connectionStatus === 'connecting' ? 'SYNCING TELEMETRY...' : 'OFFLINE TELEMETRY'}
-                </span>
-              </div>
-            </div>
-
-          </motion.div>
-
-          {/* Interactive Terminal Widget (Right Column) */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="lg:col-span-5 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl p-5 shadow-xl flex flex-col h-[420px]"
-          >
-            {/* Terminal Top Window Bar */}
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--color-border)] text-xs text-[var(--color-text-muted)]">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-red-500/80 inline-block" />
-                <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
-                <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
-                <span className="ml-2 font-bold text-[var(--color-text-main)]">GUEST@AMOOQUADRI.DEV</span>
-              </div>
-              <Terminal className="w-4 h-4 text-[#64ffda]" />
-            </div>
-
-            {/* Terminal Logs Output Scroll View */}
-            <div className="flex-1 overflow-y-auto space-y-2 text-xs leading-relaxed scrollbar-none pr-1 font-mono">
+            <div className="h-44 overflow-y-auto px-5 py-4 space-y-2 font-mono text-[13px] leading-relaxed scrollbar-none">
               {terminalLogs.map((log, i) => (
-                <div 
-                  key={i} 
-                  className={log.type === 'input' ? 'text-[#64ffda] font-bold' : 'text-[var(--color-text-muted)]'}
+                <div
+                  key={i}
+                  className={log.type === 'input' ? 'text-[#64ffda]' : 'text-[#a8b2d1]'}
                 >
                   {log.text}
                 </div>
@@ -549,46 +691,44 @@ export const VisitorMapSection: React.FC = () => {
               <div ref={terminalEndRef} />
             </div>
 
-            {/* Quick Action Button Shortcuts */}
-            <div className="pt-3 border-t border-[var(--color-border)] mt-2">
-              <div className="flex flex-wrap gap-1.5 mb-3">
-                {['help', 'about', 'skills', 'projects', 'contact', 'clear'].map(cmd => (
-                  <button
-                    key={cmd}
-                    onClick={() => handleTerminalCommand(cmd)}
-                    className="px-2 py-1 bg-[var(--color-surface-elevated)] hover:bg-[#233554] text-[#64ffda] text-[10px] font-mono rounded border border-[var(--color-border)] transition-colors cursor-pointer active:scale-95"
-                  >
-                    ${cmd}
-                  </button>
-                ))}
-              </div>
-
-              {/* Command Input Form */}
-              <form 
+            <div className="border-t border-[#233554] px-5 py-3 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+              <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleTerminalCommand();
                 }}
-                className="flex items-center gap-2 bg-[#0a192f] px-3 py-2 rounded-xl border border-[var(--color-border)] focus-within:border-[#64ffda]"
+                className="flex items-center gap-2 flex-1 min-w-0"
               >
-                <span className="text-[#64ffda] font-bold">GUEST ~ $</span>
+                <span className="font-mono text-sm text-[#64ffda]">$</span>
                 <input
                   type="text"
                   value={terminalInput}
                   onChange={(e) => setTerminalInput(e.target.value)}
-                  placeholder="TYPE A COMMAND OR QUESTION..."
-                  className="bg-transparent text-xs text-[var(--color-text-main)] placeholder-slate-500 focus:outline-none w-full font-mono"
+                  placeholder="type a command or question"
+                  aria-label="Terminal command"
+                  className="bg-transparent text-[13px] text-[#ccd6f6] placeholder-[#495670] focus:outline-none w-full font-mono"
                 />
-                <button type="submit" aria-label="Send command" className="text-[var(--color-text-muted)] hover:text-[#64ffda]">
+                <button type="submit" aria-label="Send command" className="text-[#495670] hover:text-[#64ffda] transition-colors">
                   <CornerDownLeft className="w-3.5 h-3.5" />
                 </button>
               </form>
-            </div>
 
+              <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs">
+                {['help', 'guestbook', 'skills', 'projects', 'contact', 'clear'].map((cmd) => (
+                  <button
+                    key={cmd}
+                    type="button"
+                    onClick={() => handleTerminalCommand(cmd)}
+                    className="text-[#8892b0] hover:text-[#64ffda] underline-offset-4 hover:underline transition-colors cursor-pointer"
+                  >
+                    {cmd}
+                  </button>
+                ))}
+              </div>
+            </div>
           </motion.div>
 
         </div>
-
       </div>
     </section>
   );

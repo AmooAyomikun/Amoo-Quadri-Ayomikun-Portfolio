@@ -64,32 +64,32 @@ export const Footer: React.FC = () => {
   }
 
   return (
-    <footer className="bg-[var(--color-surface-base)] text-[#0a192f] pt-12 pb-8 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto">
+    <footer className="bg-[var(--color-surface-base)] text-[#0a192f] pt-8 pb-6 relative z-40 overflow-hidden">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Teal Watts Asymmetric Arch Pill Container */}
-        <div className="rounded-t-[8rem] sm:rounded-tl-[16rem] sm:rounded-tr-[2.5rem] rounded-b-[2.5rem] bg-[var(--color-primary)] border border-[var(--color-primary)]/40 p-8 sm:p-14 lg:p-16 relative overflow-hidden shadow-2xl text-[#0a192f]">
+        {/* Teal Watts Asymmetric Arch Pill Container - Full and Independent */}
+        <div className="rounded-t-[4rem] sm:rounded-tl-[8rem] sm:rounded-tr-[2rem] rounded-b-[2rem] bg-[var(--color-primary)] border border-[var(--color-primary)]/40 p-6 sm:p-8 lg:p-10 relative overflow-hidden shadow-2xl text-[#0a192f]">
           
-          {/* Top Row Grid matching Watts Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 mb-12 relative z-10 pt-4 sm:pt-8">
+          {/* Top Row Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 mb-6 relative z-10 pt-2 sm:pt-4">
             
             {/* Professional Headline & Copyright (Left Column) */}
-            <div className="lg:col-span-5 space-y-4">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black text-[#0a192f] tracking-tight leading-tight max-w-md">
+            <div className="lg:col-span-5 space-y-3">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-serif font-black text-[#0a192f] tracking-tight leading-snug max-w-xl">
                 Engineering scalable software architectures, intelligent algorithms, and high-impact digital systems.
               </h2>
-              <p className="text-xs sm:text-sm text-[#0a192f]/80 font-mono pt-2 font-medium">
+              <p className="text-xs text-[#0a192f]/80 font-mono pt-1 font-medium">
                 © {new Date().getFullYear()} Quadri Amoo. All rights reserved. Designed & Engineered by Quadri Amoo.
               </p>
             </div>
 
             {/* Navigation & Support Columns Combined */}
             <div className="lg:col-span-4 grid grid-cols-2 gap-4">
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <h3 className="font-mono font-bold text-xs text-[#0a192f] uppercase tracking-widest">
                   NAVIGATION
                 </h3>
-                <ul className="space-y-2.5 text-xs text-[#0a192f]/80 font-medium font-sans">
+                <ul className="space-y-2 text-xs text-[#0a192f]/80 font-medium font-sans">
                   <li><Link to="/" className="hover:text-[#0a192f] hover:underline transition-colors">Home</Link></li>
                   <li><Link to="/education" className="hover:text-[#0a192f] hover:underline transition-colors">Education</Link></li>
                   <li><Link to="/experience" className="hover:text-[#0a192f] hover:underline transition-colors">Experience</Link></li>
@@ -98,11 +98,11 @@ export const Footer: React.FC = () => {
                   <li><Link to="/guestbook" className="hover:text-[#0a192f] hover:underline transition-colors">Guestbook</Link></li>
                 </ul>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <h3 className="font-mono font-bold text-xs text-[#0a192f] uppercase tracking-widest">
                   SUPPORT
                 </h3>
-                <ul className="space-y-2.5 text-xs text-[#0a192f]/80 font-medium font-sans">
+                <ul className="space-y-2 text-xs text-[#0a192f]/80 font-medium font-sans">
                   <li><Link to="/contact" className="hover:text-[#0a192f] hover:underline transition-colors">Contact Me</Link></li>
                   <li><a href={portfolioData.personal.github} target="_blank" rel="noreferrer" className="hover:text-[#0a192f] hover:underline transition-colors">GitHub ↗</a></li>
                   <li><a href={portfolioData.personal.linkedIn} target="_blank" rel="noreferrer" className="hover:text-[#0a192f] hover:underline transition-colors">LinkedIn ↗</a></li>
@@ -113,9 +113,9 @@ export const Footer: React.FC = () => {
             </div>
 
             {/* Subscribe & Social Icons Column */}
-            <div className="lg:col-span-3 space-y-6">
+            <div className="lg:col-span-3 space-y-4">
               <div>
-                <h3 className="font-mono font-bold text-xs text-[#0a192f] uppercase tracking-widest mb-3">
+                <h3 className="font-mono font-bold text-xs text-[#0a192f] uppercase tracking-widest mb-2.5">
                   GET THE LATEST FROM QUADRI.
                 </h3>
                 
@@ -125,13 +125,13 @@ export const Footer: React.FC = () => {
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="Email Address"
-                    className="w-full bg-[#0a192f] border border-[#0a192f]/40 rounded-full py-3 pl-4 pr-28 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0a192f] transition-colors font-mono"
+                    className="w-full bg-[#0a192f] border border-[#0a192f]/40 rounded-full py-2.5 pl-4 pr-28 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0a192f] transition-colors font-mono"
                     required
                   />
                   <button
                     type="submit"
                     disabled={subscribing}
-                    className="absolute right-1 px-5 py-2 bg-white text-[#0a192f] font-mono font-bold text-xs rounded-full hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-75"
+                    className="absolute right-1 px-4 py-1.5 bg-white text-[#0a192f] font-mono font-bold text-xs rounded-full hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-75"
                   >
                     {subscribing ? 'Sending...' : subscribed ? 'Subscribed!' : 'Subscribe'}
                   </button>
@@ -147,43 +147,43 @@ export const Footer: React.FC = () => {
 
               {/* Follow Us Badges */}
               <div>
-                <h4 className="font-mono font-bold text-[10px] text-[#0a192f] uppercase tracking-widest mb-3">
+                <h4 className="font-mono font-bold text-[10px] text-[#0a192f] uppercase tracking-widest mb-2.5">
                   FOLLOW US
                 </h4>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2">
                   <a
                     href={`mailto:${portfolioData.personal.email}`}
-                    className="w-9 h-9 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
+                    className="w-8 h-8 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
                     aria-label="Email"
                   >
-                    <Mail className="w-4 h-4" />
+                    <Mail className="w-3.5 h-3.5" />
                   </a>
                   <a
                     href={portfolioData.personal.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
+                    className="w-8 h-8 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
                     aria-label="GitHub"
                   >
-                    <GithubIcon className="w-4 h-4" />
+                    <GithubIcon className="w-3.5 h-3.5" />
                   </a>
                   <a
                     href={portfolioData.personal.linkedIn}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
+                    className="w-8 h-8 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
                     aria-label="LinkedIn"
                   >
-                    <LinkedinIcon className="w-4 h-4" />
+                    <LinkedinIcon className="w-3.5 h-3.5" />
                   </a>
                   <a
                     href={portfolioData.personal.twitter || 'https://x.com'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
+                    className="w-8 h-8 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
                     aria-label="Twitter"
                   >
-                    <TwitterIcon className="w-4 h-4" />
+                    <TwitterIcon className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>
@@ -192,14 +192,14 @@ export const Footer: React.FC = () => {
 
           </div>
 
-          {/* Bottom Massive Typography Watermark ("watts" -> "quadri") */}
-          <div className="relative pt-4 flex flex-col items-end justify-between border-t border-[#0a192f]/15 mt-6">
-            <h1 className="text-[18vw] sm:text-[16vw] lg:text-[14vw] font-sans font-black tracking-tighter leading-none text-[#0a192f] select-none text-right uppercase pointer-events-none w-full">
+          {/* Bottom Sleek Typography Watermark ("quadri") */}
+          <div className="relative pt-3 flex flex-col items-end justify-between border-t border-[#0a192f]/15 mt-3">
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-sans font-black tracking-tighter leading-none text-[#0a192f]/90 select-none text-right uppercase pointer-events-none w-full">
               quadri
             </h1>
 
             {/* Back to top row */}
-            <div className="w-full flex justify-between items-center pt-6 text-xs font-mono text-[#0a192f]/80 font-medium">
+            <div className="w-full flex justify-between items-center pt-3 text-xs font-mono text-[#0a192f]/80 font-medium">
               <span className="uppercase">IBADAN, NIGERIA (GMT+1)</span>
               <button
                 onClick={scrollToTop}

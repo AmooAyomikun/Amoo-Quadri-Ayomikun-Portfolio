@@ -13,25 +13,26 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     <div className="flex flex-col h-full group">
       <Link to={`/projects/${project.id}`} className="flex flex-col h-full block cursor-pointer">
         
-        {/* Screenshot / Visual Preview Block (Issue 5.7: use screenshots from /public, no cold proxy iframes) */}
-        <div className="w-full aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-to-br from-[var(--color-surface-elevated)] to-[var(--color-surface-card)] mb-6 relative border border-[var(--color-border)]/50">
-          {project.imageUrl ? (
+        {/* Live Vercel Preview or Screenshot Block */}
+        <div className="w-full aspect-[4/3] rounded-3xl overflow-hidden bg-[#0a192f] mb-6 relative border border-[var(--color-border)]/50 group-hover:border-[var(--color-primary)]/40 transition-colors">
+          {project.demoUrl && (project.demoUrl.includes('vercel.app') || project.previewType === 'iframe') ? (
+            <div className="absolute inset-0 w-full h-full overflow-hidden bg-[#0a192f]">
+              <iframe 
+                src={apiUrl(`/api/proxy?url=${encodeURIComponent(project.demoUrl)}`)}
+                title={project.title} 
+                loading="lazy"
+                className="absolute top-0 left-0 w-[400%] h-[400%] origin-top-left scale-[0.25] border-none pointer-events-none select-none bg-[#0a192f]"
+                scrolling="no"
+                tabIndex={-1}
+              />
+            </div>
+          ) : project.imageUrl ? (
             <img 
               src={project.imageUrl} 
               alt={project.title} 
               loading="lazy"
               className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.03] transition-transform duration-700 ease-out" 
             />
-          ) : project.demoUrl && project.previewType === 'iframe' ? (
-            <div className="absolute inset-0 w-full h-full overflow-hidden">
-              <iframe 
-                src={apiUrl(`/api/proxy?url=${encodeURIComponent(project.demoUrl)}`)}
-                title={project.title} 
-                className="absolute top-0 left-0 w-[400%] h-[400%] origin-top-left scale-[0.25] border-none pointer-events-none"
-                scrolling="no"
-                tabIndex={-1}
-              />
-            </div>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center group-hover:scale-105 transition-transform duration-700 ease-out">
               <h3 className="text-2xl font-serif font-bold text-[var(--color-text-main)] drop-shadow-md mb-2">{project.title}</h3>

@@ -48,20 +48,22 @@ export const Navbar: React.FC = () => {
   // Brittany Chiang inspired navigation items with numbering (Home is accessed via the AQA logo)
   const navLinks = isHome
     ? [
-        { num: '01.', name: 'About', path: '/#about', isHash: true },
-        { num: '02.', name: 'Research', path: '/research', isHash: false },
-        { num: '03.', name: 'Projects', path: '/projects', isHash: false },
-        { num: '04.', name: 'Experience', path: '/experience', isHash: false },
+        { num: '01.', name: 'Research', path: '/research', isHash: false },
+        { num: '02.', name: 'Projects', path: '/projects', isHash: false },
+        { num: '03.', name: 'Experience', path: '/experience', isHash: false },
+        { num: '04.', name: 'Education', path: '/education', isHash: false },
         { num: '05.', name: 'News', path: '/news', isHash: false },
         { num: '06.', name: 'Contact', path: '/#contact', isHash: true },
+        { num: '07.', name: 'Guestbook', path: '/guestbook', isHash: false },
       ]
     : [
-        { num: '01.', name: 'About', path: '/#about', isHash: true },
-        { num: '02.', name: 'Education', path: '/education', isHash: false },
-        { num: '03.', name: 'Research', path: '/research', isHash: false },
-        { num: '04.', name: 'Experience', path: '/experience', isHash: false },
-        { num: '05.', name: 'Projects', path: '/projects', isHash: false },
+        { num: '01.', name: 'Research', path: '/research', isHash: false },
+        { num: '02.', name: 'Projects', path: '/projects', isHash: false },
+        { num: '03.', name: 'Experience', path: '/experience', isHash: false },
+        { num: '04.', name: 'Education', path: '/education', isHash: false },
+        { num: '05.', name: 'News', path: '/news', isHash: false },
         { num: '06.', name: 'Contact', path: '/contact', isHash: false },
+        { num: '07.', name: 'Guestbook', path: '/guestbook', isHash: false },
       ]
 
   const handleLinkClick = (isHash: boolean, path: string) => {

@@ -38,6 +38,20 @@ const ScholarIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }
 )
 
 export const SocialSidebars: React.FC = () => {
+  const [hideSidebars, setHideSidebars] = React.useState(false)
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.innerHeight + window.scrollY
+      const threshold = document.documentElement.scrollHeight - 650
+      setHideSidebars(scrollPosition >= threshold)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   const socials = [
     { name: 'GitHub', url: portfolioData.personal.github, icon: <GithubIcon /> },
     { name: 'LinkedIn', url: portfolioData.personal.linkedIn, icon: <LinkedinIcon /> },
@@ -51,9 +65,11 @@ export const SocialSidebars: React.FC = () => {
       {/* Left Social Icons Bar */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 0.6 }}
-        className="hidden md:flex fixed bottom-0 left-6 lg:left-12 z-40 flex-col items-center gap-6"
+        animate={{ opacity: hideSidebars ? 0 : 1, y: hideSidebars ? 20 : 0 }}
+        transition={{ duration: 0.3 }}
+        className={`hidden md:flex fixed bottom-0 left-6 lg:left-10 z-30 flex-col items-center gap-6 ${
+          hideSidebars ? 'pointer-events-none' : ''
+        }`}
       >
         <div className="flex flex-col items-center gap-6">
           {socials.map((social) => (
@@ -76,9 +92,11 @@ export const SocialSidebars: React.FC = () => {
       {/* Right Email Bar */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.1, duration: 0.6 }}
-        className="hidden md:flex fixed bottom-0 right-6 lg:right-12 z-40 flex-col items-center gap-6"
+        animate={{ opacity: hideSidebars ? 0 : 1, y: hideSidebars ? 20 : 0 }}
+        transition={{ duration: 0.3 }}
+        className={`hidden md:flex fixed bottom-0 right-6 lg:right-10 z-30 flex-col items-center gap-6 ${
+          hideSidebars ? 'pointer-events-none' : ''
+        }`}
       >
         <a
           href={`mailto:${portfolioData.personal.email}`}

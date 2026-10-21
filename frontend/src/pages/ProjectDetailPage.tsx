@@ -112,11 +112,11 @@ export default function ProjectDetailPage() {
               </div>
             </div>
 
-            {/* Right Column: Image Display (Issue 5.7: prioritize screenshots, only use iframe if explicitly configured) */}
+            {/* Right Column: Live Vercel Preview or Image Display */}
             <div className="lg:col-span-7">
-              <div className="w-full h-full min-h-[50vh] rounded-3xl overflow-hidden relative border border-[var(--color-border)] shadow-2xl bg-[var(--color-surface-card)] flex items-center justify-center">
-                {project.demoUrl && project.previewType === 'iframe' ? (
-                  <div className="absolute inset-0 w-full h-full overflow-hidden">
+              <div className="relative w-full aspect-[4/3] min-h-[380px] rounded-3xl overflow-hidden border border-[var(--color-border)] shadow-2xl bg-[#0a192f]">
+                {project.demoUrl && (project.demoUrl.includes('vercel.app') || project.previewType === 'iframe') ? (
+                  <div className="absolute inset-0 w-full h-full overflow-hidden bg-[#0a192f]">
                     <iframe 
                       src={apiUrl(`/api/proxy?url=${encodeURIComponent(project.demoUrl)}`)}
                       title={project.title} 
