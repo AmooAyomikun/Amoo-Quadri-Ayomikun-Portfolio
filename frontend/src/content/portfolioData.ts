@@ -14,6 +14,7 @@ export interface ProjectItem {
   metrics: { label: string; value: string }[]
   imageUrl?: string
   demoUrl?: string
+  tourRoutes?: string[]
   githubUrl?: string
   caseStudyPath?: string
   previewType?: 'iframe' | 'image'
@@ -332,7 +333,7 @@ export const portfolioData = {
       id: 'dispatchlane',
       title: 'DispatchLane Delivery Tracker PWA',
       subtitle: 'Logistics & Dispatch Tracking Platform',
-      category: 'fullstack',
+      category: 'frontend',
       lens: 'industry',
       period: '2024',
       role: 'Frontend Engineer',
@@ -352,6 +353,7 @@ export const portfolioData = {
       ],
       imageUrl: '/dispatchlane.png',
       demoUrl: 'https://dispatch-lane-delivery-and-dispatch.vercel.app/',
+      tourRoutes: ['/', '/features', '/how-it-works', '/pricing', '/track'],
       githubUrl: 'https://github.com/AmooAyomikun/DispatchLane-delivery-and-dispatch-tracker',
       featured: true
     },
@@ -379,6 +381,7 @@ export const portfolioData = {
       ],
       imageUrl: '/koraapp.png',
       demoUrl: 'https://kora-e-commerce-website.vercel.app/',
+      tourRoutes: ['/', '/products', '/cart', '/sell-on-kora'],
       githubUrl: 'https://github.com/AmooAyomikun/Kora-E-commerce-Website',
       featured: true
     },
@@ -406,6 +409,7 @@ export const portfolioData = {
       ],
       imageUrl: '/kynda.png',
       demoUrl: 'https://kynda-ai-assistant-learning-platfor.vercel.app/',
+      tourRoutes: ['/', '/faq', '/signup', '/login'],
       githubUrl: 'https://github.com/AmooAyomikun/Kynda-AI-Assistant-Learning-Platform',
       featured: true
     },
@@ -413,7 +417,7 @@ export const portfolioData = {
       id: 'pathly-online',
       title: 'Pathly Online Learning Platform',
       subtitle: 'Educational Course Management System',
-      category: 'fullstack',
+      category: 'frontend',
       lens: 'industry',
       period: '2024',
       role: 'Frontend Engineer',
@@ -433,6 +437,7 @@ export const portfolioData = {
       ],
       imageUrl: '/pathly.png',
       demoUrl: 'https://pathly-online-learnig-platform.vercel.app/',
+      tourRoutes: ['/', '/courses', '/instructors', '/pricing'],
       githubUrl: 'https://github.com/AmooAyomikun/Pathly-Online-Learnig-Platform-',
       featured: true
     },
@@ -462,9 +467,10 @@ export const portfolioData = {
       ],
       imageUrl: '/cleanreport.png',
       demoUrl: 'https://cleanreport-frontend.vercel.app/',
+      tourRoutes: ['/', '/reports', '/rewards', '/login'],
       githubUrl: 'https://github.com/AmooAyomikun/axion-circle',
       caseStudyPath: '/case-study/clean-report',
-      previewType: 'image',
+      previewType: 'iframe',
       featured: true
     },
     {

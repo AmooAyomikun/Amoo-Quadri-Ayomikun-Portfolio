@@ -89,8 +89,8 @@ export const Navbar: React.FC = () => {
         isVisible ? 'translate-y-0' : '-translate-y-full shadow-none'
       } ${
         isScrolled
-          ? 'bg-[#0a192f]/85 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(2,12,27,0.7)] py-4'
-          : 'bg-transparent py-6'
+          ? 'bg-[var(--color-surface-base)]/90 backdrop-blur-md border-b border-[var(--color-border)] shadow-[var(--shadow-sm)] py-3.5'
+          : 'bg-transparent py-5 sm:py-6'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 flex items-center justify-between">
@@ -119,10 +119,10 @@ export const Navbar: React.FC = () => {
                         handleLinkClick(true, link.path)
                       }
                     }}
-                    className="font-mono text-xs text-[#ccd6f6] hover:text-[#64ffda] transition-colors flex items-center gap-1.5 group cursor-pointer"
+                    className="font-mono text-xs text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 group cursor-pointer font-medium"
                   >
-                    <span className="text-[#64ffda] text-[11px] font-normal">{link.num}</span>
-                    <span className="group-hover:text-[#64ffda]">{link.name}</span>
+                    <span className="text-[var(--color-primary)] text-[11px] font-mono">{link.num}</span>
+                    <span className="group-hover:text-[var(--color-primary)]">{link.name}</span>
                   </a>
                 )
               }
@@ -130,10 +130,10 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={link.name}
                   to={link.path}
-                  className="font-mono text-xs text-[#ccd6f6] hover:text-[#64ffda] transition-colors flex items-center gap-1.5 group"
+                  className="font-mono text-xs text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 group font-medium"
                 >
-                  <span className="text-[#64ffda] text-[11px] font-normal">{link.num}</span>
-                  <span className="group-hover:text-[#64ffda]">{link.name}</span>
+                  <span className="text-[var(--color-primary)] text-[11px] font-mono">{link.num}</span>
+                  <span className="group-hover:text-[var(--color-primary)]">{link.name}</span>
                 </Link>
               )
             })}
@@ -145,7 +145,7 @@ export const Navbar: React.FC = () => {
               href="/Amoo_Quadri_CV.pdf"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 rounded border border-[#64ffda] text-[#64ffda] font-mono text-xs font-medium hover:bg-[rgba(100,255,218,0.1)] transition-all duration-200"
+              className="px-4 py-2 rounded-lg border border-[var(--color-primary)] text-[var(--color-primary)] font-mono text-xs font-semibold hover:bg-[var(--color-primary-light)] transition-all duration-200"
             >
               Resume
             </a>
@@ -154,9 +154,14 @@ export const Navbar: React.FC = () => {
             <button
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="p-2 rounded border border-[#233554] text-[#8892b0] hover:text-[#64ffda] hover:border-[#64ffda] transition-colors cursor-pointer"
+              className="p-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-card)] hover:border-[var(--color-primary)] transition-all cursor-pointer shadow-xs group"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
-              {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-[#ccd6f6]" />}
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400 transition-transform group-hover:rotate-45" />
+              ) : (
+                <Moon className="w-4 h-4 text-indigo-600 transition-transform group-hover:-rotate-12" />
+              )}
             </button>
           </div>
         </div>
@@ -166,15 +171,20 @@ export const Navbar: React.FC = () => {
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            className="p-2 rounded border border-[#233554] text-[#8892b0]"
+            className="p-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-card)]"
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
-            {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-[#ccd6f6]" />}
+            {theme === 'dark' ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-indigo-600" />
+            )}
           </button>
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle Menu"
-            className="p-2 text-[#64ffda] focus:outline-none cursor-pointer"
+            className="p-2 text-[var(--color-primary)] focus:outline-none cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
           </button>
@@ -189,11 +199,11 @@ export const Navbar: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'tween', duration: 0.3 }}
-            className="fixed inset-y-0 right-0 w-[min(75vw,360px)] h-screen bg-[#112240] shadow-2xl z-50 flex flex-col justify-center items-center px-8 border-l border-[#233554] md:hidden"
+            className="fixed inset-y-0 right-0 w-[min(75vw,360px)] h-screen bg-[var(--color-surface-card)] shadow-2xl z-50 flex flex-col justify-center items-center px-8 border-l border-[var(--color-border)] md:hidden"
           >
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="absolute top-6 right-6 p-2 text-[#64ffda]"
+              className="absolute top-6 right-6 p-2 text-[var(--color-primary)]"
               aria-label="Close Menu"
             >
               <X className="w-7 h-7" />
@@ -214,9 +224,9 @@ export const Navbar: React.FC = () => {
                           setMobileMenuOpen(false)
                         }
                       }}
-                      className="font-mono text-base text-[#ccd6f6] hover:text-[#64ffda] transition-colors flex flex-col items-center gap-1"
+                      className="font-mono text-base text-[var(--color-text-main)] hover:text-[var(--color-primary)] transition-colors flex flex-col items-center gap-1 font-medium"
                     >
-                      <span className="text-[#64ffda] text-xs">{link.num}</span>
+                      <span className="text-[var(--color-primary)] text-xs">{link.num}</span>
                       <span>{link.name}</span>
                     </a>
                   )
@@ -226,9 +236,9 @@ export const Navbar: React.FC = () => {
                     key={link.name}
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-mono text-base text-[#ccd6f6] hover:text-[#64ffda] transition-colors flex flex-col items-center gap-1"
+                    className="font-mono text-base text-[var(--color-text-main)] hover:text-[var(--color-primary)] transition-colors flex flex-col items-center gap-1 font-medium"
                   >
-                    <span className="text-[#64ffda] text-xs">{link.num}</span>
+                    <span className="text-[var(--color-primary)] text-xs">{link.num}</span>
                     <span>{link.name}</span>
                   </Link>
                 )
@@ -239,7 +249,7 @@ export const Navbar: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="mt-4 px-8 py-3 rounded border border-[#64ffda] text-[#64ffda] font-mono text-sm font-medium hover:bg-[rgba(100,255,218,0.1)] transition-all"
+                className="mt-4 px-8 py-3 rounded-lg border border-[var(--color-primary)] text-[var(--color-primary)] font-mono text-sm font-semibold hover:bg-[var(--color-primary-light)] transition-all"
               >
                 Resume
               </a>

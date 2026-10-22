@@ -15,7 +15,7 @@ export const AQALogo: React.FC<AQALogoProps> = ({ className = "h-11", showText =
     >
       {/* Fun, Custom Stylized Monogram for AQA */}
       <motion.div 
-        className="relative flex items-center justify-center p-1.5 rounded-xl transition-colors duration-300 group-hover:bg-[#64ffda]/10"
+        className="relative flex items-center justify-center p-1.5 rounded-xl transition-colors duration-300 group-hover:bg-[var(--color-primary-light)]"
         variants={{
           initial: { scale: 1, rotate: 0 },
           hover: { 
@@ -38,12 +38,12 @@ export const AQALogo: React.FC<AQALogoProps> = ({ className = "h-11", showText =
             width="74"
             height="48"
             rx="12"
-            className="stroke-[#233554] group-hover:stroke-[#64ffda] transition-colors duration-300"
+            className="stroke-[var(--color-border)] group-hover:stroke-[var(--color-primary)] transition-colors duration-300"
             strokeWidth="1.5"
             strokeDasharray="4 4"
             fill="transparent"
             variants={{
-              initial: { opacity: 0.4 },
+              initial: { opacity: 0.5 },
               hover: { opacity: 1 }
             }}
           />
@@ -58,7 +58,7 @@ export const AQALogo: React.FC<AQALogoProps> = ({ className = "h-11", showText =
             {/* Left foot to apex to right foot */}
             <path
               d="M 9 32 L 18 10 L 27 32"
-              stroke="#64ffda"
+              stroke="var(--color-primary)"
               strokeWidth="3.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -66,7 +66,7 @@ export const AQALogo: React.FC<AQALogoProps> = ({ className = "h-11", showText =
             {/* Crossbar */}
             <path
               d="M 13 23 L 23 23"
-              stroke="#64ffda"
+              stroke="var(--color-primary)"
               strokeWidth="3.2"
               strokeLinecap="round"
             />
@@ -89,14 +89,14 @@ export const AQALogo: React.FC<AQALogoProps> = ({ className = "h-11", showText =
               cx="39"
               cy="25"
               r="10.5"
-              stroke="#64ffda"
+              stroke="var(--color-primary)"
               strokeWidth="3.5"
               strokeLinecap="round"
             />
             {/* Playful curved kick/tail */}
             <path
               d="M 44 29 L 52 38"
-              stroke="#64ffda"
+              stroke="var(--color-primary)"
               strokeWidth="3.8"
               strokeLinecap="round"
             />
@@ -105,7 +105,7 @@ export const AQALogo: React.FC<AQALogoProps> = ({ className = "h-11", showText =
               cx="52"
               cy="38"
               r="1.8"
-              fill="#ccd6f6"
+              fill="var(--color-text-main)"
             />
           </motion.g>
 
@@ -119,7 +119,7 @@ export const AQALogo: React.FC<AQALogoProps> = ({ className = "h-11", showText =
             {/* Left foot to apex to right foot */}
             <path
               d="M 51 42 L 61 20 L 71 42"
-              stroke="#64ffda"
+              stroke="var(--color-primary)"
               strokeWidth="3.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -127,7 +127,7 @@ export const AQALogo: React.FC<AQALogoProps> = ({ className = "h-11", showText =
             {/* Crossbar */}
             <path
               d="M 55 33 L 66 33"
-              stroke="#64ffda"
+              stroke="var(--color-primary)"
               strokeWidth="3.2"
               strokeLinecap="round"
             />

@@ -68,17 +68,17 @@ export const Footer: React.FC = () => {
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Teal Watts Asymmetric Arch Pill Container - Full and Independent */}
-        <div className="rounded-t-[4rem] sm:rounded-tl-[8rem] sm:rounded-tr-[2rem] rounded-b-[2rem] bg-[var(--color-primary)] border border-[var(--color-primary)]/40 p-6 sm:p-8 lg:p-10 relative overflow-hidden shadow-2xl text-[#0a192f]">
+        <div className="rounded-t-[4rem] sm:rounded-tl-[8rem] sm:rounded-tr-[2rem] rounded-b-[2rem] bg-[var(--color-primary)] border border-[var(--color-primary)]/40 p-6 sm:p-8 lg:p-10 relative overflow-hidden shadow-2xl text-[var(--color-primary-text)]">
           
           {/* Top Row Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 mb-6 relative z-10 pt-2 sm:pt-4">
             
             {/* Professional Headline & Copyright (Left Column) */}
             <div className="lg:col-span-5 space-y-3">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-serif font-black text-[#0a192f] tracking-tight leading-snug max-w-xl">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-serif font-black text-[var(--color-primary-text)] tracking-tight leading-snug max-w-xl">
                 Engineering scalable software architectures, intelligent algorithms, and high-impact digital systems.
               </h2>
-              <p className="text-xs text-[#0a192f]/80 font-mono pt-1 font-medium">
+              <p className="text-xs text-[var(--color-primary-text)]/80 font-mono pt-1 font-medium">
                 © {new Date().getFullYear()} Quadri Amoo. All rights reserved. Designed & Engineered by Quadri Amoo.
               </p>
             </div>
@@ -86,28 +86,28 @@ export const Footer: React.FC = () => {
             {/* Navigation & Support Columns Combined */}
             <div className="lg:col-span-4 grid grid-cols-2 gap-4">
               <div className="space-y-3">
-                <h3 className="font-mono font-bold text-xs text-[#0a192f] uppercase tracking-widest">
+                <h3 className="font-mono font-bold text-xs text-[var(--color-primary-text)] uppercase tracking-widest">
                   NAVIGATION
                 </h3>
-                <ul className="space-y-2 text-xs text-[#0a192f]/80 font-medium font-sans">
-                  <li><Link to="/" className="hover:text-[#0a192f] hover:underline transition-colors">Home</Link></li>
-                  <li><Link to="/education" className="hover:text-[#0a192f] hover:underline transition-colors">Education</Link></li>
-                  <li><Link to="/experience" className="hover:text-[#0a192f] hover:underline transition-colors">Experience</Link></li>
-                  <li><Link to="/research" className="hover:text-[#0a192f] hover:underline transition-colors">Research</Link></li>
-                  <li><Link to="/projects" className="hover:text-[#0a192f] hover:underline transition-colors">Projects</Link></li>
-                  <li><Link to="/guestbook" className="hover:text-[#0a192f] hover:underline transition-colors">Guestbook</Link></li>
+                <ul className="space-y-2 text-xs text-[var(--color-primary-text)]/85 font-medium font-sans">
+                  <li><Link to="/" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Home</Link></li>
+                  <li><Link to="/education" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Education</Link></li>
+                  <li><Link to="/experience" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Experience</Link></li>
+                  <li><Link to="/research" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Research</Link></li>
+                  <li><Link to="/projects" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Projects</Link></li>
+                  <li><Link to="/guestbook" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Guestbook</Link></li>
                 </ul>
               </div>
               <div className="space-y-3">
-                <h3 className="font-mono font-bold text-xs text-[#0a192f] uppercase tracking-widest">
+                <h3 className="font-mono font-bold text-xs text-[var(--color-primary-text)] uppercase tracking-widest">
                   SUPPORT
                 </h3>
-                <ul className="space-y-2 text-xs text-[#0a192f]/80 font-medium font-sans">
-                  <li><Link to="/contact" className="hover:text-[#0a192f] hover:underline transition-colors">Contact Me</Link></li>
-                  <li><a href={portfolioData.personal.github} target="_blank" rel="noreferrer" className="hover:text-[#0a192f] hover:underline transition-colors">GitHub ↗</a></li>
-                  <li><a href={portfolioData.personal.linkedIn} target="_blank" rel="noreferrer" className="hover:text-[#0a192f] hover:underline transition-colors">LinkedIn ↗</a></li>
-                  <li><a href={portfolioData.personal.googleScholar} target="_blank" rel="noreferrer" className="hover:text-[#0a192f] hover:underline transition-colors">Google Scholar ↗</a></li>
-                  <li><a href="/Amoo_Quadri_CV.pdf" download="Amoo_Quadri_CV.pdf" className="hover:text-[#0a192f] hover:underline transition-colors">Download CV ↓</a></li>
+                <ul className="space-y-2 text-xs text-[var(--color-primary-text)]/85 font-medium font-sans">
+                  <li><Link to="/contact" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Contact Me</Link></li>
+                  <li><a href={portfolioData.personal.github} target="_blank" rel="noreferrer" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">GitHub ↗</a></li>
+                  <li><a href={portfolioData.personal.linkedIn} target="_blank" rel="noreferrer" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">LinkedIn ↗</a></li>
+                  <li><a href={portfolioData.personal.googleScholar} target="_blank" rel="noreferrer" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Google Scholar ↗</a></li>
+                  <li><a href="/Amoo_Quadri_CV.pdf" download="Amoo_Quadri_CV.pdf" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Download CV ↓</a></li>
                 </ul>
               </div>
             </div>
@@ -115,7 +115,7 @@ export const Footer: React.FC = () => {
             {/* Subscribe & Social Icons Column */}
             <div className="lg:col-span-3 space-y-4">
               <div>
-                <h3 className="font-mono font-bold text-xs text-[#0a192f] uppercase tracking-widest mb-2.5">
+                <h3 className="font-mono font-bold text-xs text-[var(--color-primary-text)] uppercase tracking-widest mb-2.5">
                   GET THE LATEST FROM QUADRI.
                 </h3>
                 
@@ -125,20 +125,20 @@ export const Footer: React.FC = () => {
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="Email Address"
-                    className="w-full bg-[#0a192f] border border-[#0a192f]/40 rounded-full py-2.5 pl-4 pr-28 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0a192f] transition-colors font-mono"
+                    className="w-full bg-[#0a192f] border border-white/20 rounded-full py-2.5 pl-4 pr-28 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-white transition-colors font-mono shadow-inner"
                     required
                   />
                   <button
                     type="submit"
                     disabled={subscribing}
-                    className="absolute right-1 px-4 py-1.5 bg-white text-[#0a192f] font-mono font-bold text-xs rounded-full hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-75"
+                    className="absolute right-1 px-4 py-1.5 bg-white text-[#0a192f] font-mono font-bold text-xs rounded-full hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-75 shadow-xs"
                   >
                     {subscribing ? 'Sending...' : subscribed ? 'Subscribed!' : 'Subscribe'}
                   </button>
                 </form>
 
                 {subscribeMsg && (
-                  <p className={`text-xs font-mono font-bold flex items-center gap-1.5 mt-2 ${subscribed ? 'text-[#0a192f]' : 'text-red-700'}`}>
+                  <p className={`text-xs font-mono font-bold flex items-center gap-1.5 mt-2 ${subscribed ? 'text-[var(--color-primary-text)]' : 'text-red-300'}`}>
                     {subscribed && <CheckCircle2 className="w-3.5 h-3.5" />}
                     <span>{subscribeMsg}</span>
                   </p>

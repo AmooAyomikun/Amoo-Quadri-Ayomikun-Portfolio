@@ -79,14 +79,14 @@ export const SocialSidebars: React.FC = () => {
               target={social.isInternal ? undefined : '_blank'}
               rel={social.isInternal ? undefined : 'noopener noreferrer'}
               aria-label={social.name}
-              className="text-[#8892b0] hover:text-[#64ffda] hover:-translate-y-1 transition-all duration-200"
+              className="text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:-translate-y-1 transition-all duration-200"
             >
               {social.icon}
             </a>
           ))}
         </div>
         {/* Vertical Rule Line */}
-        <div className="w-[1px] h-24 bg-[#495670]" />
+        <div className="w-[1px] h-24 bg-[var(--color-border)]" />
       </motion.div>
 
       {/* Right Email Bar */}
@@ -100,12 +100,12 @@ export const SocialSidebars: React.FC = () => {
       >
         <a
           href={`mailto:${portfolioData.personal.email}`}
-          className="font-mono text-xs tracking-widest text-[#8892b0] hover:text-[#64ffda] hover:-translate-y-1 transition-all duration-200 [writing-mode:vertical-rl]"
+          className="font-mono text-xs tracking-widest text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:-translate-y-1 transition-all duration-200 [writing-mode:vertical-rl]"
         >
           {portfolioData.personal.email}
         </a>
         {/* Vertical Rule Line */}
-        <div className="w-[1px] h-24 bg-[#495670]" />
+        <div className="w-[1px] h-24 bg-[var(--color-border)]" />
       </motion.div>
     </>
   )

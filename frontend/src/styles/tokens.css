@@ -34,30 +34,39 @@
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-full: 9999px;
+
+  --nextjs-filter: invert(1);
 }
 
-html.light {
-  /* Light mode alternative tuned to Brittany palette */
-  --color-primary: #0f766e;
-  --color-primary-hover: #0d9488;
-  --color-primary-light: #e6fffa;
+html.light,
+html[data-theme='light'] {
+  --nextjs-filter: none;
+  /* Light mode alternative tuned to Brittany palette with exceptional contrast */
+  --color-primary: #0d9488;
+  --color-primary-hover: #0f766e;
+  --color-primary-light: rgba(13, 148, 136, 0.1);
   --color-primary-text: #ffffff;
 
   --color-accent: #0284c7;
-  --color-accent-light: #e0f2fe;
+  --color-accent-light: rgba(2, 132, 199, 0.12);
 
   --color-surface-base: #f8fafc;
   --color-surface-card: #ffffff;
   --color-surface-elevated: #f1f5f9;
 
   --color-text-main: #0a192f;
-  --color-text-muted: #475569;
-  --color-text-subtle: #94a3b8;
+  --color-text-muted: #334155;
+  --color-text-subtle: #64748b;
 
   --color-border: #e2e8f0;
-  --color-border-hover: #0f766e;
+  --color-border-hover: #0d9488;
 
-  --shadow-sm: 0 1px 2px 0 rgba(10, 25, 47, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(10, 25, 47, 0.08);
-  --shadow-lg: 0 10px 15px -3px rgba(10, 25, 47, 0.1);
+  --shadow-sm: 0 1px 3px 0 rgba(10, 25, 47, 0.06), 0 1px 2px -1px rgba(10, 25, 47, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(10, 25, 47, 0.08), 0 2px 6px -1px rgba(10, 25, 47, 0.04);
+  --shadow-lg: 0 12px 28px -4px rgba(10, 25, 47, 0.12), 0 4px 10px -2px rgba(10, 25, 47, 0.05);
+}
+
+html.light ::selection {
+  background-color: rgba(13, 148, 136, 0.2);
+  color: #0f766e;
 }

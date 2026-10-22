@@ -205,7 +205,24 @@ app.get('/api/proxy', async (req, res) => {
     })
 
     let html = await response.text()
-    html = html.replace('<head>', `<head><base href="${urlObj.origin}">`)
+    const injectedScript = `
+<script>
+  try {
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: undefined,
+      configurable: true
+    });
+  } catch(e) {}
+  if (window.location.pathname.startsWith('/api/proxy')) {
+    try {
+      window.history.replaceState(null, '', window.location.origin + ${JSON.stringify(urlObj.pathname || '/')});
+    } catch(e) {}
+  }
+</script>
+`
+    html = html.replace('<head>', `<head>${injectedScript}`)
+    html = html.replaceAll('src="/', `src="${urlObj.origin}/`)
+    html = html.replaceAll('href="/', `href="${urlObj.origin}/`)
 
     // Sandboxing and Content-Security-Policy to protect API origin
     res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; frame-ancestors *;")

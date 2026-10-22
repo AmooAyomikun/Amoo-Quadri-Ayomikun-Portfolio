@@ -16,9 +16,9 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imgSrc, alt, tilt }) => {
   return (
     <div className="relative w-fit group cursor-pointer select-none">
       {/* Background sleeve/holder slot */}
-      <div className="rounded-[22px] border border-[#233554] p-2 w-[210px] h-[295px] bg-[#112240]/40 backdrop-blur-sm shadow-xl transition-all duration-300 group-hover:border-[#64ffda]/40">
-        <div className="w-full h-full rounded-xl border border-[#233554]/50 bg-[#0a192f]/60 flex items-center justify-center">
-          <span className="font-mono text-[10px] tracking-widest text-[#495670] uppercase">
+      <div className="rounded-[22px] border border-[var(--color-border)] p-2 w-[210px] h-[295px] bg-[var(--color-surface-card)] backdrop-blur-sm shadow-xl transition-all duration-300 group-hover:border-[var(--color-primary)]/40">
+        <div className="w-full h-full rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface-elevated)] flex items-center justify-center">
+          <span className="font-mono text-[10px] tracking-widest text-[var(--color-text-subtle)] uppercase font-semibold">
             AQA • ARCHIVE
           </span>
         </div>
@@ -28,7 +28,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imgSrc, alt, tilt }) => {
       <img
         src={imgSrc}
         alt={alt}
-        className={`absolute left-0 top-0 w-[202px] h-[287px] rounded-xl object-cover shadow-2xl border border-[#233554] transition-all duration-500 ease-out filter contrast-[1.05] group-hover:rotate-0 group-hover:scale-[1.02] group-hover:border-[#64ffda]/50 ${
+        className={`absolute left-0 top-0 w-[202px] h-[287px] rounded-xl object-cover shadow-2xl border border-[var(--color-border)] transition-all duration-500 ease-out filter contrast-[1.05] group-hover:rotate-0 group-hover:scale-[1.02] group-hover:border-[var(--color-primary)]/50 ${
           isLeft ? 'rotate-[-6deg]' : 'rotate-[6deg]'
         }`}
       />
@@ -98,10 +98,10 @@ export const AboutJourneySection: React.FC = () => {
     <section 
       id="about" 
       ref={containerRef}
-      className="relative pt-20 sm:pt-28 pb-12 sm:pb-14 bg-[#0a192f] text-[#ccd6f6] scroll-mt-24 overflow-hidden"
+      className="relative pt-20 sm:pt-28 pb-12 sm:pb-14 bg-[var(--color-surface-base)] text-[var(--color-text-main)] scroll-mt-24 overflow-hidden transition-colors duration-200"
     >
       {/* Subtle Ambient Background Grid */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#64ffda_1px,transparent_1px)] [background-size:28px_28px]" />
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(var(--color-primary)_1px,transparent_1px)] [background-size:28px_28px]" />
 
       {/* Top Header */}
       <div className="max-w-4xl mx-auto px-6 text-center mb-16 sm:mb-20 relative z-20">
@@ -111,10 +111,10 @@ export const AboutJourneySection: React.FC = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <span className="font-mono text-xs uppercase tracking-widest text-[#64ffda] font-semibold bg-[#112240] px-4 py-1.5 rounded-full border border-[#233554] shadow-sm">
+          <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-primary)] font-semibold bg-[var(--color-surface-card)] px-4 py-1.5 rounded-full border border-[var(--color-border)] shadow-sm">
             About
           </span>
-          <h2 className="text-3xl sm:text-5xl font-sans font-bold text-[#ccd6f6] tracking-tight mt-4 leading-tight">
+          <h2 className="text-3xl sm:text-5xl font-sans font-bold text-[var(--color-text-main)] tracking-tight mt-4 leading-tight">
             Here's a quick intro about me and what I love to do
           </h2>
         </motion.div>
@@ -150,7 +150,7 @@ export const AboutJourneySection: React.FC = () => {
             {/* Base Background Track (Faint Circuit Wire) */}
             <path
               d={serpentinePathD}
-              stroke="#233554"
+              stroke="var(--color-border)"
               strokeWidth="4"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -160,33 +160,33 @@ export const AboutJourneySection: React.FC = () => {
             <motion.path
               ref={pathRef}
               d={serpentinePathD}
-              stroke="#64ffda"
+              stroke="var(--color-primary)"
               strokeWidth="4"
               strokeLinecap="round"
               strokeLinejoin="round"
               style={{
                 pathLength: smoothProgress,
-                filter: 'drop-shadow(0 0 6px rgba(100,255,218,0.6))'
+                filter: 'drop-shadow(0 0 6px var(--color-primary-light))'
               }}
             />
 
             {/* Terminal Docking Junction onto the final Photo Card */}
-            <circle cx="325" cy="1898" r="5" className="fill-[#64ffda]" />
-            <circle cx="325" cy="1898" r="8" fill="none" stroke="#233554" strokeWidth="2" />
+            <circle cx="325" cy="1898" r="5" className="fill-[var(--color-primary)]" />
+            <circle cx="325" cy="1898" r="8" fill="none" stroke="var(--color-border)" strokeWidth="2" />
 
             {/* THE INTERACTIVE MOVING GLOWING DOT (Single solid traveling dot like Braydon Coyer) */}
             <g transform={`translate(${dotPos.x}, ${dotPos.y})`}>
               {/* Outer Soft Halo Glow */}
               <circle
                 r="11"
-                fill="#64ffda"
+                fill="var(--color-primary)"
                 opacity="0.25"
                 filter="url(#tealGlow)"
               />
               {/* Core Solid Radiant Dot */}
               <circle
                 r="7.5"
-                fill="#64ffda"
+                fill="var(--color-primary)"
                 filter="url(#tealGlow)"
               />
             </g>
@@ -194,7 +194,7 @@ export const AboutJourneySection: React.FC = () => {
         </div>
 
         {/* Mobile Linear Vertical Wire */}
-        <div className="lg:hidden absolute left-4 top-8 bottom-12 w-[2px] bg-[#233554] pointer-events-none" />
+        <div className="lg:hidden absolute left-4 top-8 bottom-12 w-[2px] bg-[var(--color-border)] pointer-events-none" />
 
         {/* =========================================================================
             MILESTONE 1: My Programming Origins & Academic Foundation
@@ -226,14 +226,14 @@ export const AboutJourneySection: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
             >
-              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[#ccd6f6] tracking-tight">
+              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
                 My programming origins
               </h3>
-              <p className="text-[#8892b0] text-sm sm:text-base leading-relaxed">
-                My journey into technology began with a deep curiosity for how software systems operate under the hood. That curiosity led me to pursue a degree in Software Engineering at <strong className="text-[#ccd6f6]">Abiola Ajimobi Technical University</strong>, where I recently graduated in the <strong className="text-[#64ffda]">Top 10% of my class</strong> with Second-Class Upper Honors.
+              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
+                My journey into technology began with a deep curiosity for how software systems operate under the hood. That curiosity led me to pursue a degree in Software Engineering at <strong className="text-[var(--color-text-main)]">Abiola Ajimobi Technical University</strong>, where I recently graduated in the <strong className="text-[var(--color-primary)]">Top 10% of my class</strong> with Second-Class Upper Honors.
               </p>
-              <p className="text-[#8892b0] text-sm sm:text-base leading-relaxed">
-                During my studies, I maintained a <strong className="text-[#ccd6f6]">4.45 / 5.00 Final CGPA</strong> alongside a perfect <strong className="text-[#64ffda]">5.0 / 5.0 Major GPA</strong>, earning four subject-specific excellence awards in Operating Systems, Human-Computer Interaction, Software Engineering Practice, and Data Structures.
+              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
+                During my studies, I maintained a <strong className="text-[var(--color-text-main)]">4.45 / 5.00 Final CGPA</strong> alongside a perfect <strong className="text-[var(--color-primary)]">5.0 / 5.0 Major GPA</strong>, earning four subject-specific excellence awards in Operating Systems, Human-Computer Interaction, Software Engineering Practice, and Data Structures.
               </p>
             </motion.div>
 
@@ -259,14 +259,14 @@ export const AboutJourneySection: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="order-2 lg:order-1 mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:right-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
             >
-              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[#ccd6f6] tracking-tight">
+              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
                 Finding My Way to Web
               </h3>
-              <p className="text-[#8892b0] text-sm sm:text-base leading-relaxed">
+              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
                 Despite exploring diverse fields of computing, modern web engineering kept calling my name. With my passion for clean design and performance, frontend and full-stack development felt like the perfect playground. I dove deep into modern HTML, CSS, JavaScript, TypeScript, and React.
               </p>
-              <p className="text-[#8892b0] text-sm sm:text-base leading-relaxed">
-                For my undergraduate thesis supervised by <strong className="text-[#ccd6f6]">Dr. J.E.T. Akinsola</strong>, I engineered an intelligent location-based recommendation engine. Bridging theoretical Computer Science research with real-world, accessible web systems became my core mission.
+              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
+                For my undergraduate thesis supervised by <strong className="text-[var(--color-text-main)]">Dr. J.E.T. Akinsola</strong>, I engineered an intelligent location-based recommendation engine. Bridging theoretical Computer Science research with real-world, accessible web systems became my core mission.
               </p>
             </motion.div>
 
@@ -322,13 +322,13 @@ export const AboutJourneySection: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
             >
-              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[#ccd6f6] tracking-tight">
+              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
                 Life Beyond Code
               </h3>
-              <p className="text-[#8892b0] text-sm sm:text-base leading-relaxed">
-                Knowledge sharing has always been at the core of my journey. During my undergraduate years, I spent significant time every single week breaking down difficult topics like <strong className="text-[#ccd6f6]">Data Structures, Algorithms, and Discrete Mathematics</strong> for over 350 peers.
+              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
+                Knowledge sharing has always been at the core of my journey. During my undergraduate years, I spent significant time every single week breaking down difficult topics like <strong className="text-[var(--color-text-main)]">Data Structures, Algorithms, and Discrete Mathematics</strong> for over 350 peers.
               </p>
-              <p className="text-[#8892b0] text-sm sm:text-base leading-relaxed">
+              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
                 As an Academic Support Officer with the Nigerian Association of Software Engineering Students (NASSA), I organized foundational workshops for more than 100 students. Seeing peers unlock difficult computing concepts and thrive in their careers is one of the most rewarding experiences I cherish.
               </p>
             </motion.div>
@@ -355,14 +355,14 @@ export const AboutJourneySection: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="order-2 lg:order-1 mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:right-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
             >
-              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[#ccd6f6] tracking-tight">
+              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
                 These Days
               </h3>
-              <p className="text-[#8892b0] text-sm sm:text-base leading-relaxed">
-                Currently, I serve as a Research Assistant under <strong className="text-[#ccd6f6]">Prof. Jude Sinebe</strong>, focusing on machine learning model validation, data-driven systems, and software reliability. When I'm not writing code or evaluating models, I'm publishing academic research and building open-source web tools.
+              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
+                Currently, I serve as a Research Assistant under <strong className="text-[var(--color-text-main)]">Prof. Jude Sinebe</strong>, focusing on machine learning model validation, data-driven systems, and software reliability. When I'm not writing code or evaluating models, I'm publishing academic research and building open-source web tools.
               </p>
-              <p className="text-[#8892b0] text-sm sm:text-base leading-relaxed">
-                Looking ahead, I am actively seeking <strong className="text-[#64ffda]">postgraduate (MSc / PhD) placements</strong> and scholarship opportunities where I can dive deeper into Applied Artificial Intelligence, Natural Language Processing, and intelligent software engineering alongside world-class faculty.
+              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
+                Looking ahead, I am actively seeking <strong className="text-[var(--color-primary)]">postgraduate (MSc / PhD) placements</strong> and scholarship opportunities where I can dive deeper into Applied Artificial Intelligence, Natural Language Processing, and intelligent software engineering alongside world-class faculty.
               </p>
             </motion.div>
 
