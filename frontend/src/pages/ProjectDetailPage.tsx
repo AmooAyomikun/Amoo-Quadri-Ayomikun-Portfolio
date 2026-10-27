@@ -42,11 +42,11 @@ export default function ProjectDetailPage() {
       />
       <Navbar />
 
-      <main className="flex-grow pt-28 pb-20">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="flex-grow pt-20 sm:pt-24 pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Back Navigation Breadcrumb */}
-          <div className="mb-8">
+          <div className="mb-4">
             <Link 
               to="/projects" 
               className="inline-flex items-center gap-2 text-xs font-mono text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors group"
@@ -57,10 +57,10 @@ export default function ProjectDetailPage() {
           </div>
 
           {/* Two-Column Layout: Scrollable Words on Left, Sticky Non-Scrolling Preview on Right (leerob style) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
             
             {/* Left Column: Fully Scrollable Project Story & Architecture Details */}
-            <div className="order-2 lg:order-1 lg:col-span-5 xl:col-span-5 flex flex-col space-y-8 pb-16">
+            <div className="order-2 lg:order-1 lg:col-span-6 xl:col-span-6 flex flex-col space-y-8 pb-16">
               
               {/* Header Info */}
               <div>
@@ -241,20 +241,31 @@ export default function ProjectDetailPage() {
             </div>
 
             {/* Right Column: Sticky Non-Scrolling Live Application Preview (leerob style) */}
-            <div className="order-1 lg:order-2 lg:col-span-7 xl:col-span-7 lg:sticky lg:top-24 self-start w-full">
+            <div className="order-1 lg:order-2 lg:col-span-6 xl:col-span-6 lg:sticky lg:top-20 self-start w-full">
               <InteractiveAppPreview
                 demoUrl={project.previewType !== 'image' ? project.demoUrl : undefined}
                 imageUrl={project.imageUrl}
                 title={project.title}
-                aspectRatio="aspect-auto h-[540px] sm:h-[620px] lg:h-[700px] xl:h-[740px]"
+                aspectRatio="aspect-auto h-[360px] sm:h-[400px] lg:h-[430px] max-h-[calc(100vh-8.5rem)]"
                 tourRoutes={project.tourRoutes}
                 initialInteractive={true}
                 scaleMode="full"
                 showInteractiveBadge={false}
               />
-              <p className="mt-2.5 text-center text-[11px] font-mono text-[var(--color-text-muted)]">
-                Live interactive preview · Directly usable
-              </p>
+              {/* Interactive Status Callout */}
+              <div className="mt-2.5 px-3 py-2 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] flex items-center justify-between gap-2 font-mono text-xs shadow-xs">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span className="font-semibold text-[11px] text-[var(--color-text-main)]">Live Sandbox:</span>
+                  <span className="text-[11px] text-[var(--color-text-muted)]">Click &amp; test directly · Toggle Desktop / Mobile</span>
+                </div>
+                <div className="hidden sm:flex items-center gap-1 text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                  <span>FULLY INTERACTIVE</span>
+                </div>
+              </div>
             </div>
 
           </div>

@@ -7,7 +7,8 @@ import {
   Lock,
   Play,
   Pause,
-  MousePointer,
+  Monitor,
+  Smartphone,
   X
 } from 'lucide-react'
 
@@ -21,6 +22,7 @@ interface InteractiveAppPreviewProps {
   initialInteractive?: boolean
   scaleMode?: 'scaled' | 'full'
   showInteractiveBadge?: boolean
+  defaultDeviceMode?: 'desktop' | 'mobile'
 }
 
 export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
@@ -33,8 +35,10 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
   initialInteractive = false,
   scaleMode = 'scaled',
   showInteractiveBadge = true,
+  defaultDeviceMode = 'desktop',
 }) => {
   const [isInteractive, setIsInteractive] = useState(initialInteractive)
+  const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>(defaultDeviceMode)
   const [isTourActive, setIsTourActive] = useState(false)
   const [iframeKey, setIframeKey] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
@@ -43,6 +47,22 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
   const [iframeError, setIframeError] = useState(false)
   const [currentRouteIndex, setCurrentRouteIndex] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const [viewportWidth, setViewportWidth] = useState(580)
+
+  // Measure actual viewport container width dynamically
+  useEffect(() => {
+    if (!viewportRef.current) return
+    const updateWidth = () => {
+      if (viewportRef.current) {
+        setViewportWidth(viewportRef.current.clientWidth)
+      }
+    }
+    updateWidth()
+    const ro = new ResizeObserver(updateWidth)
+    ro.observe(viewportRef.current)
+    return () => ro.disconnect()
+  }, [])
 
   useEffect(() => {
     if (initialInteractive) {
@@ -177,14 +197,22 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
           </div>
         )}
 
-        {/* Viewport: Full 100% natural scale for detail pages, or 200% / 0.5 scaled for compact cards */}
-        <div className="w-full h-full overflow-hidden relative bg-white">
-          {scaleMode === 'full' ? (
-            <div className="w-full h-full relative">
+        {/* Viewport: Supports Desktop Mode (scaled 1180px) and Mobile/Responsive Mode (100%) */}
+        <div ref={viewportRef} className="w-full h-full overflow-hidden relative bg-white">
+          {deviceMode === 'desktop' ? (
+            <div
+              style={{
+                width: '1180px',
+                height: `${(1 / (viewportWidth > 0 ? Math.min(1, viewportWidth / 1180) : 0.5)) * 100}%`,
+                transform: `scale(${viewportWidth > 0 ? Math.min(1, viewportWidth / 1180) : 0.5})`,
+                transformOrigin: 'top left',
+              }}
+              className="relative"
+            >
               <iframe
-                key={iframeKey}
+                key={`${iframeKey}-desktop`}
                 src={effectiveSrc}
-                title={`${title} - ${currentSubRoute}`}
+                title={`${title} - ${currentSubRoute} (Desktop)`}
                 loading="lazy"
                 onLoad={handleIframeLoad}
                 onError={() => setIframeError(true)}
@@ -195,11 +223,11 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
               />
             </div>
           ) : (
-            <div className="w-[200%] h-[200%] origin-top-left scale-[0.5] relative">
+            <div className="w-full h-full relative">
               <iframe
-                key={iframeKey}
+                key={`${iframeKey}-mobile`}
                 src={effectiveSrc}
-                title={`${title} - ${currentSubRoute}`}
+                title={`${title} - ${currentSubRoute} (Mobile)`}
                 loading="lazy"
                 onLoad={handleIframeLoad}
                 onError={() => setIframeError(true)}
@@ -210,50 +238,21 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
               />
             </div>
           )}
-        </div>
 
-        {/* Top Route Quick-Switch Tabs (when multiple pages exist) */}
-        {routes.length > 1 && !isInteractive && (
-          <div className="absolute top-2 left-2 z-10 flex items-center gap-1 p-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 shadow-lg">
-            {routes.map((r, i) => (
-              <button
-                key={r}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setCurrentRouteIndex(i)
-                }}
-                className={`px-2 py-0.5 rounded-full font-mono text-[9px] font-bold transition-all cursor-pointer ${
-                  i === currentRouteIndex
-                    ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] shadow-xs'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
-                }`}
-                title={`Switch to ${r}`}
-              >
-                {r === '/' ? 'Home' : r.replace('/', '')}
-              </button>
-            ))}
-          </div>
-        )}
+          {/* Interactive Mode Non-blocking Badge */}
+          {isInteractive && (
+            <div className="absolute top-2.5 right-2.5 z-10 pointer-events-none flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md border border-emerald-500/40 text-emerald-300 font-mono text-[9px] font-bold shadow-lg">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Live Interactive App</span>
+            </div>
+          )}
+        </div>
 
         {/* Tour Mode Indicator Badge */}
         {isTourActive && !isInteractive && (
           <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/85 backdrop-blur-md border border-emerald-500/40 text-emerald-400 font-mono text-[9px] font-bold shadow-lg">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>TOUR ACTIVE</span>
-          </div>
-        )}
-
-        {/* Bottom Scrim & Centered Action Button (Only when NOT interactive) */}
-        {!isInteractive && (
-          <div className="absolute inset-x-0 bottom-0 z-10 pb-2.5 pt-6 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex items-center justify-center pointer-events-none">
-            <button
-              onClick={toggleInteractive}
-              className="pointer-events-auto flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[var(--color-surface-base)]/95 hover:bg-[var(--color-primary)] text-[var(--color-primary)] hover:text-[var(--color-primary-text)] backdrop-blur-md border border-[var(--color-primary)] font-mono text-xs font-bold shadow-2xl transition-all duration-200 cursor-pointer group/btn"
-              title="Click to take control and interact directly with the app"
-            >
-              <MousePointer className="w-3.5 h-3.5 group-hover/btn:scale-110 transition-transform" />
-              <span>Click to Interact &amp; Navigate App</span>
-            </button>
           </div>
         )}
 
@@ -287,15 +286,21 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
         {/* macOS / Safari Inspired Window Header (Compact 32px height) */}
         <div className="w-full px-3 py-1.5 bg-[var(--color-surface-elevated)] border-b border-[var(--color-border)] flex items-center justify-between gap-1.5 select-none shrink-0 h-8">
           
-          {/* Traffic light window dots */}
+          {/* Traffic light window dots & LIVE badge */}
           <div className="flex items-center gap-1.5 shrink-0">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+            {hasLiveDemo && (
+              <span className="ml-1 px-1.5 py-0.2 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[9px] font-bold flex items-center gap-1 shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="hidden sm:inline">LIVE</span>
+              </span>
+            )}
           </div>
 
           {/* Center Address Pill */}
-          <div className="flex items-center justify-center max-w-[180px] sm:max-w-xs flex-1 mx-1.5">
+          <div className="flex items-center justify-center max-w-[170px] sm:max-w-xs flex-1 mx-1.5">
             <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[10px] font-mono text-[var(--color-text-muted)] w-full justify-center truncate shadow-inner">
               <Lock className="w-2.5 h-2.5 text-emerald-500 shrink-0" />
               <span className="truncate">{displayAddress}</span>
@@ -306,6 +311,40 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
           <div className="flex items-center gap-1 shrink-0">
             {hasLiveDemo && (
               <>
+                {/* Device Mode Switcher (Desktop / Mobile Mode) */}
+                <div className="flex items-center bg-[var(--color-surface-card)] rounded-md p-0.5 border border-[var(--color-border)] mr-0.5">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setDeviceMode('desktop')
+                    }}
+                    className={`px-1.5 py-0.5 rounded flex items-center gap-1 text-[9px] font-mono transition-colors cursor-pointer ${
+                      deviceMode === 'desktop'
+                        ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold shadow-xs'
+                        : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-main)]'
+                    }`}
+                    title="Desktop Mode (Full desktop layout)"
+                  >
+                    <Monitor className="w-2.5 h-2.5" />
+                    <span className="hidden sm:inline">Desktop</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setDeviceMode('mobile')
+                    }}
+                    className={`px-1.5 py-0.5 rounded flex items-center gap-1 text-[9px] font-mono transition-colors cursor-pointer ${
+                      deviceMode === 'mobile'
+                        ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold shadow-xs'
+                        : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-main)]'
+                    }`}
+                    title="Mobile Mode (Responsive mobile layout)"
+                  >
+                    <Smartphone className="w-2.5 h-2.5" />
+                    <span className="hidden sm:inline">Mobile</span>
+                  </button>
+                </div>
+
                 {/* Guided Tour Toggle Button (when multiple routes exist and not in initialInteractive mode) */}
                 {routes.length > 1 && !initialInteractive && (
                   <button

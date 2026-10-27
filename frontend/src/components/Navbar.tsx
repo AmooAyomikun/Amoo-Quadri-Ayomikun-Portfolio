@@ -83,6 +83,27 @@ export const Navbar: React.FC = () => {
     }
   }
 
+  // Determine if a link corresponds to the current route or subroute
+  const isActiveLink = (link: { path: string; isHash?: boolean }) => {
+    const currentPath = location.pathname
+    
+    // Hash links on homepage
+    if (link.isHash) {
+      if (isHome && location.hash) {
+        return location.hash === link.path.replace('/', '')
+      }
+      return false
+    }
+
+    // Exact homepage match
+    if (link.path === '/') {
+      return currentPath === '/'
+    }
+
+    // Match exact route or subroutes (e.g. /projects/dispatchlane active for /projects)
+    return currentPath === link.path || currentPath.startsWith(`${link.path}/`)
+  }
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 transform ${
@@ -106,8 +127,10 @@ export const Navbar: React.FC = () => {
 
         {/* Desktop Nav Items */}
         <div className="hidden md:flex items-center gap-7">
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-4 lg:gap-5">
             {navLinks.map((link) => {
+              const active = isActiveLink(link)
+
               if (link.isHash) {
                 return (
                   <a
@@ -119,10 +142,23 @@ export const Navbar: React.FC = () => {
                         handleLinkClick(true, link.path)
                       }
                     }}
-                    className="font-mono text-xs text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 group cursor-pointer font-medium"
+                    className={`relative font-mono text-xs px-2.5 py-1 rounded-md transition-all flex items-center gap-1.5 group cursor-pointer ${
+                      active
+                        ? 'text-[var(--color-primary)] font-bold bg-[var(--color-primary)]/10 shadow-xs'
+                        : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-elevated)]/40 font-medium'
+                    }`}
                   >
                     <span className="text-[var(--color-primary)] text-[11px] font-mono">{link.num}</span>
-                    <span className="group-hover:text-[var(--color-primary)]">{link.name}</span>
+                    <span className={active ? 'text-[var(--color-primary)] font-bold' : 'group-hover:text-[var(--color-primary)]'}>
+                      {link.name}
+                    </span>
+                    {active && (
+                      <motion.span
+                        layoutId="activeNavIndicator"
+                        className="absolute -bottom-1 left-2 right-2 h-[2px] bg-[var(--color-primary)] rounded-full shadow-[0_0_8px_var(--color-primary)]"
+                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      />
+                    )}
                   </a>
                 )
               }
@@ -130,10 +166,23 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={link.name}
                   to={link.path}
-                  className="font-mono text-xs text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 group font-medium"
+                  className={`relative font-mono text-xs px-2.5 py-1 rounded-md transition-all flex items-center gap-1.5 group ${
+                    active
+                      ? 'text-[var(--color-primary)] font-bold bg-[var(--color-primary)]/10 shadow-xs'
+                      : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-elevated)]/40 font-medium'
+                  }`}
                 >
                   <span className="text-[var(--color-primary)] text-[11px] font-mono">{link.num}</span>
-                  <span className="group-hover:text-[var(--color-primary)]">{link.name}</span>
+                  <span className={active ? 'text-[var(--color-primary)] font-bold' : 'group-hover:text-[var(--color-primary)]'}>
+                    {link.name}
+                  </span>
+                  {active && (
+                    <motion.span
+                      layoutId="activeNavIndicator"
+                      className="absolute -bottom-1 left-2 right-2 h-[2px] bg-[var(--color-primary)] rounded-full shadow-[0_0_8px_var(--color-primary)]"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
                 </Link>
               )
             })}
@@ -209,8 +258,10 @@ export const Navbar: React.FC = () => {
               <X className="w-7 h-7" />
             </button>
 
-            <nav className="flex flex-col items-center gap-7 text-center w-full">
+            <nav className="flex flex-col items-center gap-3.5 text-center w-full">
               {navLinks.map((link) => {
+                const active = isActiveLink(link)
+
                 if (link.isHash) {
                   return (
                     <a
@@ -224,10 +275,19 @@ export const Navbar: React.FC = () => {
                           setMobileMenuOpen(false)
                         }
                       }}
-                      className="font-mono text-base text-[var(--color-text-main)] hover:text-[var(--color-primary)] transition-colors flex flex-col items-center gap-1 font-medium"
+                      className={`w-full font-mono text-sm px-4 py-2.5 rounded-lg transition-all flex items-center justify-between font-medium ${
+                        active
+                          ? 'text-[var(--color-primary)] font-bold bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 shadow-xs'
+                          : 'text-[var(--color-text-main)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-elevated)]/40'
+                      }`}
                     >
-                      <span className="text-[var(--color-primary)] text-xs">{link.num}</span>
+                      <span className="text-[var(--color-primary)] text-xs font-mono">{link.num}</span>
                       <span>{link.name}</span>
+                      {active ? (
+                        <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] shadow-[0_0_8px_var(--color-primary)] animate-pulse" />
+                      ) : (
+                        <span className="w-2 h-2" />
+                      )}
                     </a>
                   )
                 }
@@ -236,10 +296,19 @@ export const Navbar: React.FC = () => {
                     key={link.name}
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-mono text-base text-[var(--color-text-main)] hover:text-[var(--color-primary)] transition-colors flex flex-col items-center gap-1 font-medium"
+                    className={`w-full font-mono text-sm px-4 py-2.5 rounded-lg transition-all flex items-center justify-between font-medium ${
+                      active
+                        ? 'text-[var(--color-primary)] font-bold bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 shadow-xs'
+                        : 'text-[var(--color-text-main)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-elevated)]/40'
+                    }`}
                   >
-                    <span className="text-[var(--color-primary)] text-xs">{link.num}</span>
+                    <span className="text-[var(--color-primary)] text-xs font-mono">{link.num}</span>
                     <span>{link.name}</span>
+                    {active ? (
+                      <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] shadow-[0_0_8px_var(--color-primary)] animate-pulse" />
+                    ) : (
+                      <span className="w-2 h-2" />
+                    )}
                   </Link>
                 )
               })}
