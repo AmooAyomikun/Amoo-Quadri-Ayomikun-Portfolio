@@ -64,9 +64,9 @@ export const HeroSection: React.FC = () => {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[100dvh] md:h-screen flex flex-col justify-center pt-20 pb-8 sm:pt-24 sm:pb-10 bg-[var(--color-surface-base)] text-[var(--color-text-main)] overflow-hidden transition-colors duration-200"
+      className="relative pt-6 sm:pt-12 pb-8 sm:pb-12 lg:min-h-[calc(100vh-70px)] lg:flex lg:flex-col lg:justify-center bg-[var(--color-surface-base)] text-[var(--color-text-main)] overflow-hidden transition-colors duration-200"
     >
-      <div className="max-w-5xl mx-auto px-6 sm:px-12 lg:px-16 w-full flex flex-col justify-center h-full">
+      <div className="max-w-5xl mx-auto px-4 sm:px-12 lg:px-16 w-full flex flex-col justify-center">
         <div className="flex flex-col items-start text-left space-y-3 sm:space-y-4 md:space-y-4 max-w-4xl">
           
           {/* Subtitle / Intro Greeting */}
@@ -80,7 +80,7 @@ export const HeroSection: React.FC = () => {
           </h1>
 
           {/* Second Headline with Synchronized Typewriter Effect */}
-          <h2 className="gsap-hero-item text-2xl sm:text-3xl lg:text-4xl font-sans font-bold text-[var(--color-text-muted)] tracking-tight leading-snug">
+          <h2 className="gsap-hero-item text-xl sm:text-3xl lg:text-4xl font-sans font-bold text-[var(--color-text-muted)] tracking-tight leading-snug">
             <span>I build things for the web &amp;&nbsp;</span>
             <span className="text-[var(--color-primary)] inline">{currentText}</span>
             <span className="inline-block w-[3px] h-[0.85em] bg-[var(--color-primary)] ml-1 align-baseline animate-pulse" />
@@ -92,7 +92,7 @@ export const HeroSection: React.FC = () => {
           </p>
 
           {/* CTA Buttons */}
-          <div className="gsap-hero-item pt-2 sm:pt-3 flex flex-wrap items-center gap-3.5">
+          <div className="gsap-hero-item pt-2 sm:pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-3.5 w-full sm:w-auto">
             <Link
               to="/projects"
               className="inline-flex items-center justify-center px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg border border-[var(--color-primary)] text-[var(--color-primary)] font-mono text-xs sm:text-sm font-semibold hover:bg-[var(--color-primary-light)] transition-all duration-200 group text-center"
@@ -104,7 +104,7 @@ export const HeroSection: React.FC = () => {
             <a
               href="/Amoo_Quadri_CV.pdf"
               download="Amoo_Quadri_CV.pdf"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-card)] text-[var(--color-text-main)] font-mono text-xs sm:text-sm font-medium hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all duration-200 shadow-xs"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-card)] text-[var(--color-text-main)] font-mono text-xs sm:text-sm font-medium hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all duration-200 shadow-xs text-center"
             >
               <Download className="w-4 h-4 text-[var(--color-primary)]" />
               <span>Download CV (PDF)</span>
@@ -112,7 +112,7 @@ export const HeroSection: React.FC = () => {
           </div>
 
           {/* Quick Links in font-mono */}
-          <div className="gsap-hero-item pt-4 sm:pt-5 border-t border-[var(--color-border)] w-full flex flex-wrap items-center gap-5 sm:gap-7 font-mono text-[11px] sm:text-xs text-[var(--color-text-muted)]">
+          <div className="gsap-hero-item pt-4 sm:pt-5 border-t border-[var(--color-border)] w-full flex flex-wrap items-center gap-4 sm:gap-7 font-mono text-[11px] sm:text-xs text-[var(--color-text-muted)]">
             <a href="#about" className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 cursor-pointer">
               <GraduationCap className="w-3.5 h-3.5 text-[var(--color-primary)]" />
               <span>Read Biography</span>

@@ -368,8 +368,13 @@ export const GithubActivitySection: React.FC = () => {
               </div>
             </div>
 
+            {/* Mobile swipe helper cue */}
+            <div className="sm:hidden flex items-center justify-end text-[10px] font-mono text-[var(--color-text-subtle)] pb-1.5">
+              <span>← Swipe for full year →</span>
+            </div>
+
             {/* Scrollable Heatmap Canvas Container */}
-            <div className="overflow-x-auto scrollbar-none pb-2">
+            <div className="overflow-x-auto no-scrollbar pb-2 touch-pan-x" style={{ WebkitOverflowScrolling: 'touch' }}>
               <div className="min-w-[720px]">
                 
                 {/* Month labels row */}

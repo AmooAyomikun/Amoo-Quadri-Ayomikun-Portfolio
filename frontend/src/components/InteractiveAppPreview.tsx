@@ -23,6 +23,7 @@ interface InteractiveAppPreviewProps {
   scaleMode?: 'scaled' | 'full'
   showInteractiveBadge?: boolean
   defaultDeviceMode?: 'desktop' | 'mobile'
+  autoPlayTourDefault?: boolean
 }
 
 export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
@@ -36,10 +37,11 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
   scaleMode = 'scaled',
   showInteractiveBadge = true,
   defaultDeviceMode = 'desktop',
+  autoPlayTourDefault = false,
 }) => {
   const [isInteractive, setIsInteractive] = useState(initialInteractive)
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>(defaultDeviceMode)
-  const [isTourActive, setIsTourActive] = useState(false)
+  const [isTourActive, setIsTourActive] = useState(autoPlayTourDefault)
   const [iframeKey, setIframeKey] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false)

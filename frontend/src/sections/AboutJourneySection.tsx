@@ -1,9 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useMotionValueEvent, useSpring } from 'framer-motion'
 import profileImg from '../assets/profile.png'
-import aboutWebImg from '../assets/about-web.jpg'
-import aboutTutoringImg from '../assets/about-tutoring.jpg'
-import aboutConferenceImg from '../assets/about-conference.jpg'
 
 interface PhotoCardProps {
   imgSrc: string
@@ -16,9 +13,9 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imgSrc, alt, tilt }) => {
   return (
     <div className="relative w-fit group cursor-pointer select-none">
       {/* Background sleeve/holder slot */}
-      <div className="rounded-[22px] border border-[var(--color-border)] p-2 w-[210px] h-[295px] bg-[var(--color-surface-card)] backdrop-blur-sm shadow-xl transition-all duration-300 group-hover:border-[var(--color-primary)]/40">
+      <div className="rounded-[20px] sm:rounded-[22px] border border-[var(--color-border)] p-2 w-[185px] h-[260px] sm:w-[210px] sm:h-[295px] bg-[var(--color-surface-card)] backdrop-blur-sm shadow-xl transition-all duration-300 group-hover:border-[var(--color-primary)]/40">
         <div className="w-full h-full rounded-xl border border-[var(--color-border)]/50 bg-[var(--color-surface-elevated)] flex items-center justify-center">
-          <span className="font-mono text-[10px] tracking-widest text-[var(--color-text-subtle)] uppercase font-semibold">
+          <span className="font-mono text-[9px] sm:text-[10px] tracking-widest text-[var(--color-text-subtle)] uppercase font-semibold">
             AQA • ARCHIVE
           </span>
         </div>
@@ -28,8 +25,8 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imgSrc, alt, tilt }) => {
       <img
         src={imgSrc}
         alt={alt}
-        className={`absolute left-0 top-0 w-[202px] h-[287px] rounded-xl object-cover shadow-2xl border border-[var(--color-border)] transition-all duration-500 ease-out filter contrast-[1.05] group-hover:rotate-0 group-hover:scale-[1.02] group-hover:border-[var(--color-primary)]/50 ${
-          isLeft ? 'rotate-[-6deg]' : 'rotate-[6deg]'
+        className={`absolute left-0 top-0 w-[178px] h-[252px] sm:w-[202px] sm:h-[287px] rounded-xl object-cover object-top shadow-2xl border border-[var(--color-border)] transition-all duration-500 ease-out filter contrast-[1.05] group-hover:rotate-0 group-hover:scale-[1.02] group-hover:border-[var(--color-primary)]/50 ${
+          isLeft ? 'rotate-[-5deg] sm:rotate-[-6deg]' : 'rotate-[5deg] sm:rotate-[6deg]'
         }`}
       />
     </div>
@@ -43,18 +40,18 @@ export const AboutJourneySection: React.FC = () => {
   // Interactive dot coordinates calculated along the serpentine SVG path
   const [dotPos, setDotPos] = useState<{ x: number; y: number }>({ x: 145, y: 0.5 })
 
-  // Track scroll progress through this section with a natural, measured scroll range
+  // Track scroll progress through this section
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start 35%', 'end 85%']
+    offset: ['start 35%', 'end 85%'],
   })
 
-  // Calibrated smooth spring physics for a graceful, measured scroll dot movement
+  // Calibrated smooth spring physics for natural scroll dot movement
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 45,
     damping: 24,
     mass: 0.5,
-    restDelta: 0.001
+    restDelta: 0.001,
   })
 
   // Synchronize dot movement with user scroll along the winding SVG path
@@ -88,52 +85,54 @@ export const AboutJourneySection: React.FC = () => {
 
   // Braydon Coyer Serpentine Circuit Path:
   // Left track is at x = 4, Right track is at x = 272. Midpoint is at x = 138 (container center 50%).
-  // M1 Center: y = 318 (runs at x = 4, text ends at y = 448, crossover at y = 556 -> 108px clearance)
-  // M2 Center: y = 818 (runs at x = 272)
-  // M3 Center: y = 1368 (runs at x = 4, text ends at y = 1528, crossover at y = 1626 -> 98px clearance)
-  // M4 Center: y = 1898 (terminal wire docks into card sleeve at x = 325, y = 1898)
-  const serpentinePathD = `M145 0.5 L145 10 C145 14.4 141.4 18 137 18 L20 18 C11.2 18 4 25.2 4 34 L4 540 C4 548.8 11.2 556 20 556 L256 556 C264.8 556 272 563.2 272 572 L272 1040 C272 1044.2 270.3 1048.3 267.3 1051.3 L180.7 1137.9 C177.7 1140.9 173.6 1142.6 169.4 1142.6 L20 1142.6 C11.2 1142.6 4 1149.8 4 1158.6 L4 1610 C4 1618.8 11.2 1626 20 1626 L256 1626 C264.8 1626 272 1633.2 272 1642 L272 1883 C272 1891.8 279.2 1898 288 1898 L325 1898`
+  // M1: starts y=64, ends y=444. Crossover 1 at y=556 (in Gap 1->2).
+  // M2: starts y=564, ends y=944.
+  // Crossover 2 in Gap 2->3 (y=944 to 1124): diagonal 951->1038, horizontal at y=1042.6, transitions to left track by y=1058.6.
+  // M3: starts y=1124, ends y=1504. Wire travels safely down left track at x=4, completely clear of 'Life Beyond Code' heading.
+  // Crossover 3 in Gap 3->4 (y=1504 to 1644): horizontal at y=1586.
+  // M4: starts y=1644, docks into photo card at x=325, y=1840.
+  const serpentinePathD = `M145 0.5 L145 10 C145 14.4 141.4 18 137 18 L20 18 C11.2 18 4 25.2 4 34 L4 540 C4 548.8 11.2 556 20 556 L256 556 C264.8 556 272 563.2 272 572 L272 940 C272 944.2 270.3 948.3 267.3 951.3 L180.7 1037.9 C177.7 1040.9 173.6 1042.6 169.4 1042.6 L20 1042.6 C11.2 1042.6 4 1049.8 4 1058.6 L4 1570 C4 1578.8 11.2 1586 20 1586 L256 1586 C264.8 1586 272 1593.2 272 1602 L272 1825 C272 1833.8 279.2 1840 288 1840 L325 1840`
 
   return (
-    <section 
-      id="about" 
+    <section
+      id="about"
       ref={containerRef}
-      className="relative pt-20 sm:pt-28 pb-12 sm:pb-14 bg-[var(--color-surface-base)] text-[var(--color-text-main)] scroll-mt-24 overflow-hidden transition-colors duration-200"
+      className="relative pt-10 sm:pt-16 pb-12 sm:pb-16 bg-[var(--color-surface-base)] text-[var(--color-text-main)] scroll-mt-16 overflow-hidden transition-colors duration-200"
     >
       {/* Subtle Ambient Background Grid */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(var(--color-primary)_1px,transparent_1px)] [background-size:28px_28px]" />
 
       {/* Top Header */}
-      <div className="max-w-4xl mx-auto px-6 text-center mb-16 sm:mb-20 relative z-20">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center mb-8 sm:mb-12 relative z-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-primary)] font-semibold bg-[var(--color-surface-card)] px-4 py-1.5 rounded-full border border-[var(--color-border)] shadow-sm">
+          <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-primary)] font-semibold bg-[var(--color-surface-card)] px-4 py-1.5 rounded-full border border-[var(--color-border)] shadow-xs">
             About
           </span>
-          <h2 className="text-3xl sm:text-5xl font-sans font-bold text-[var(--color-text-main)] tracking-tight mt-4 leading-tight">
-            Here's a quick intro about me and what I love to do
+          <h2 className="text-2xl sm:text-4xl font-sans font-bold text-[var(--color-text-main)] tracking-tight mt-3 leading-tight">
+            Here&apos;s a quick intro about me and what I love to do
           </h2>
         </motion.div>
       </div>
 
-      {/* Main Journey Container (Centered: max-w-4xl ~ 896px) with generous top space */}
-      <div className="max-w-4xl mx-auto px-6 lg:px-8 relative z-10 pt-32">
+      {/* Main Journey Container */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-4 sm:pt-8 lg:pt-16">
 
         {/* =========================================================================
             DESKTOP INTERACTIVE SERPENTINE SVG WIRE WITH SCROLL-TRACKING MOVING DOT
             (Rendered at z-30 with pointer-events-none so wire & terminal dot cleanly join with the cards)
         ========================================================================= */}
-        <div 
-          className="pointer-events-none absolute top-0 h-[1980px] w-[380px] hidden lg:block z-30"
+        <div
+          className="pointer-events-none absolute top-0 h-[2020px] w-[380px] hidden lg:block z-30"
           style={{ left: 'calc(50% - 138px)' }}
         >
           <svg
-            className="w-[380px] h-[1980px]"
-            viewBox="-10 -10 400 2000"
+            className="w-[380px] h-[2020px]"
+            viewBox="-10 -10 400 2040"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -166,15 +165,15 @@ export const AboutJourneySection: React.FC = () => {
               strokeLinejoin="round"
               style={{
                 pathLength: smoothProgress,
-                filter: 'drop-shadow(0 0 6px var(--color-primary-light))'
+                filter: 'drop-shadow(0 0 6px var(--color-primary-light))',
               }}
             />
 
             {/* Terminal Docking Junction onto the final Photo Card */}
-            <circle cx="325" cy="1898" r="5" className="fill-[var(--color-primary)]" />
-            <circle cx="325" cy="1898" r="8" fill="none" stroke="var(--color-border)" strokeWidth="2" />
+            <circle cx="325" cy="1840" r="5" className="fill-[var(--color-primary)]" />
+            <circle cx="325" cy="1840" r="8" fill="none" stroke="var(--color-border)" strokeWidth="2" />
 
-            {/* THE INTERACTIVE MOVING GLOWING DOT (Single solid traveling dot like Braydon Coyer) */}
+            {/* THE INTERACTIVE MOVING GLOWING DOT */}
             <g transform={`translate(${dotPos.x}, ${dotPos.y})`}>
               {/* Outer Soft Halo Glow */}
               <circle
@@ -193,46 +192,44 @@ export const AboutJourneySection: React.FC = () => {
           </svg>
         </div>
 
-        {/* Mobile Linear Vertical Wire */}
-        <div className="lg:hidden absolute left-4 top-8 bottom-12 w-[2px] bg-[var(--color-border)] pointer-events-none" />
-
         {/* =========================================================================
             MILESTONE 1: My Programming Origins & Academic Foundation
-            (Left: Tilted Photo Card, Right: Story Text — 65px intimate spacing)
+            Desktop: Photo Left, Story Right
+            Mobile: Photo Top, Story Bottom (never adjacent to next photo!)
         ========================================================================= */}
-        <div className="relative z-20 h-auto lg:h-[380px] flex items-center mb-16 lg:mb-0">
-          <div className="w-full relative lg:flex lg:items-center">
+        <div className="relative z-20 h-auto lg:h-[380px] flex items-center mb-12 sm:mb-16 lg:mb-0">
+          <div className="w-full relative flex flex-col items-center lg:block">
             
-            {/* Left Column: Photo Card (right edge at 50% - 155px, 21px from Left Track) */}
-            <motion.div 
+            {/* Photo Card */}
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
+              viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.6 }}
               className="flex justify-center lg:justify-end lg:w-1/2 lg:pr-[155px]"
             >
-              <PhotoCard 
-                imgSrc={profileImg} 
-                alt="Quadri Amoo - Software Engineer" 
-                tilt="left" 
+              <PhotoCard
+                imgSrc={profileImg}
+                alt="Quadri Amoo - Software Engineer"
+                tilt="left"
               />
             </motion.div>
 
-            {/* Right Column: Story Text (left edge at 50% - 90px, 44px from Left Track) */}
-            <motion.div 
+            {/* Story Text */}
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
+              viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.6 }}
-              className="mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
+              className="mt-6 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-3 sm:space-y-4"
             >
-              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
+              <h3 className="text-xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
                 My programming origins
               </h3>
-              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
+              <p className="text-[var(--color-text-muted)] text-xs sm:text-base leading-relaxed">
                 My journey into technology began with a deep curiosity for how software systems operate under the hood. That curiosity led me to pursue a degree in Software Engineering at <strong className="text-[var(--color-text-main)]">Abiola Ajimobi Technical University</strong>, where I recently graduated in the <strong className="text-[var(--color-primary)]">Top 10% of my class</strong> with Second-Class Upper Honors.
               </p>
-              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
+              <p className="text-[var(--color-text-muted)] text-xs sm:text-base leading-relaxed">
                 During my studies, I maintained a <strong className="text-[var(--color-text-main)]">4.45 / 5.00 Final CGPA</strong> alongside a perfect <strong className="text-[var(--color-primary)]">5.0 / 5.0 Major GPA</strong>, earning four subject-specific excellence awards in Operating Systems, Human-Computer Interaction, Software Engineering Practice, and Data Structures.
               </p>
             </motion.div>
@@ -240,92 +237,92 @@ export const AboutJourneySection: React.FC = () => {
           </div>
         </div>
 
-        {/* TRANSITION GAP 1 -> 2:
-            Horizontal connector line crosses cleanly at y = 556 from x = 20 to x = 256 (108px below text). */}
+        {/* Transition gap between 1 and 2 on desktop */}
         <div className="hidden lg:block h-[120px]" />
 
         {/* =========================================================================
             MILESTONE 2: Finding My Way to Web
-            (Left: Story Text, Right: Tilted Photo Card — 65px intimate spacing)
+            Desktop: Story Left, Photo Right
+            Mobile: Photo Top, Story Bottom (consistent order prevents 2 images back-to-back!)
         ========================================================================= */}
-        <div className="relative z-20 h-auto lg:h-[380px] flex items-center mb-16 lg:mb-0">
-          <div className="w-full relative lg:flex lg:items-center">
+        <div className="relative z-20 h-auto lg:h-[380px] flex items-center mb-12 sm:mb-16 lg:mb-0">
+          <div className="w-full relative flex flex-col items-center lg:block">
             
-            {/* Left Column: Story Text (right edge at 50% + 90px, 44px from Right Track) */}
-            <motion.div 
+            {/* Photo Card on right on desktop, on top on mobile */}
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
+              viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.6 }}
-              className="order-2 lg:order-1 mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:right-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
+              className="flex justify-center lg:justify-start lg:w-1/2 lg:ml-auto lg:pl-[155px]"
             >
-              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
-                Finding My Way to Web
-              </h3>
-              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
-                Despite exploring diverse fields of computing, modern web engineering kept calling my name. With my passion for clean design and performance, frontend and full-stack development felt like the perfect playground. I dove deep into modern HTML, CSS, JavaScript, TypeScript, and React.
-              </p>
-              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
-                For my undergraduate thesis supervised by <strong className="text-[var(--color-text-main)]">Dr. J.E.T. Akinsola</strong>, I engineered an intelligent location-based recommendation engine. Bridging theoretical Computer Science research with real-world, accessible web systems became my core mission.
-              </p>
+              <PhotoCard
+                imgSrc={profileImg}
+                alt="Quadri Amoo - Web Engineering"
+                tilt="right"
+              />
             </motion.div>
 
-            {/* Right Column: Photo Card (left edge at 50% + 155px, 21px from Right Track) */}
-            <motion.div 
+            {/* Story Text on left on desktop, below photo on mobile */}
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
+              viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.6 }}
-              className="order-1 lg:order-2 flex justify-center lg:justify-start lg:w-1/2 lg:ml-auto lg:pl-[155px]"
+              className="mt-6 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:right-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-3 sm:space-y-4"
             >
-              <PhotoCard 
-                imgSrc={aboutWebImg} 
-                alt="Web Engineering Workspace" 
-                tilt="right" 
-              />
+              <h3 className="text-xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
+                Finding My Way to Web
+              </h3>
+              <p className="text-[var(--color-text-muted)] text-xs sm:text-base leading-relaxed">
+                Despite exploring diverse fields of computing, modern web engineering kept calling my name. With my passion for clean design and performance, frontend and full-stack development felt like the perfect playground. I dove deep into modern HTML, CSS, JavaScript, TypeScript, and React.
+              </p>
+              <p className="text-[var(--color-text-muted)] text-xs sm:text-base leading-relaxed">
+                For my undergraduate thesis supervised by <strong className="text-[var(--color-text-main)]">Dr. J.E.T. Akinsola</strong>, I engineered an intelligent location-based recommendation engine. Bridging theoretical Computer Science research with real-world, accessible web systems became my core mission.
+              </p>
             </motion.div>
 
           </div>
         </div>
 
-        {/* TRANSITION GAP 2 -> 3:
-            Braydon Coyer 45-degree diagonal line from Right Track to Left Track */}
-        <div className="hidden lg:block h-[160px]" />
+        {/* Transition gap between 2 and 3 on desktop */}
+        <div className="hidden lg:block h-[180px]" />
 
         {/* =========================================================================
             MILESTONE 3: Life Beyond Code
-            (Left: Tilted Photo Card, Right: Story Text — 65px intimate spacing)
+            Desktop: Photo Left, Story Right
+            Mobile: Photo Top, Story Bottom
         ========================================================================= */}
-        <div className="relative z-20 h-auto lg:h-[400px] flex items-center mb-16 lg:mb-0">
-          <div className="w-full relative lg:flex lg:items-center">
+        <div className="relative z-20 h-auto lg:h-[380px] flex items-center mb-12 sm:mb-16 lg:mb-0">
+          <div className="w-full relative flex flex-col items-center lg:block">
             
-            {/* Left Column: Photo Card (right edge at 50% - 155px, 21px from Left Track) */}
-            <motion.div 
+            {/* Photo Card */}
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
+              viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.6 }}
               className="flex justify-center lg:justify-end lg:w-1/2 lg:pr-[155px]"
             >
-              <PhotoCard 
-                imgSrc={aboutTutoringImg} 
-                alt="Mentorship and Tutoring Peers" 
-                tilt="left" 
+              <PhotoCard
+                imgSrc={profileImg}
+                alt="Quadri Amoo - Mentorship & Teaching"
+                tilt="left"
               />
             </motion.div>
 
-            {/* Right Column: Story Text (left edge at 50% - 90px, 44px from Left Track) */}
-            <motion.div 
+            {/* Story Text */}
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
+              viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.6 }}
-              className="mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
+              className="mt-6 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-3 sm:space-y-4"
             >
-              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
+              <h3 className="text-xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
                 Life Beyond Code
               </h3>
-              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
+              <p className="text-[var(--color-text-muted)] text-xs sm:text-base leading-relaxed">
                 Knowledge sharing has always been at the core of my journey. During my undergraduate years, I spent significant time every single week breaking down difficult topics like <strong className="text-[var(--color-text-main)]">Data Structures, Algorithms, and Discrete Mathematics</strong> for over 350 peers.
               </p>
               <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
@@ -336,49 +333,49 @@ export const AboutJourneySection: React.FC = () => {
           </div>
         </div>
 
-        {/* TRANSITION GAP 3 -> 4:
-            Horizontal connector line crosses cleanly at y = 1626 from x = 20 to x = 256 (over 98px below text). */}
+        {/* Transition gap between 3 and 4 on desktop */}
         <div className="hidden lg:block h-[140px]" />
 
         {/* =========================================================================
             MILESTONE 4: These Days
-            (Left: Story Text, Right: Tilted Photo Card directly joined with terminal dot)
+            Desktop: Story Left, Photo Right (docks into circuit terminal)
+            Mobile: Photo Top, Story Bottom
         ========================================================================= */}
         <div className="relative z-20 h-auto lg:h-[380px] flex items-center">
-          <div className="w-full relative lg:flex lg:items-center">
+          <div className="w-full relative flex flex-col items-center lg:block">
             
-            {/* Left Column: Story Text (right edge at 50% + 90px, 44px from Right Track) */}
-            <motion.div 
+            {/* Photo Card on right on desktop, on top on mobile */}
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
+              viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.6 }}
-              className="order-2 lg:order-1 mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:right-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-4"
+              className="flex justify-center lg:justify-start lg:w-1/2 lg:ml-auto lg:pl-[155px]"
             >
-              <h3 className="text-2xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
-                These Days
-              </h3>
-              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
-                Currently, I serve as a Research Assistant under <strong className="text-[var(--color-text-main)]">Prof. Jude Sinebe</strong>, focusing on machine learning model validation, data-driven systems, and software reliability. When I'm not writing code or evaluating models, I'm publishing academic research and building open-source web tools.
-              </p>
-              <p className="text-[var(--color-text-muted)] text-sm sm:text-base leading-relaxed">
-                Looking ahead, I am actively seeking <strong className="text-[var(--color-primary)]">postgraduate (MSc / PhD) placements</strong> and scholarship opportunities where I can dive deeper into Applied Artificial Intelligence, Natural Language Processing, and intelligent software engineering alongside world-class faculty.
-              </p>
+              <PhotoCard
+                imgSrc={profileImg}
+                alt="Quadri Amoo - Research & AI Systems"
+                tilt="right"
+              />
             </motion.div>
 
-            {/* Right Column: Photo Card (left edge at 50% + 155px, terminal dot joins at x=310, y=1560) */}
-            <motion.div 
+            {/* Story Text */}
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
+              viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.6 }}
-              className="order-1 lg:order-2 flex justify-center lg:justify-start lg:w-1/2 lg:ml-auto lg:pl-[155px]"
+              className="mt-6 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:right-[calc(50%-90px)] max-w-lg lg:max-w-[420px] text-left space-y-3 sm:space-y-4"
             >
-              <PhotoCard 
-                imgSrc={aboutConferenceImg} 
-                alt="Presenting Research and AI Systems" 
-                tilt="right" 
-              />
+              <h3 className="text-xl sm:text-3xl font-sans font-bold text-[var(--color-text-main)] tracking-tight">
+                These Days
+              </h3>
+              <p className="text-[var(--color-text-muted)] text-xs sm:text-base leading-relaxed">
+                Currently, I serve as a Research Assistant under <strong className="text-[var(--color-text-main)]">Prof. Jude Sinebe</strong>, focusing on machine learning model validation, data-driven systems, and software reliability. When I&apos;m not writing code or evaluating models, I&apos;m publishing academic research and building open-source web tools.
+              </p>
+              <p className="text-[var(--color-text-muted)] text-xs sm:text-base leading-relaxed">
+                Looking ahead, I am actively seeking <strong className="text-[var(--color-primary)]">postgraduate (MSc / PhD) placements</strong> and scholarship opportunities where I can dive deeper into Applied Artificial Intelligence, Natural Language Processing, and intelligent software engineering alongside world-class faculty.
+              </p>
             </motion.div>
 
           </div>

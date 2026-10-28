@@ -487,11 +487,11 @@ export const VisitorMapSection: React.FC = () => {
           </motion.header>
 
           {/* Figures */}
-          <dl className="mt-10 grid grid-cols-3 border-y border-[#233554] divide-x divide-[#233554]">
+          <dl className="mt-8 sm:mt-10 grid grid-cols-3 border-y border-[var(--color-border)] divide-x divide-[var(--color-border)]">
             {stats.map((s) => (
-              <div key={s.label} className="py-5 px-4 sm:px-8 first:pl-0">
-                <dt className="text-xs font-mono text-[#8892b0]">{s.label}</dt>
-                <dd className="mt-1.5 text-2xl sm:text-[2rem] leading-none font-serif font-bold text-[#ccd6f6] tabular-nums">
+              <div key={s.label} className="py-4 sm:py-5 px-2.5 sm:px-8 first:pl-0">
+                <dt className="text-[10px] sm:text-xs font-mono text-[var(--color-text-muted)] truncate">{s.label}</dt>
+                <dd className="mt-1 sm:mt-1.5 text-lg sm:text-2xl md:text-[2rem] leading-none font-serif font-bold text-[var(--color-text-main)] tabular-nums">
                   {s.value}
                 </dd>
               </div>
@@ -499,9 +499,9 @@ export const VisitorMapSection: React.FC = () => {
           </dl>
 
           {/* Personal line */}
-          <p className="mt-6 text-sm sm:text-[15px] text-[#8892b0] flex items-center gap-2.5">
+          <p className="mt-5 sm:mt-6 text-xs sm:text-[15px] text-[var(--color-text-muted)] flex items-center gap-2">
             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusDot}`} />
-            <span>{greeting}</span>
+            <span className="truncate">{greeting}</span>
           </p>
 
           {/* Map + leaderboard */}
