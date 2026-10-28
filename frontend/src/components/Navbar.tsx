@@ -1,331 +1,284 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Sun, Moon, Menu, X } from 'lucide-react'
+import {
+  Sun,
+  Moon,
+  Monitor,
+  Home,
+  FlaskConical,
+  FolderGit2,
+  Briefcase,
+  GraduationCap,
+  Newspaper,
+  Mail,
+  BookOpen,
+} from 'lucide-react'
 import { useTheme } from '../lib/theme'
-import { motion, AnimatePresence } from 'framer-motion'
-import { AQALogo } from './AQALogo'
+import { motion } from 'framer-motion'
+
+type NavItem = {
+  num: string
+  name: string
+  path: string
+  isHash: boolean
+  icon: React.ComponentType<{ className?: string }>
+}
+
+type ThemeMode = 'system' | 'light' | 'dark'
 
 export const Navbar: React.FC = () => {
-  const { theme, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const location = useLocation()
-  
-  // Smart Sticky state: hide on scroll down, show on scroll up
-  const [isVisible, setIsVisible] = useState(true)
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [lastScrollY, setLastScrollY] = useState(0)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
   const isHome = location.pathname === '/'
 
+  // Theme mode (system / light / dark) layered on top of the existing theme provider
+  const [mode, setMode] = useState<ThemeMode>(() => {
+    const saved = localStorage.getItem('aq-theme-mode') as ThemeMode | null
+    return saved === 'system' || saved === 'light' || saved === 'dark' ? saved : theme
+  })
+
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      
-      // Determine if scrolled past initial threshold
-      setIsScrolled(currentScrollY > 50)
-
-      // Only toggle smart hide/reveal once past 100px
-      if (currentScrollY > 100) {
-        if (currentScrollY > lastScrollY && !mobileMenuOpen) {
-          // Scrolling down -> hide navbar
-          setIsVisible(false)
-        } else {
-          // Scrolling up -> show navbar
-          setIsVisible(true)
-        }
-      } else {
-        // At top -> always visible
-        setIsVisible(true)
-      }
-
-      setLastScrollY(currentScrollY)
+    localStorage.setItem('aq-theme-mode', mode)
+    if (mode !== 'system') {
+      setTheme(mode)
+      return
     }
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const apply = () => setTheme(mq.matches ? 'dark' : 'light')
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode])
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [lastScrollY, mobileMenuOpen])
+  // Collapse the name banner into a monogram once the user scrolls
+  const [isScrolled, setIsScrolled] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 80)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
-  // Brittany Chiang inspired navigation items with numbering (Home is accessed via the AQA logo)
-  const navLinks = isHome
-    ? [
-        { num: '01.', name: 'Research', path: '/research', isHash: false },
-        { num: '02.', name: 'Projects', path: '/projects', isHash: false },
-        { num: '03.', name: 'Experience', path: '/experience', isHash: false },
-        { num: '04.', name: 'Education', path: '/education', isHash: false },
-        { num: '05.', name: 'News', path: '/news', isHash: false },
-        { num: '06.', name: 'Contact', path: '/#contact', isHash: true },
-        { num: '07.', name: 'Guestbook', path: '/guestbook', isHash: false },
-      ]
-    : [
-        { num: '01.', name: 'Research', path: '/research', isHash: false },
-        { num: '02.', name: 'Projects', path: '/projects', isHash: false },
-        { num: '03.', name: 'Experience', path: '/experience', isHash: false },
-        { num: '04.', name: 'Education', path: '/education', isHash: false },
-        { num: '05.', name: 'News', path: '/news', isHash: false },
-        { num: '06.', name: 'Contact', path: '/contact', isHash: false },
-        { num: '07.', name: 'Guestbook', path: '/guestbook', isHash: false },
-      ]
+  // Leave room at the bottom of every page so the dock never covers content
+  useEffect(() => {
+    const prev = document.body.style.paddingBottom
+    document.body.style.paddingBottom = '96px'
+    return () => {
+      document.body.style.paddingBottom = prev
+    }
+  }, [])
 
-  const handleLinkClick = (isHash: boolean, path: string) => {
-    setMobileMenuOpen(false)
-    if (isHash && isHome) {
-      const hash = path.replace('/#', '').replace('#', '')
-      const elem = document.getElementById(hash)
-      if (elem) {
-        const headerOffset = 80
-        const elementPosition = elem.getBoundingClientRect().top
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        })
-      }
+  const navLinks: NavItem[] = [
+    { num: '00', name: 'Home', path: '/', isHash: false, icon: Home },
+    { num: '01', name: 'Research', path: '/research', isHash: false, icon: FlaskConical },
+    { num: '02', name: 'Projects', path: '/projects', isHash: false, icon: FolderGit2 },
+    { num: '03', name: 'Experience', path: '/experience', isHash: false, icon: Briefcase },
+    { num: '04', name: 'Education', path: '/education', isHash: false, icon: GraduationCap },
+    { num: '05', name: 'News', path: '/news', isHash: false, icon: Newspaper },
+    isHome
+      ? { num: '06', name: 'Contact', path: '/#contact', isHash: true, icon: Mail }
+      : { num: '06', name: 'Contact', path: '/contact', isHash: false, icon: Mail },
+    { num: '07', name: 'Guestbook', path: '/guestbook', isHash: false, icon: BookOpen },
+  ]
+
+  const scrollToHash = (path: string) => {
+    const hash = path.replace('/#', '').replace('#', '')
+    const elem = document.getElementById(hash)
+    if (elem) {
+      const offsetPosition = elem.getBoundingClientRect().top + window.pageYOffset - 80
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
     }
   }
 
-  // Determine if a link corresponds to the current route or subroute
-  const isActiveLink = (link: { path: string; isHash?: boolean }) => {
+  const isActiveLink = (link: NavItem) => {
     const currentPath = location.pathname
-    
-    // Hash links on homepage
-    if (link.isHash) {
-      if (isHome && location.hash) {
-        return location.hash === link.path.replace('/', '')
-      }
-      return false
-    }
-
-    // Exact homepage match
-    if (link.path === '/') {
-      return currentPath === '/'
-    }
-
-    // Match exact route or subroutes (e.g. /projects/dispatchlane active for /projects)
+    if (link.isHash) return isHome && location.hash === link.path.replace('/', '')
+    if (link.path === '/') return currentPath === '/' && !location.hash
     return currentPath === link.path || currentPath.startsWith(`${link.path}/`)
   }
 
-  return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 transform ${
-        isVisible ? 'translate-y-0' : '-translate-y-full shadow-none'
-      } ${
-        isScrolled
-          ? 'bg-[var(--color-surface-base)]/90 backdrop-blur-md border-b border-[var(--color-border)] shadow-[var(--shadow-sm)] py-3.5'
-          : 'bg-transparent py-5 sm:py-6'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 flex items-center justify-between">
-        
-        {/* Creative Monogram Logo for AQA (Amoo Quadri Ayomikun) */}
-        <Link
-          to="/"
-          className="focus:outline-none"
-          aria-label="Home - Quadri Ayomikun Amoo (AQA)"
+  const renderDockItem = (link: NavItem) => {
+    const active = isActiveLink(link)
+    const Icon = link.icon
+    const className = `group relative flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-full text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] ${
+      active
+        ? 'text-[var(--color-primary)]'
+        : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-main)]'
+    }`
+
+    const inner = (
+      <>
+        {active && (
+          <motion.span
+            layoutId="dockActive"
+            className="absolute inset-0 rounded-full bg-[var(--color-primary)]/10"
+            transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+          />
+        )}
+        <Icon className="relative w-4 h-4 shrink-0" />
+        <span className={`relative whitespace-nowrap ${active ? 'inline' : 'hidden lg:inline'}`}>
+          {link.name}
+        </span>
+      </>
+    )
+
+    if (link.isHash) {
+      return (
+        <a
+          key={link.name}
+          id={`dock-${link.name.toLowerCase()}`}
+          href={link.path}
+          aria-label={link.name}
+          aria-current={active ? 'page' : undefined}
+          onClick={(e) => {
+            if (isHome) {
+              e.preventDefault()
+              window.history.replaceState(null, '', link.path)
+              scrollToHash(link.path)
+            }
+          }}
+          className={className}
         >
-          <AQALogo />
-        </Link>
+          {inner}
+        </a>
+      )
+    }
 
-        {/* Desktop Nav Items */}
-        <div className="hidden md:flex items-center gap-7">
-          <nav className="flex items-center gap-4 lg:gap-5">
-            {navLinks.map((link) => {
-              const active = isActiveLink(link)
+    return (
+      <Link
+        key={link.name}
+        id={`dock-${link.name.toLowerCase()}`}
+        to={link.path}
+        aria-label={link.name}
+        aria-current={active ? 'page' : undefined}
+        className={className}
+      >
+        {inner}
+      </Link>
+    )
+  }
 
-              if (link.isHash) {
-                return (
-                  <a
-                    key={link.name}
-                    href={link.path}
-                    onClick={(e) => {
-                      if (isHome) {
-                        e.preventDefault()
-                        handleLinkClick(true, link.path)
-                      }
-                    }}
-                    className={`relative font-mono text-xs px-2.5 py-1 rounded-md transition-all flex items-center gap-1.5 group cursor-pointer ${
-                      active
-                        ? 'text-[var(--color-primary)] font-bold bg-[var(--color-primary)]/10 shadow-xs'
-                        : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-elevated)]/40 font-medium'
-                    }`}
-                  >
-                    <span className="text-[var(--color-primary)] text-[11px] font-mono">{link.num}</span>
-                    <span className={active ? 'text-[var(--color-primary)] font-bold' : 'group-hover:text-[var(--color-primary)]'}>
-                      {link.name}
-                    </span>
-                    {active && (
-                      <motion.span
-                        layoutId="activeNavIndicator"
-                        className="absolute -bottom-1 left-2 right-2 h-[2px] bg-[var(--color-primary)] rounded-full shadow-[0_0_8px_var(--color-primary)]"
-                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                  </a>
-                )
-              }
+  const modes: { key: ThemeMode; icon: React.ComponentType<{ className?: string }>; label: string }[] = [
+    { key: 'system', icon: Monitor, label: 'System theme' },
+    { key: 'light', icon: Sun, label: 'Light theme' },
+    { key: 'dark', icon: Moon, label: 'Dark theme' },
+  ]
+
+  return (
+    <>
+      {/* Full-width name banner header */}
+      <header
+        className={`sticky top-0 z-50 w-full border-b-2 border-[var(--color-text-main)] transition-[background-color,backdrop-filter] duration-500 ${
+          isScrolled ? 'bg-[var(--color-surface-base)]/80 backdrop-blur-md' : 'bg-[var(--color-surface-base)]'
+        }`}
+      >
+        <div
+          className={`flex items-center gap-3 sm:gap-6 px-4 sm:px-8 transition-[padding] duration-500 ease-[cubic-bezier(.7,0,.2,1)] ${
+            isScrolled ? 'py-2' : 'py-2 sm:py-3'
+          }`}
+        >
+          <Link
+            to="/"
+            aria-label="Home - Quadri Ayomikun Amoo"
+            className={`name-banner group flex flex-1 items-center focus:outline-none ${
+              isScrolled ? 'justify-start gap-1 sm:gap-2' : 'justify-between gap-4'
+            }`}
+          >
+            {['Quadri', 'Ayomikun', 'Amoo'].map((word, i) => (
+              <span
+                key={word}
+                className="name-word font-black uppercase leading-none tracking-tight inline-flex transition-[font-size] duration-500 ease-[cubic-bezier(.7,0,.2,1)]"
+                style={{
+                  fontFamily: "'Archivo Black', 'Inter', system-ui, sans-serif",
+                  fontSize: isScrolled ? 'clamp(1.25rem,2.4vw,1.75rem)' : 'clamp(1.4rem,5.6vw,4rem)',
+                  transitionDelay: `${i * 90}ms`,
+                }}
+              >
+                <span className="name-fill" style={{ transitionDelay: `${i * 110}ms` }}>
+                  {word[0]}
+                </span>
+                <span
+                  className="name-fill overflow-hidden whitespace-nowrap"
+                  style={{
+                    maxWidth: isScrolled ? '0' : '12ch',
+                    opacity: isScrolled ? 0 : 1,
+                    transitionDelay: `${i * 110}ms`,
+                  }}
+                >
+                  {word.slice(1)}
+                </span>
+                {isScrolled && i < 2 && (
+                  <span className="ml-1 sm:ml-2 text-[var(--color-primary)]" aria-hidden>
+                    ·
+                  </span>
+                )}
+              </span>
+            ))}
+          </Link>
+
+          <button
+            id="header-theme-toggle"
+            onClick={() => setMode(theme === 'dark' ? 'light' : 'dark')}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            className="group shrink-0 grid place-items-center w-9 h-9 sm:w-11 sm:h-11 rounded-full border-2 border-[var(--color-text-main)] text-[var(--color-text-main)] hover:bg-[var(--color-text-main)] hover:text-[var(--color-surface-base)] transition-colors cursor-pointer overflow-hidden"
+          >
+            <motion.span
+              key={theme}
+              initial={{ rotate: -90, scale: 0.4, opacity: 0 }}
+              animate={{ rotate: 0, scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
+            </motion.span>
+          </button>
+        </div>
+      </header>
+
+      {/* Floating bottom dock navigation */}
+      <motion.nav
+        aria-label="Primary"
+        initial={{ y: 60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 26, delay: 0.15 }}
+        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-[calc(100vw-1.5rem)]"
+      >
+        <div className="flex items-center gap-0.5 p-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-base)]/70 backdrop-blur-xl shadow-[0_10px_30px_-12px_rgba(0,0,0,0.6)] overflow-x-auto no-scrollbar">
+          {navLinks.map(renderDockItem)}
+          <span className="mx-1 h-5 w-px shrink-0 bg-[var(--color-border)]" />
+          <div role="radiogroup" aria-label="Theme" className="flex items-center gap-0.5 pr-1">
+            {modes.map(({ key, icon: Icon, label }) => {
+              const active = mode === key
               return (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  className={`relative font-mono text-xs px-2.5 py-1 rounded-md transition-all flex items-center gap-1.5 group ${
+                <button
+                  key={key}
+                  id={`theme-${key}`}
+                  role="radio"
+                  aria-checked={active}
+                  aria-label={label}
+                  title={label}
+                  onClick={() => setMode(key)}
+                  className={`relative p-1.5 rounded-full transition-colors cursor-pointer ${
                     active
-                      ? 'text-[var(--color-primary)] font-bold bg-[var(--color-primary)]/10 shadow-xs'
-                      : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-elevated)]/40 font-medium'
+                      ? 'text-[var(--color-text-main)]'
+                      : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-main)]'
                   }`}
                 >
-                  <span className="text-[var(--color-primary)] text-[11px] font-mono">{link.num}</span>
-                  <span className={active ? 'text-[var(--color-primary)] font-bold' : 'group-hover:text-[var(--color-primary)]'}>
-                    {link.name}
-                  </span>
                   {active && (
                     <motion.span
-                      layoutId="activeNavIndicator"
-                      className="absolute -bottom-1 left-2 right-2 h-[2px] bg-[var(--color-primary)] rounded-full shadow-[0_0_8px_var(--color-primary)]"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      layoutId="themeActive"
+                      className="absolute inset-0 rounded-full bg-[var(--color-surface-elevated)] border border-[var(--color-border)]"
+                      transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                     />
                   )}
-                </Link>
+                  <Icon className="relative w-3.5 h-3.5" />
+                </button>
               )
             })}
-          </nav>
-
-          {/* Brittany Chiang Style Outlined Resume Button */}
-          <div className="flex items-center gap-4">
-            <a
-              href="/Amoo_Quadri_CV.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 rounded-lg border border-[var(--color-primary)] text-[var(--color-primary)] font-mono text-xs font-semibold hover:bg-[var(--color-primary-light)] transition-all duration-200"
-            >
-              Resume
-            </a>
-
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-              className="p-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-card)] hover:border-[var(--color-primary)] transition-all cursor-pointer shadow-xs group"
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-4 h-4 text-amber-400 transition-transform group-hover:rotate-45" />
-              ) : (
-                <Moon className="w-4 h-4 text-indigo-600 transition-transform group-hover:-rotate-12" />
-              )}
-            </button>
           </div>
         </div>
-
-        {/* Mobile Hamburger Button */}
-        <div className="flex items-center gap-3 md:hidden">
-          <button
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            className="p-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-card)]"
-            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-4 h-4 text-amber-400" />
-            ) : (
-              <Moon className="w-4 h-4 text-indigo-600" />
-            )}
-          </button>
-
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle Menu"
-            className="p-2 text-[var(--color-primary)] focus:outline-none cursor-pointer"
-          >
-            {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Drawer Overlay */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ type: 'tween', duration: 0.3 }}
-            className="fixed inset-y-0 right-0 w-[min(75vw,360px)] h-screen bg-[var(--color-surface-card)] shadow-2xl z-50 flex flex-col justify-center items-center px-8 border-l border-[var(--color-border)] md:hidden"
-          >
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="absolute top-6 right-6 p-2 text-[var(--color-primary)]"
-              aria-label="Close Menu"
-            >
-              <X className="w-7 h-7" />
-            </button>
-
-            <nav className="flex flex-col items-center gap-3.5 text-center w-full">
-              {navLinks.map((link) => {
-                const active = isActiveLink(link)
-
-                if (link.isHash) {
-                  return (
-                    <a
-                      key={link.name}
-                      href={link.path}
-                      onClick={(e) => {
-                        if (isHome) {
-                          e.preventDefault()
-                          handleLinkClick(true, link.path)
-                        } else {
-                          setMobileMenuOpen(false)
-                        }
-                      }}
-                      className={`w-full font-mono text-sm px-4 py-2.5 rounded-lg transition-all flex items-center justify-between font-medium ${
-                        active
-                          ? 'text-[var(--color-primary)] font-bold bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 shadow-xs'
-                          : 'text-[var(--color-text-main)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-elevated)]/40'
-                      }`}
-                    >
-                      <span className="text-[var(--color-primary)] text-xs font-mono">{link.num}</span>
-                      <span>{link.name}</span>
-                      {active ? (
-                        <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] shadow-[0_0_8px_var(--color-primary)] animate-pulse" />
-                      ) : (
-                        <span className="w-2 h-2" />
-                      )}
-                    </a>
-                  )
-                }
-                return (
-                  <Link
-                    key={link.name}
-                    to={link.path}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`w-full font-mono text-sm px-4 py-2.5 rounded-lg transition-all flex items-center justify-between font-medium ${
-                      active
-                        ? 'text-[var(--color-primary)] font-bold bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 shadow-xs'
-                        : 'text-[var(--color-text-main)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-elevated)]/40'
-                    }`}
-                  >
-                    <span className="text-[var(--color-primary)] text-xs font-mono">{link.num}</span>
-                    <span>{link.name}</span>
-                    {active ? (
-                      <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] shadow-[0_0_8px_var(--color-primary)] animate-pulse" />
-                    ) : (
-                      <span className="w-2 h-2" />
-                    )}
-                  </Link>
-                )
-              })}
-
-              <a
-                href="/Amoo_Quadri_CV.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setMobileMenuOpen(false)}
-                className="mt-4 px-8 py-3 rounded-lg border border-[var(--color-primary)] text-[var(--color-primary)] font-mono text-sm font-semibold hover:bg-[var(--color-primary-light)] transition-all"
-              >
-                Resume
-              </a>
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+      </motion.nav>
+    </>
   )
 }
