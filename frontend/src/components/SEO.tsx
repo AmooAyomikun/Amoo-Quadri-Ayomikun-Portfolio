@@ -6,6 +6,7 @@ interface SEOProps {
   canonicalUrl?: string
   ogImage?: string
   type?: 'website' | 'article'
+  noIndex?: boolean
 }
 
 const DEFAULT_TITLE = 'Quadri Ayomikun Amoo — Software Engineer & Researcher'
@@ -18,7 +19,8 @@ export const SEO: React.FC<SEOProps> = ({
   description = DEFAULT_DESC,
   canonicalUrl,
   ogImage = DEFAULT_IMAGE,
-  type = 'website'
+  type = 'website',
+  noIndex = false
 }) => {
   const fullTitle = title 
     ? `${title} | Quadri Ayomikun Amoo` 
@@ -39,10 +41,17 @@ export const SEO: React.FC<SEOProps> = ({
       element.setAttribute('content', content)
     }
 
-    // 2. Primary Meta Tags
+    // 2. Robots Directives
+    if (noIndex) {
+      setMetaTag('name', 'robots', 'noindex, nofollow')
+    } else {
+      setMetaTag('name', 'robots', 'index, follow')
+    }
+
+    // 3. Primary Meta Tags
     setMetaTag('name', 'description', description)
 
-    // 3. Open Graph
+    // 4. Open Graph
     setMetaTag('property', 'og:title', fullTitle)
     setMetaTag('property', 'og:description', description)
     setMetaTag('property', 'og:type', type)
@@ -52,12 +61,12 @@ export const SEO: React.FC<SEOProps> = ({
       setMetaTag('property', 'og:url', fullUrl)
     }
 
-    // 4. Twitter Cards
+    // 5. Twitter Cards
     setMetaTag('name', 'twitter:title', fullTitle)
     setMetaTag('name', 'twitter:description', description)
     setMetaTag('name', 'twitter:image', ogImage)
 
-    // 5. Canonical Link
+    // 6. Canonical Link
     if (canonicalUrl) {
       const fullUrl = canonicalUrl.startsWith('http') ? canonicalUrl : `${SITE_URL}${canonicalUrl}`
       let linkCanonical = document.querySelector('link[rel="canonical"]')
@@ -68,7 +77,53 @@ export const SEO: React.FC<SEOProps> = ({
       }
       linkCanonical.setAttribute('href', fullUrl)
     }
-  }, [fullTitle, description, canonicalUrl, ogImage, type])
+    // 7. Structured Data (Schema.org JSON-LD) (Issue 5.1)
+    if (!noIndex) {
+      let scriptTag = document.querySelector('script[type="application/ld+json"]#seo-structured-data')
+      if (!scriptTag) {
+        scriptTag = document.createElement('script')
+        scriptTag.setAttribute('type', 'application/ld+json')
+        scriptTag.setAttribute('id', 'seo-structured-data')
+        document.head.appendChild(scriptTag)
+      }
+
+      const structuredData = {
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'Person',
+            '@id': `${SITE_URL}/#person`,
+            'name': 'Quadri Ayomikun Amoo',
+            'alternateName': ['Amoo Quadri', 'Quadri Amoo'],
+            'url': SITE_URL,
+            'image': DEFAULT_IMAGE,
+            'jobTitle': 'Full-Stack Software Engineer & Machine Learning Researcher',
+            'alumniOf': {
+              '@type': 'EducationalOrganization',
+              'name': 'Babcock University'
+            },
+            'sameAs': [
+              'https://github.com/AmooAyomikun',
+              'https://linkedin.com/in/quadri-amoo',
+              'https://x.com/AmooAyomikun'
+            ]
+          },
+          {
+            '@type': 'WebSite',
+            '@id': `${SITE_URL}/#website`,
+            'url': SITE_URL,
+            'name': 'Quadri Ayomikun Amoo Portfolio',
+            'description': DEFAULT_DESC,
+            'publisher': {
+              '@id': `${SITE_URL}/#person`
+            }
+          }
+        ]
+      }
+
+      scriptTag.textContent = JSON.stringify(structuredData)
+    }
+  }, [fullTitle, description, canonicalUrl, ogImage, type, noIndex])
 
   return null
 }

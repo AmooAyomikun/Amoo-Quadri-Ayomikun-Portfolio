@@ -33,4 +33,14 @@ describe('<SEO /> component', () => {
     const canonical = document.querySelector('link[rel="canonical"]')
     expect(canonical?.getAttribute('href')).toBe('https://amoo-quadri.vercel.app/projects')
   })
+
+  it('injects Schema.org JSON-LD structured data when noIndex is false', () => {
+    render(<SEO title="Home" />)
+    const script = document.querySelector('script#seo-structured-data')
+    expect(script).not.toBeNull()
+    const json = JSON.parse(script?.textContent || '{}')
+    expect(json['@context']).toBe('https://schema.org')
+    expect(json['@graph'][0]['@type']).toBe('Person')
+    expect(json['@graph'][0]['name']).toBe('Quadri Ayomikun Amoo')
+  })
 })

@@ -5,6 +5,7 @@ import { LensProvider } from './lib/lens'
 import { Preloader } from './components/Preloader'
 import { BackToTop } from './components/BackToTop'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { SkipLink } from './components/SkipLink'
 import { useBackendKeepAlive } from './hooks/useBackendKeepAlive'
 
 const Home = lazy(() => import('./pages/Home'))
@@ -53,6 +54,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <LensProvider>
+        <SkipLink />
         {loading && <Preloader onComplete={handlePreloaderComplete} />}
         <ErrorBoundary>
           <Suspense fallback={<div className="min-h-screen bg-[var(--color-surface-base)]" />}>

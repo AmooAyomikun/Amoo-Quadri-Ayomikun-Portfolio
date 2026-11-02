@@ -104,7 +104,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col md:flex-row">
-      <SEO title="Admin Dashboard" description="Portfolio content and telemetry management." canonicalUrl="/admin/dashboard" />
+      <SEO title="Admin Dashboard" description="Portfolio content and telemetry management." canonicalUrl="/admin/dashboard" noIndex />
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-[var(--color-surface-card)] border-r border-[var(--color-border)] flex flex-col shrink-0">
         <div className="p-4 sm:p-6 border-b border-[var(--color-border)] flex items-center justify-between">
