@@ -71,6 +71,7 @@ export const contactMessageSchema = z.object({
     .email('Invalid email address')
     .max(120, 'Email cannot exceed 120 characters'),
   subject: z.string().trim().max(150, 'Subject cannot exceed 150 characters').optional().default('General Inquiry'),
+  lens: z.string().trim().max(50, 'Lens cannot exceed 50 characters').optional().default('general'),
   message: z.string()
     .trim()
     .min(5, 'Message must be at least 5 characters')
@@ -95,6 +96,11 @@ export const guestbookSignatureSchema = z.object({
     .trim()
     .min(2, 'Message must be at least 2 characters')
     .max(280, 'Message cannot exceed 280 characters'),
+  signatureData: z.string()
+    .max(500000, 'Signature data is too large (maximum 500KB)')
+    .regex(/^data:image\/png;base64,[A-Za-z0-9+/=]+$/, 'Signature must be a valid PNG image data URL')
+    .or(z.literal(''))
+    .optional(),
   location: z.string().trim().max(80).optional(),
   avatar: z.string().trim().max(30).optional()
 })

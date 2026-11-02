@@ -26,8 +26,14 @@ export const globalErrorHandler = (
   // Log the error safely without leaking internal secrets
   console.error(`[Server Error] [Status ${status}]:`, err?.message || err)
 
+  // In production, mask internal 500 errors to avoid leaking implementation details, stack traces or DB errors
+  const isProd = process.env.NODE_ENV === 'production'
+  const message = (status === 500 && isProd)
+    ? 'An unexpected internal server error occurred.'
+    : (err?.message || 'An unexpected internal server error occurred.')
+
   res.status(status).json({
     success: false,
-    error: err?.message || 'An unexpected internal server error occurred.'
+    error: message
   })
 }

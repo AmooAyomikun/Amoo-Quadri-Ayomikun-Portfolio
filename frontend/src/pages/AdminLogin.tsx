@@ -60,13 +60,16 @@ export default function AdminLogin() {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-xs font-mono text-[var(--color-text-subtle)] mb-2 uppercase tracking-wider">
+            <label htmlFor="admin-passphrase" className="block text-xs font-mono text-[var(--color-text-subtle)] mb-2 uppercase tracking-wider">
               Admin Passphrase
             </label>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
               <input
+                id="admin-passphrase"
+                name="password"
                 type="password"
+                autoComplete="current-password"
                 value={passphrase}
                 onChange={(e) => {
                   setPassphrase(e.target.value)

@@ -193,9 +193,12 @@ export default function GuestbookPage() {
               
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-xs font-mono text-[var(--color-text-muted)] mb-2">NAME <span className="text-[var(--color-primary)]">*</span></label>
+                  <label htmlFor="guestbook-name" className="block text-xs font-mono text-[var(--color-text-muted)] mb-2">NAME <span className="text-[var(--color-primary)]">*</span></label>
                   <input
+                    id="guestbook-name"
+                    name="name"
                     type="text"
+                    autoComplete="name"
                     value={name}
                     onChange={(e) => {
                       setName(e.target.value)
@@ -208,8 +211,10 @@ export default function GuestbookPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-[var(--color-text-muted)] mb-2">MESSAGE</label>
+                  <label htmlFor="guestbook-message" className="block text-xs font-mono text-[var(--color-text-muted)] mb-2">MESSAGE</label>
                   <textarea
+                    id="guestbook-message"
+                    name="message"
                     value={message}
                     onChange={(e) => {
                       setMessage(e.target.value)
@@ -223,7 +228,7 @@ export default function GuestbookPage() {
 
                 <div>
                   <div className="flex justify-between items-end mb-2">
-                    <label className="block text-xs font-mono text-[var(--color-text-muted)]">SIGNATURE DRAWING</label>
+                    <label id="guestbook-signature-label" className="block text-xs font-mono text-[var(--color-text-muted)]">SIGNATURE DRAWING</label>
                     <button type="button" onClick={clearSignature} className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] flex items-center gap-1 cursor-pointer">
                       <RefreshCw className="w-3 h-3" /> Clear
                     </button>
@@ -235,7 +240,9 @@ export default function GuestbookPage() {
                       canvasProps={{ 
                         width: canvasSize.width, 
                         height: canvasSize.height,
-                        className: 'cursor-crosshair w-full h-full' 
+                        className: 'cursor-crosshair w-full h-full',
+                        'aria-labelledby': 'guestbook-signature-label',
+                        role: 'img'
                       }}
                       backgroundColor="transparent"
                     />

@@ -4,6 +4,7 @@ import {
   publishNewsSchema,
   contactMessageSchema,
   subscribeSchema,
+  guestbookSignatureSchema,
   aiChatSchema,
   visitorLogSchema
 } from '../middleware/validate.js'
@@ -102,5 +103,95 @@ describe('Backend Security & Validation Schemas (Issues 2.1 - 2.10)', () => {
       email: 'bad-email'
     })
     assert.strictEqual(resultInvalidSub.success, false)
+  })
+
+  it('guestbookSignatureSchema: accepts valid canvas PNG signature data and rejects invalid formats', () => {
+    // Valid PNG data URL
+    const validDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+    const validResult = guestbookSignatureSchema.safeParse({
+      name: 'Adekunle Gold',
+      message: 'Great website design and portfolio!',
+      signatureData: validDataUrl
+    })
+    assert.strictEqual(validResult.success, true)
+    if (validResult.success) {
+      assert.strictEqual(validResult.data.signatureData, validDataUrl)
+    }
+
+    // Accepts empty string / omission
+    const emptyResult = guestbookSignatureSchema.safeParse({
+      name: 'Adekunle Gold',
+      message: 'Great website design and portfolio!',
+      signatureData: ''
+    })
+    assert.strictEqual(emptyResult.success, true)
+
+    // Rejects non-PNG data URLs (e.g. SVG or JPEG or raw string)
+    const invalidFormatResult = guestbookSignatureSchema.safeParse({
+      name: 'Adekunle Gold',
+      message: 'Great website design and portfolio!',
+      signatureData: 'data:image/jpeg;base64,12345'
+    })
+    assert.strictEqual(invalidFormatResult.success, false)
+  })
+
+  it('contactMessageSchema: accepts and preserves submission lens field', () => {
+    const result = contactMessageSchema.safeParse({
+      name: 'Dr. Emily Vance',
+      email: 'emily.vance@mit.edu',
+      subject: 'Research Collaboration',
+      lens: 'researcher',
+      message: 'Would love to discuss your intelligent systems publications.'
+    })
+    assert.strictEqual(result.success, true)
+    if (result.success) {
+      assert.strictEqual(result.data.lens, 'researcher')
+    }
+  })
+
+  it('escapeHtml: safely escapes HTML injection characters', async () => {
+    const { escapeHtml } = await import('../services/emailService.js')
+    const maliciousPayload = '<script>alert("XSS")</script>&<img src="x" onerror="evil()">'
+    const sanitized = escapeHtml(maliciousPayload)
+    assert.strictEqual(sanitized.includes('<script>'), false)
+    assert.strictEqual(sanitized.includes('&lt;script&gt;'), true)
+    assert.strictEqual(sanitized.includes('&amp;'), true)
+    assert.strictEqual(sanitized.includes('&quot;'), true)
+  })
+
+  it('globalErrorHandler: masks internal 500 errors in production but preserves 4xx messages', async () => {
+    const { globalErrorHandler } = await import('../middleware/errorHandlers.js')
+
+    // Test 500 error in production
+    const prevEnv = process.env.NODE_ENV
+    process.env.NODE_ENV = 'production'
+
+    let capturedStatus = 0
+    let capturedJson: any = null
+    const mockRes: any = {
+      status(s: number) {
+        capturedStatus = s
+        return this
+      },
+      json(data: any) {
+        capturedJson = data
+        return this
+      }
+    }
+
+    // 500 with sensitive DB error message
+    globalErrorHandler(new Error('Firebase connection secret failed at /var/data/private.key'), {} as any, mockRes, (() => {}) as any)
+    assert.strictEqual(capturedStatus, 500)
+    assert.strictEqual(capturedJson.error, 'An unexpected internal server error occurred.')
+    assert.strictEqual(capturedJson.error.includes('Firebase connection secret'), false)
+
+    // 400 with user-facing message
+    const err400: any = new Error('Invalid query format')
+    err400.status = 400
+    globalErrorHandler(err400, {} as any, mockRes, (() => {}) as any)
+    assert.strictEqual(capturedStatus, 400)
+    assert.strictEqual(capturedJson.error, 'Invalid query format')
+
+    process.env.NODE_ENV = prevEnv
   })
 })

@@ -1,11 +1,31 @@
 import { ContactSubmission } from '../repositories/contactRepository.js'
 
+/**
+ * HTML-escapes sensitive characters to prevent HTML injection and email spoofing.
+ */
+export function escapeHtml(str: string): string {
+  if (!str) return ''
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 export class EmailService {
   async notifyNewContactMessage(submission: ContactSubmission): Promise<boolean> {
     const resendApiKey = process.env.RESEND_API_KEY
 
     if (resendApiKey) {
       try {
+        const safeName = escapeHtml(submission.name || '')
+        const safeEmail = escapeHtml(submission.email || '')
+        const safeLens = escapeHtml(submission.lens || 'general')
+        const safeTimestamp = escapeHtml(submission.timestamp || '')
+        const safeSubject = (submission.subject || 'New Contact Message').replace(/[\r\n]+/g, ' ').trim()
+        const safeMessage = escapeHtml(submission.message || '').replace(/\n/g, '<br/>')
+
         const response = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -15,17 +35,17 @@ export class EmailService {
           body: JSON.stringify({
             from: process.env.EMAIL_FROM || 'Portfolio Contact <onboarding@resend.dev>',
             to: [process.env.ADMIN_NOTIFY_EMAIL || 'amooquadri555@gmail.com'],
-            subject: `[Portfolio Inquiry] ${submission.subject || 'New Contact Message'} from ${submission.name}`,
+            subject: `[Portfolio Inquiry] ${safeSubject} from ${safeName.replace(/[\r\n]+/g, ' ')}`,
             html: `
               <h2>New Contact Submission Received</h2>
-              <p><strong>Name:</strong> ${submission.name}</p>
-              <p><strong>Email:</strong> ${submission.email}</p>
-              <p><strong>Lens:</strong> ${submission.lens || 'general'}</p>
-              <p><strong>Received At:</strong> ${submission.timestamp}</p>
+              <p><strong>Name:</strong> ${safeName}</p>
+              <p><strong>Email:</strong> ${safeEmail}</p>
+              <p><strong>Lens:</strong> ${safeLens}</p>
+              <p><strong>Received At:</strong> ${safeTimestamp}</p>
               <hr />
               <p><strong>Message:</strong></p>
               <blockquote style="background:#f4f4f4;padding:12px;border-left:4px solid #00c6ff;">
-                ${submission.message.replace(/\n/g, '<br/>')}
+                ${safeMessage}
               </blockquote>
             `
           })

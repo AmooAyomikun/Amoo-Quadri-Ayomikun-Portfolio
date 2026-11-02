@@ -203,12 +203,14 @@ export const ContactSection: React.FC<{ showHeader?: boolean }> = ({ showHeader 
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-mono uppercase text-[var(--color-text-muted)] mb-1">
+                  <label htmlFor="contact-name" className="block text-xs font-mono uppercase text-[var(--color-text-muted)] mb-1">
                     Your Name *
                   </label>
                   <input
+                    id="contact-name"
                     type="text"
                     name="name"
+                    autoComplete="name"
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Prof. John Doe / Jane Smith"
@@ -218,12 +220,14 @@ export const ContactSection: React.FC<{ showHeader?: boolean }> = ({ showHeader 
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase text-[var(--color-text-muted)] mb-1">
+                  <label htmlFor="contact-email" className="block text-xs font-mono uppercase text-[var(--color-text-muted)] mb-1">
                     Your Email Address *
                   </label>
                   <input
+                    id="contact-email"
                     type="email"
                     name="email"
+                    autoComplete="email"
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="johndoe@university.edu"
@@ -235,10 +239,11 @@ export const ContactSection: React.FC<{ showHeader?: boolean }> = ({ showHeader 
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-mono uppercase text-[var(--color-text-muted)] mb-1">
+                  <label htmlFor="contact-lens" className="block text-xs font-mono uppercase text-[var(--color-text-muted)] mb-1">
                     Inquiry Perspective
                   </label>
                   <select
+                    id="contact-lens"
                     name="lens"
                     value={formData.lens}
                     onChange={handleChange}
@@ -251,10 +256,11 @@ export const ContactSection: React.FC<{ showHeader?: boolean }> = ({ showHeader 
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase text-[var(--color-text-muted)] mb-1">
+                  <label htmlFor="contact-subject" className="block text-xs font-mono uppercase text-[var(--color-text-muted)] mb-1">
                     Subject Line
                   </label>
                   <input
+                    id="contact-subject"
                     type="text"
                     name="subject"
                     value={formData.subject}
@@ -266,10 +272,11 @@ export const ContactSection: React.FC<{ showHeader?: boolean }> = ({ showHeader 
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase text-[var(--color-text-muted)] mb-1">
+                <label htmlFor="contact-message" className="block text-xs font-mono uppercase text-[var(--color-text-muted)] mb-1">
                   Message Content *
                 </label>
                 <textarea
+                  id="contact-message"
                   name="message"
                   rows={4}
                   value={formData.message}

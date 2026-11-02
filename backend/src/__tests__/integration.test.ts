@@ -162,16 +162,19 @@ describe('Backend Integration Test Suite (Issues 3.1 - 3.9)', () => {
     assert.match(res.body.error, /inappropriate/i)
   })
 
-  it('POST /api/guestbook accepts valid signature submission', async () => {
+  it('POST /api/guestbook accepts valid signature submission and preserves canvas signatureData', async () => {
+    const validDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
     const res = await request(app)
       .post('/api/guestbook')
       .send({
         name: 'Prof. Adeleke',
         message: 'Brilliant portfolio and inspiring academic trajectory!',
+        signatureData: validDataUrl,
         location: 'Ibadan, Nigeria'
       })
     assert.strictEqual(res.status, 201)
     assert.strictEqual(res.body.name, 'Prof. Adeleke')
+    assert.strictEqual(res.body.signatureData, validDataUrl)
   })
 
   // 7. SSRF-Safe Proxy Route (Issue 2.1, 3.9)
