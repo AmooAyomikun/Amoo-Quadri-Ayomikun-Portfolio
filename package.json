@@ -5,7 +5,8 @@
   "description": "Portfolio Website & Research Portal for Quadri Ayomikun Amoo (Frontend + Backend REST API)",
   "workspaces": [
     "frontend",
-    "backend"
+    "backend",
+    "shared"
   ],
   "scripts": {
     "dev": "npm run dev --prefix frontend",

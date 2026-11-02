@@ -44,7 +44,7 @@ export const ContactSection: React.FC<{ showHeader?: boolean }> = ({ showHeader 
 
       if (response.ok && result.success) {
         setStatus('success')
-        setStatusMsg('Thank you! Your message has been successfully delivered and saved to Quadri\'s inbox.')
+        setStatusMsg(result.message || 'Thank you! Your message has been received and saved to Quadri\'s communication portal.')
         setFormData({ name: '', email: '', subject: '', message: '', lens: 'research' })
       } else {
         throw new Error(result.error || 'Server rejected message submission')

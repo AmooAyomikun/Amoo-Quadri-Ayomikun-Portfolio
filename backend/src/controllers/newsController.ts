@@ -1,171 +1,57 @@
 import { Request, Response } from 'express'
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import { initialNewsData, NewsItem } from '../data/newsData.js'
-import { db } from '../config/firebase.js'
+import { newsService } from '../services/newsService.js'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const newsFilePath = path.join(__dirname, '../data/news.json')
-
-// Read news from disk or initialize with initialNewsData
-const readNewsFromFile = (): NewsItem[] => {
+export const getNews = async (_req: Request, res: Response): Promise<void> => {
   try {
-    if (fs.existsSync(newsFilePath)) {
-      const raw = fs.readFileSync(newsFilePath, 'utf8')
-      const parsed = JSON.parse(raw) as NewsItem[]
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed
-      }
-    }
-  } catch (err) {
-    console.error('Error reading news.json:', err)
-  }
-  // Initialize file with default data
-  saveNewsToFile(initialNewsData)
-  return [...initialNewsData]
-}
-
-const saveNewsToFile = (news: NewsItem[]): void => {
-  try {
-    fs.writeFileSync(newsFilePath, JSON.stringify(news, null, 2), 'utf8')
-  } catch (err) {
-    console.error('Error saving news.json:', err)
-  }
-}
-
-let newsStore: NewsItem[] = readNewsFromFile()
-
-export const getNews = async (req: Request, res: Response): Promise<void> => {
-  const { category } = req.query
-
-  // Refresh from file to capture any updates
-  newsStore = readNewsFromFile()
-
-  if (db) {
-    try {
-      const snapshot = await db.collection('news').orderBy('date', 'desc').get()
-      if (!snapshot.empty) {
-        const firestoreNews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as NewsItem)
-        if (firestoreNews.length > 0) {
-          newsStore = firestoreNews
-        }
-      }
-    } catch (err) {
-      // Fallback silently to newsStore
-    }
-  }
-
-  if (category && typeof category === 'string') {
-    const filtered = newsStore.filter(n => n.category.toLowerCase() === category.toLowerCase())
+    const articles = await newsService.getAllNews()
     res.status(200).json({
       success: true,
-      count: filtered.length,
-      data: filtered
+      count: articles.length,
+      data: articles
     })
-    return
+  } catch (error) {
+    console.error('[NewsController] Get news error:', error)
+    res.status(500).json({ success: false, error: 'Internal server error retrieving news articles' })
   }
-
-  res.status(200).json({
-    success: true,
-    count: newsStore.length,
-    data: newsStore
-  })
 }
 
 export const publishNews = async (req: Request, res: Response): Promise<void> => {
-  const { title, category, summary, content, tags, externalUrl } = req.body as Partial<NewsItem>
-
-  if (
-    typeof title !== 'string' ||
-    typeof summary !== 'string' ||
-    typeof content !== 'string' ||
-    !title.trim() ||
-    !summary.trim() ||
-    !content.trim()
-  ) {
-    res.status(400).json({
-      success: false,
-      error: 'Missing or invalid required fields: title, summary, and content must be non-empty strings.'
+  try {
+    const { title, category, summary, content, tags, externalUrl } = req.body ?? {}
+    const newArticle = await newsService.publishArticle({
+      title,
+      category,
+      summary,
+      content,
+      tags,
+      externalUrl
     })
-    return
+
+    console.log('[NewsController] News published:', newArticle.id)
+    res.status(201).json({
+      success: true,
+      message: 'News announcement published successfully!',
+      data: newArticle
+    })
+  } catch (error) {
+    console.error('[NewsController] Publish news error:', error)
+    res.status(500).json({ success: false, error: 'Internal server error publishing news announcement' })
   }
-
-  // Safe externalUrl check (block javascript: or malformed URLs)
-  let safeExternalUrl: string | undefined = undefined
-  if (typeof externalUrl === 'string' && externalUrl.trim()) {
-    try {
-      const parsedUrl = new URL(externalUrl.trim())
-      if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-        safeExternalUrl = parsedUrl.href
-      }
-    } catch {
-      // Ignore invalid URL
-    }
-  }
-
-  const safeTags = Array.isArray(tags)
-    ? tags.filter((t): t is string => typeof t === 'string').map(t => t.trim().slice(0, 50)).slice(0, 10)
-    : ['News Update']
-
-  const newArticle: NewsItem = {
-    id: `news-${Date.now()}`,
-    title: title.trim().slice(0, 200),
-    date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-    category: (typeof category === 'string' && ['Research', 'Industry', 'Awards', 'Technical', 'General'].includes(category))
-      ? (category as NewsItem['category'])
-      : 'Research',
-    summary: summary.trim().slice(0, 500),
-    content: content.trim().slice(0, 20000),
-    author: 'Quadri Ayomikun Amoo',
-    readTime: `${Math.max(1, Math.ceil(content.split(/\s+/).length / 150))} min read`,
-    tags: safeTags.length > 0 ? safeTags : ['News Update'],
-    externalUrl: safeExternalUrl,
-    isPinned: false
-  }
-
-  newsStore.unshift(newArticle)
-  saveNewsToFile(newsStore)
-
-  if (db) {
-    try {
-      await db.collection('news').doc(newArticle.id).set(newArticle)
-    } catch (err) {
-      console.error('Firestore save news error:', err)
-    }
-  }
-
-  console.log('[News API Published]', newArticle)
-
-  res.status(201).json({
-    success: true,
-    message: 'News announcement published successfully!',
-    data: newArticle
-  })
 }
 
 export const deleteNewsArticle = async (req: Request, res: Response): Promise<void> => {
-  const rawId = req.params.id
-  const id = Array.isArray(rawId) ? rawId[0] : rawId
-  if (!id) {
-    res.status(400).json({ success: false, error: 'Article ID is required' })
-    return
-  }
-
-  newsStore = newsStore.filter(n => n.id !== id)
-  saveNewsToFile(newsStore)
-
-  if (db) {
-    try {
-      await db.collection('news').doc(id).delete()
-    } catch (err) {
-      console.error('Firestore delete news error:', err)
+  try {
+    const rawId = req.params.id
+    const id = Array.isArray(rawId) ? rawId[0] : rawId
+    if (!id) {
+      res.status(400).json({ success: false, error: 'Article ID is required' })
+      return
     }
-  }
 
-  res.status(200).json({
-    success: true,
-    message: 'Article deleted successfully.'
-  })
+    await newsService.deleteArticle(id)
+    res.status(200).json({ success: true, message: 'Article deleted successfully' })
+  } catch (error) {
+    console.error('[NewsController] Delete news error:', error)
+    res.status(500).json({ success: false, error: 'Internal server error deleting news article' })
+  }
 }

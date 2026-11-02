@@ -20,6 +20,9 @@ interface GuestbookEntry {
 export default function GuestbookPage() {
   const { theme } = useTheme()
   const [entries, setEntries] = useState<GuestbookEntry[]>([])
+  const [nextCursor, setNextCursor] = useState<string | null>(null)
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -75,15 +78,40 @@ export default function GuestbookPage() {
 
   const fetchEntries = async () => {
     try {
-      const res = await fetch(apiUrl('/api/guestbook'))
+      const res = await fetch(apiUrl('/api/guestbook?limit=15'))
       if (res.ok) {
         const data = await res.json()
         if (Array.isArray(data)) {
           setEntries(data)
+          setHasMore(false)
+        } else if (data && Array.isArray(data.entries)) {
+          setEntries(data.entries)
+          setNextCursor(data.nextCursor || null)
+          setHasMore(Boolean(data.hasMore))
         }
       }
     } catch (err) {
       console.error('Failed to fetch guestbook entries', err)
+    }
+  }
+
+  const loadMoreEntries = async () => {
+    if (!nextCursor || loadingMore) return
+    setLoadingMore(true)
+    try {
+      const res = await fetch(apiUrl(`/api/guestbook?limit=15&cursor=${encodeURIComponent(nextCursor)}`))
+      if (res.ok) {
+        const data = await res.json()
+        if (data && Array.isArray(data.entries)) {
+          setEntries(prev => [...prev, ...data.entries])
+          setNextCursor(data.nextCursor || null)
+          setHasMore(Boolean(data.hasMore))
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load more entries', err)
+    } finally {
+      setLoadingMore(false)
     }
   }
 
@@ -277,6 +305,25 @@ export default function GuestbookPage() {
                 ))
               )}
             </div>
+
+            {hasMore && (
+              <div className="pt-6 text-center">
+                <button
+                  onClick={loadMoreEntries}
+                  disabled={loadingMore}
+                  className="px-6 py-2.5 rounded-full border border-[var(--color-border)] hover:border-[var(--color-primary)] text-xs font-mono font-semibold text-[var(--color-text-main)] hover:bg-[var(--color-surface-elevated)] transition-colors cursor-pointer disabled:opacity-50 inline-flex items-center gap-2"
+                >
+                  {loadingMore ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Loading more signatures...</span>
+                    </>
+                  ) : (
+                    <span>Load More Signatures</span>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
           
         </div>

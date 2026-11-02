@@ -1,8 +1,9 @@
 export interface NewsItem {
   id: string
   title: string
+  /** ISO 8601 string (e.g. "2026-08-15T10:00:00.000Z") for chronological sorting */
   date: string
-  category: 'Research' | 'Industry' | 'Academics' | 'Awards'
+  category: 'Research' | 'Industry' | 'Academics' | 'Awards' | 'Technical' | 'General'
   summary: string
   content: string
   author: string
@@ -12,27 +13,21 @@ export interface NewsItem {
   isPinned?: boolean
 }
 
+/** Utility to format an ISO 8601 news date into human-readable format e.g. "Aug 2026" */
+export function formatNewsDate(dateString: string): string {
+  if (!dateString) return ''
+  const parsed = new Date(dateString)
+  if (isNaN(parsed.getTime())) {
+    return dateString
+  }
+  return parsed.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+}
+
 export const initialNewsData: NewsItem[] = [
-  {
-    id: 'news-dsu-assistantship',
-    title: 'Appointed NYSC Research Assistant under Assoc. Prof. Jude Sinebe',
-    date: 'Sept 2025',
-    category: 'Research',
-    summary: 'Selected to join the Computer Science postgraduate research lab, investigating applied data science and software reliability.',
-    content: `I am profoundly honored to announce my appointment as a Research Assistant within the Department of Computer Science, serving under the esteemed mentorship of Associate Professor Jude Sinebe during my NYSC service year. This role represents a pivotal step in my academic and professional journey, allowing me to bridge the gap between theoretical computer science and practical, industry-standard software engineering.
-
-In this capacity, my primary research focus is directed towards computational intelligence, the rigorous evaluation of machine learning models, and advanced software quality assurance methodologies. We are currently investigating how data-driven paradigms can be leveraged to improve the reliability and fault-tolerance of complex software systems.
-
-Working in the postgraduate research lab provides an intellectually stimulating environment where I collaborate on empirical data analysis, algorithm optimization, and technical documentation. I am actively involved in developing script pipelines for data processing and assisting in the preparation of research manuscripts for peer-reviewed journals. This assistantship not only hones my technical acumen but also reinforces my commitment to advancing the frontiers of applied artificial intelligence and intelligent computing.`,
-    author: 'Quadri Ayomikun Amoo',
-    readTime: '2 min read',
-    tags: ['Research Assistantship', 'Computer Science', 'Assoc. Prof. Jude Sinebe', 'AI'],
-    isPinned: true
-  },
   {
     id: 'news-cleanreport-launch',
     title: 'CleanReport Civic-Tech PWA Successfully Deployed at Circo Digital Academy',
-    date: 'August 2026',
+    date: '2026-08-15T10:00:00.000Z',
     category: 'Industry',
     summary: 'As sole frontend engineer on the 5-member team, I built CleanReport—a civic sanitation PWA supporting offline issue queueing and real-time map pinning.',
     content: `I am thrilled to share the successful deployment of CleanReport, a civic-technology sanitation platform developed during the intensive 8-week Orange Internship Programme at Circo Digital Academy. Serving as the sole frontend engineer in a dynamic, cross-functional team of five, I was tasked with architecture and building a robust, highly accessible user interface that empowers citizens to report environmental hazards seamlessly.
@@ -46,9 +41,25 @@ Additionally, I integrated the HTML5 Geolocation API and interactive mapping too
     isPinned: true
   },
   {
+    id: 'news-dsu-assistantship',
+    title: 'Appointed NYSC Research Assistant under Assoc. Prof. Jude Sinebe',
+    date: '2025-09-01T09:00:00.000Z',
+    category: 'Research',
+    summary: 'Selected to join the Computer Science postgraduate research lab, investigating applied data science and software reliability.',
+    content: `I am profoundly honored to announce my appointment as a Research Assistant within the Department of Computer Science, serving under the esteemed mentorship of Associate Professor Jude Sinebe during my NYSC service year. This role represents a pivotal step in my academic and professional journey, allowing me to bridge the gap between theoretical computer science and practical, industry-standard software engineering.
+
+In this capacity, my primary research focus is directed towards computational intelligence, the rigorous evaluation of machine learning models, and advanced software quality assurance methodologies. We are currently investigating how data-driven paradigms can be leveraged to improve the reliability and fault-tolerance of complex software systems.
+
+Working in the postgraduate research lab provides an intellectually stimulating environment where I collaborate on empirical data analysis, algorithm optimization, and technical documentation. I am actively involved in developing script pipelines for data processing and assisting in the preparation of research manuscripts for peer-reviewed journals. This assistantship not only hones my technical acumen but also reinforces my commitment to advancing the frontiers of applied artificial intelligence and intelligent computing.`,
+    author: 'Quadri Ayomikun Amoo',
+    readTime: '2 min read',
+    tags: ['Research Assistantship', 'Computer Science', 'Assoc. Prof. Jude Sinebe', 'AI'],
+    isPinned: true
+  },
+  {
     id: 'news-best-graduating-awards',
     title: 'Awarded 4 Best Graduating Student Subject Honors at First Technical University',
-    date: 'Sept 2024',
+    date: '2024-09-15T12:00:00.000Z',
     category: 'Awards',
     summary: 'Graduated in the Top 10% of Software Engineering class with a 4.45/5.00 Final CGPA and top marks in Operating Systems, HCI, SE Practice, and Data Structures.',
     content: `It is with immense gratitude and pride that I reflect on my graduation from First Technical University (now Abiola Ajimobi Technical University), where I was honored to receive the Best Graduating Student award in four core software engineering disciplines. Achieving a 4.45/5.00 Final CGPA (Second-Class Upper Honors) and graduating in the Top 10% of my class was the culmination of years of rigorous academic discipline and a deep-seated passion for computer science.
@@ -58,7 +69,7 @@ The four subject honors I received encompass critical areas of software engineer
 These accolades are not just a reflection of academic grades, but a validation of my problem-solving methodology, algorithmic thinking, and dedication to continuous learning. I extend my deepest appreciation to my lecturers, mentors, and peers who challenged and inspired me throughout this journey. As I transition further into the tech industry and advanced research, these foundational pillars will continue to guide my approach to engineering intelligent, high-performance systems.`,
     author: 'Quadri Ayomikun Amoo',
     readTime: '2 min read',
-    tags: ['4.45 Final CGPA', 'Best Graduating Student', 'Academic Honors'],
+    tags: ['Academic Excellence', 'Subject Honors', 'Valedictory', 'Top 10%'],
     isPinned: false
   }
 ]

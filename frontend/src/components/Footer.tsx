@@ -137,6 +137,10 @@ export const Footer: React.FC = () => {
                   </button>
                 </form>
 
+                <p className="text-[10px] text-[var(--color-primary-text)]/75 mt-1.5 leading-tight font-mono">
+                  By subscribing, you agree to receive research & project releases. Unsubscribe anytime via one-click link.
+                </p>
+
                 {subscribeMsg && (
                   <p className={`text-xs font-mono font-bold flex items-center gap-1.5 mt-2 ${subscribed ? 'text-[var(--color-primary-text)]' : 'text-red-300'}`}>
                     {subscribed && <CheckCircle2 className="w-3.5 h-3.5" />}

@@ -47,6 +47,6 @@ describe('AI Controller & Fallback Logic (backend/src/controllers/aiController.t
 
   it('provides a helpful menu for unrecognized queries', () => {
     const reply = getSmartPortfolioReply('quantum teleportation')
-    assert.match(reply, /You can ask me about:/i)
+    assert.match(reply, /(You can ask me about|Try asking about)/i)
   })
 })

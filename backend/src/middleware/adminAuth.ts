@@ -14,7 +14,7 @@ import { env } from '../config/env.js'
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 8 // 8 hours
 
 const getSecret = (): string =>
-  env.ADMIN_TOKEN_SECRET || env.ADMIN_PASSWORD || ''
+  process.env.ADMIN_TOKEN_SECRET || env.ADMIN_TOKEN_SECRET || process.env.ADMIN_PASSWORD || env.ADMIN_PASSWORD || ''
 
 const sign = (payload: string, secret: string): string =>
   crypto.createHmac('sha256', secret).update(payload).digest('base64url')
@@ -25,11 +25,13 @@ const safeEqual = (a: string, b: string): boolean => {
   return crypto.timingSafeEqual(ha, hb)
 }
 
-export const isAdminConfigured = (): boolean =>
-  Boolean(env.ADMIN_PASSWORD && env.ADMIN_PASSWORD.trim().length > 0)
+export const isAdminConfigured = (): boolean => {
+  const pwd = process.env.ADMIN_PASSWORD || env.ADMIN_PASSWORD
+  return Boolean(pwd && pwd.trim().length > 0)
+}
 
 export const checkAdminPassword = (input: unknown): boolean => {
-  const expected = env.ADMIN_PASSWORD
+  const expected = process.env.ADMIN_PASSWORD || env.ADMIN_PASSWORD
   if (!expected || typeof input !== 'string') return false
   return safeEqual(input, expected)
 }

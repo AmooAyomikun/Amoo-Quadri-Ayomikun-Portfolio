@@ -4,7 +4,7 @@ import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { Badge } from '../components/Badge'
 import { ArrowLeft, Calendar, Clock } from 'lucide-react'
-import { initialNewsData, type NewsItem } from '../content/newsData'
+import { initialNewsData, formatNewsDate, type NewsItem } from '../content/newsData'
 import { apiUrl } from '../lib/api'
 import { SEO } from '../components/SEO'
 
@@ -93,7 +93,7 @@ export default function NewsArticlePage() {
               By {news.author}
             </span>
             <span className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" /> {news.date}
+              <Calendar className="w-4 h-4" /> {formatNewsDate(news.date)}
             </span>
             <span className="flex items-center gap-2">
               <Clock className="w-4 h-4" /> {news.readTime}

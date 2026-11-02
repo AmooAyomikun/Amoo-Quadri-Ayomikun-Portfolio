@@ -23,6 +23,13 @@ describe('News Data (frontend/src/content/newsData.ts)', () => {
       expect(article.author).toBe('Quadri Ayomikun Amoo')
       expect(Array.isArray(article.tags)).toBe(true)
       expect(article.tags.length).toBeGreaterThan(0)
+      expect(new Date(article.date).getTime()).not.toBeNaN()
     }
+  })
+
+  it('formats ISO dates into human-readable strings via formatNewsDate', async () => {
+    const { formatNewsDate } = await import('../content/newsData')
+    expect(formatNewsDate('2026-08-15T10:00:00.000Z')).toBe('Aug 2026')
+    expect(formatNewsDate('2025-09-01T00:00:00.000Z')).toBe('Sep 2025')
   })
 })

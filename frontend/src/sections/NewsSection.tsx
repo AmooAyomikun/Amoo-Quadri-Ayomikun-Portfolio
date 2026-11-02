@@ -6,7 +6,7 @@ import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { AnimatedWords } from '../components/AnimatedWords'
 import { apiUrl, getAdminToken, setAdminToken } from '../lib/api'
-import { initialNewsData, type NewsItem } from '../content/newsData'
+import { initialNewsData, formatNewsDate, type NewsItem } from '../content/newsData'
 
 export type { NewsItem }
 
@@ -170,7 +170,7 @@ export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & 
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <Badge variant="primary" size="sm">{item.category}</Badge>
                   <span className="text-xs font-mono text-[var(--color-text-subtle)] flex items-center gap-1">
-                    <Calendar className="w-3 h-3" /> {item.date}
+                    <Calendar className="w-3 h-3" /> {formatNewsDate(item.date)}
                   </span>
                 </div>
 
@@ -225,7 +225,7 @@ export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & 
                   </h3>
                   <div className="flex items-center gap-4 text-xs font-mono text-[var(--color-text-subtle)] mt-1">
                     <span>By {selectedNews.author}</span>
-                    <span>• {selectedNews.date}</span>
+                    <span>• {formatNewsDate(selectedNews.date)}</span>
                     <span>• {selectedNews.readTime}</span>
                   </div>
                 </div>
