@@ -9,7 +9,7 @@ export const cvData = {
     googleScholar: "https://scholar.google.com/citations?hl=en&user=e9bX70kAAAAJ",
     linkedIn: "http://www.linkedin.com/in/ayomikun-amoo-6b836428b",
     github: "https://github.com/AmooAyomikun",
-    summary: "A highly motivated Software Engineering graduate with a 5.0/5.0 Major GPA and hands-on experience in software development, research, and industry projects. Committed to building an impactful career at the intersection of software engineering, artificial intelligence, data-driven systems, and intelligent computing.",
+    summary: "A highly motivated Software Engineering graduate with a strong academic record (4.45/5.00 Final CGPA, Second-Class Upper Honors, Top 10% of class) and hands-on experience in software development, research, and industry projects. Committed to building an impactful career at the intersection of software engineering, artificial intelligence, data-driven systems, and intelligent computing.",
     researchInterests: [
       "Applied Data Science",
       "Artificial Intelligence",
@@ -28,7 +28,7 @@ export const cvData = {
       location: "Ibadan, Nigeria",
       degree: "Bachelor of Science (B.Sc.) in Software Engineering",
       period: "2021 – 2024",
-      majorGpa: "5.0 / 5.0",
+      peakTermGpa: "5.0 / 5.0 (Single Term Peak)",
       finalCgpa: "4.45 / 5.00 (Equivalent to 3.56/4.00 and 89%)",
       honors: "Second-Class Honors (Upper Division), Top 10% of Graduating Class",
       awards: [
@@ -67,7 +67,7 @@ export const cvData = {
       role: "Research Assistant (NYSC)",
       institution: "Department of Computer Science / Postgraduate Research Lab",
       period: "Sept. 2025 – Sept. 2026",
-      supervisor: "Prof. Jude Sinebe",
+      supervisor: "Assoc. Prof. Jude Sinebe",
       highlights: [
         "Supported research activities applying computer science, software engineering, AI, and data-driven methods to complex problems.",
         "Contributed to data analysis, computational problem solving, literature review, technical documentation, and research findings interpretation.",

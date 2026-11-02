@@ -7,6 +7,7 @@ import { PenTool, CheckCircle, RefreshCw, AlertCircle } from 'lucide-react'
 import { apiUrl } from '../lib/api'
 import { useTheme } from '../lib/theme'
 import { SEO } from '../components/SEO'
+import { GuestbookHero } from '../components/PageHeroes'
 
 interface GuestbookEntry {
   id: string
@@ -147,21 +148,8 @@ export default function GuestbookPage() {
       />
       <Navbar />
       
-      <main className="pt-32 pb-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
-        <div ref={headerRef} className="mb-16">
-          <span className="text-xs font-mono uppercase tracking-widest font-semibold text-[var(--color-primary)] mb-4 block">
-            Leave Your Mark
-          </span>
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-[var(--color-text-main)] tracking-tight mb-4">
-            Guestbook
-          </h1>
-          <p className="text-[var(--color-text-muted)] max-w-2xl leading-relaxed">
-            I appreciate you stopping by! Drop a message, draw a signature, or just say hello. 
-            This is a permanent digital record of awesome people who visited my portfolio.
-          </p>
-        </div>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-28 sm:pb-32">
+        <GuestbookHero />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           

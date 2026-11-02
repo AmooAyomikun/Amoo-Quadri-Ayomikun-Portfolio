@@ -37,8 +37,8 @@ export default function CaseStudyHotel() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] mb-10">
             <div>
-              <div className="text-xs font-mono text-[var(--color-text-subtle)] uppercase">Grade</div>
-              <div className="text-sm font-bold text-[var(--color-primary)]">5.0 / 5.0 Major GPA</div>
+              <div className="text-xs font-mono text-[var(--color-text-subtle)] uppercase">Evaluation</div>
+              <div className="text-sm font-bold text-[var(--color-primary)]">Distinction / Approved</div>
             </div>
             <div>
               <div className="text-xs font-mono text-[var(--color-text-subtle)] uppercase">Supervisor</div>

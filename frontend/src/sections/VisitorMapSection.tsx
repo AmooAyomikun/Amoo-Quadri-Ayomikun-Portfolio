@@ -219,76 +219,91 @@ export const VisitorMapSection: React.FC = () => {
       }
 
       // Issue 4.5: Deduplicate logging per session using sessionStorage
-      const isAlreadyLogged = sessionStorage.getItem(SESSION_KEY) === 'true';
+      let retryTimer: ReturnType<typeof setTimeout> | null = null;
 
-      try {
-        if (isAlreadyLogged) {
-          // Already logged during this browser session; fetch current stats via GET /api/visitors
-          setConnectionStatus('connecting');
-          const res = await fetch(apiUrl('/api/visitors'), { signal: AbortSignal.timeout(5000) });
-          if (res.ok) {
-            const json = await res.json();
-            if (isMounted) {
-              setConnectionStatus('connected');
-              const countryCount = country ? (json.countryStats?.[country] || findCountryCount(country, json.countryStats) || 1) : 1;
-              setData(prev => ({
-                ...prev,
-                userCountry: country || prev.userCountry || 'UNKNOWN',
-                userCountryCode: countryCode || prev.userCountryCode,
-                userCity: city || prev.userCity,
-                userCountryCount: countryCount,
-                totalVisitors: typeof json.total === 'number' ? json.total : prev.totalVisitors,
-                topCountries: Array.isArray(json.topCountries) ? json.topCountries : prev.topCountries,
-                countryStats: json.countryStats || prev.countryStats,
-                locations: Array.isArray(json.locations) ? json.locations : prev.locations
-              }));
+      const syncWithBackend = async (isRetry = false) => {
+        const isAlreadyLogged = sessionStorage.getItem(SESSION_KEY) === 'true';
+
+        try {
+          if (isAlreadyLogged) {
+            // Already logged during this browser session; fetch current stats via GET /api/visitors
+            setConnectionStatus('connecting');
+            const res = await fetch(apiUrl('/api/visitors'), { signal: AbortSignal.timeout(5000) });
+            if (res.ok) {
+              const json = await res.json();
+              if (isMounted) {
+                setConnectionStatus('connected');
+                const countryCount = country ? (json.countryStats?.[country] || findCountryCount(country, json.countryStats) || 1) : 1;
+                setData(prev => ({
+                  ...prev,
+                  userCountry: country || prev.userCountry || 'UNKNOWN',
+                  userCountryCode: countryCode || prev.userCountryCode,
+                  userCity: city || prev.userCity,
+                  userCountryCount: countryCount,
+                  totalVisitors: typeof json.total === 'number' ? json.total : prev.totalVisitors,
+                  topCountries: Array.isArray(json.topCountries) ? json.topCountries : prev.topCountries,
+                  countryStats: json.countryStats || prev.countryStats,
+                  locations: Array.isArray(json.locations) ? json.locations : prev.locations
+                }));
+              }
+            } else {
+              if (isMounted) {
+                setConnectionStatus('offline');
+                if (!isRetry) retryTimer = setTimeout(() => syncWithBackend(true), 3000);
+              }
             }
           } else {
-            if (isMounted) setConnectionStatus('offline');
+            // First visit in this session: log visitor via POST /api/visitors/log
+            setConnectionStatus('connecting');
+            const logPayload = clientGeo ? {
+              country: clientGeo.country,
+              countryCode: clientGeo.country_code,
+              city: clientGeo.city,
+              lat,
+              lon
+            } : {};
+
+            const res = await fetch(apiUrl('/api/visitors/log'), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(logPayload),
+              signal: AbortSignal.timeout(6000)
+            });
+
+            if (res.ok) {
+              const json = await res.json();
+              sessionStorage.setItem(SESSION_KEY, 'true');
+              if (isMounted && json.success) {
+                setConnectionStatus('connected');
+                setData(prev => ({
+                  ...prev,
+                  userCountry: json.userCountry || country || 'UNKNOWN',
+                  userCountryCode: json.userCountryCode || countryCode,
+                  userCity: json.userCity || city,
+                  userCountryCount: json.userCountryCount || 1,
+                  totalVisitors: json.totalVisitors || 1,
+                  topCountries: Array.isArray(json.topCountries) ? json.topCountries : [],
+                  countryStats: json.countryStats || {},
+                  locations: Array.isArray(json.locations) ? json.locations : []
+                }));
+              }
+            } else {
+              if (isMounted) {
+                setConnectionStatus('offline');
+                if (!isRetry) retryTimer = setTimeout(() => syncWithBackend(true), 3000);
+              }
+            }
           }
-        } else {
-          // First visit in this session: log visitor via POST /api/visitors/log
-          setConnectionStatus('connecting');
-          const logPayload = clientGeo ? {
-            country: clientGeo.country,
-            countryCode: clientGeo.country_code,
-            city: clientGeo.city,
-            lat,
-            lon
-          } : {};
-
-          const res = await fetch(apiUrl('/api/visitors/log'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(logPayload),
-            signal: AbortSignal.timeout(6000)
-          });
-
-          if (res.ok) {
-            const json = await res.json();
-            sessionStorage.setItem(SESSION_KEY, 'true');
-            if (isMounted && json.success) {
-              setConnectionStatus('connected');
-              setData(prev => ({
-                ...prev,
-                userCountry: json.userCountry || country || 'UNKNOWN',
-                userCountryCode: json.userCountryCode || countryCode,
-                userCity: json.userCity || city,
-                userCountryCount: json.userCountryCount || 1,
-                totalVisitors: json.totalVisitors || 1,
-                topCountries: Array.isArray(json.topCountries) ? json.topCountries : [],
-                countryStats: json.countryStats || {},
-                locations: Array.isArray(json.locations) ? json.locations : []
-              }));
-            }
-          } else {
-            if (isMounted) setConnectionStatus('offline');
+        } catch (err) {
+          console.warn('Visitor sync note:', err);
+          if (isMounted) {
+            setConnectionStatus('offline');
+            if (!isRetry) retryTimer = setTimeout(() => syncWithBackend(true), 3000);
           }
         }
-      } catch (err) {
-        console.warn('Visitor sync note:', err);
-        if (isMounted) setConnectionStatus('offline');
-      }
+      };
+
+      syncWithBackend();
     };
 
     initDynamicGeolocation();
@@ -342,7 +357,7 @@ export const VisitorMapSection: React.FC = () => {
       }
 
       if (!reply) {
-        reply = "I am Quadri's AI Assistant! Ask me anything about Quadri's software engineering projects, AI research, 5.0/5.0 Major GPA, or how to get in touch.";
+        reply = "I am Quadri's AI Assistant! Ask me anything about Quadri's software engineering projects, AI research, academic background, or how to get in touch.";
       }
 
       setTerminalLogs(prev => {

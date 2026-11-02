@@ -101,10 +101,10 @@ export const portfolioData = {
     twitter: "https://x.com/ayomhykun",
     github: "https://github.com/AmooAyomikun",
     cvPdfUrl: "/Amoo_Quadri_CV.pdf",
-    bio: "I am a top-ranking Software Engineering graduate (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA, Second-Class Upper Honors, Top 10% of class) and dedicated Software Engineering & Applied AI Researcher. My work bridges academic research in intelligent computing, data-driven systems, and machine learning with production-grade full-stack and frontend engineering.",
+    bio: "I am a top-ranking Software Engineering graduate (4.45/5.00 Final CGPA, Second-Class Upper Honors, Top 10% of class) and dedicated Software Engineering & Applied AI Researcher. My work bridges academic research in intelligent computing, data-driven systems, and machine learning with production-grade full-stack and frontend engineering.",
     stats: [
-      { label: "Major GPA", value: "5.0 / 5.0", detail: "Abiola Ajimobi Technical Univ" },
       { label: "Final CGPA", value: "4.45 / 5.00", detail: "89% Equivalent (3.56/4.00)" },
+      { label: "Peak Term GPA", value: "5.0 / 5.0", detail: "Single-Term Peak Standing" },
       { label: "Graduating Class", value: "Top 10%", detail: "Second-Class Upper Honors" },
       { label: "Subject Awards", value: "4 Best Student", detail: "OS, HCI, SE Practice, Data Struct" },
       { label: "Tutor Reach", value: "350+ Students", detail: "Algorithms & Programming" },
@@ -130,7 +130,7 @@ export const portfolioData = {
       imageUrl: "/abiola-ajimobi-1.png",
       degree: "Bachelor of Science (B.Sc.) in Software Engineering",
       period: "2021 – 2024",
-      majorGpa: "5.0 / 5.0",
+      peakTermGpa: "5.0 / 5.0 (Single Term Peak)",
       finalCgpa: "4.45 / 5.00 (Equivalent to 3.56/4.00 and 89%)",
       honors: "Second-Class Honors (Upper Division), Top 10% of Graduating Class",
       awards: [
@@ -149,7 +149,7 @@ export const portfolioData = {
         "Research Methodology in Computer Science"
       ],
       highlights: [
-        "Achieved a perfect 5.0/5.0 Major GPA in core Software Engineering curriculum.",
+        "Maintained a 4.45/5.00 Final CGPA (Second-Class Upper, Top 10% of cohort) with a 5.0/5.0 single-term peak GPA.",
         "Graduated in the Top 10% of the class with 4 subject excellence awards.",
         "Thesis supervised by Dr. J.E.T. Akinsola on Location-Based Hotel Recommendation Systems."
       ]
@@ -176,7 +176,7 @@ export const portfolioData = {
       imageUrl: "/david-joel.png",
       degree: "Secondary School Education",
       period: "2013 – 2019",
-      highlights: ["Served as the Social Prefect.", "Graduated with excellent O-Level results."]
+      highlights: ["Pure Sciences and Mathematics curriculum focus.", "Senior Secondary Certificate Examination (WASSCE)."]
     }
   ] as EducationItem[],
 
@@ -187,10 +187,10 @@ export const portfolioData = {
       role: 'Research Assistant (NYSC)',
       institution: 'Department of Computer Science / Postgraduate Research Lab',
       period: 'Sept. 2025 – Sept. 2026',
-      supervisor: 'Prof. Jude Sinebe',
+      supervisor: 'Assoc. Prof. Jude Sinebe',
       location: 'Nigeria',
       focusArea: 'Applied Data Science, Machine Learning & Intelligent Software Systems',
-      abstract: 'Conducting empirical research under Prof. Jude Sinebe, exploring data-driven problem solving, AI computational models, literature analysis, and experimental evaluation of software reliability.',
+      abstract: 'Conducting empirical research under Assoc. Prof. Jude Sinebe, exploring data-driven problem solving, AI computational models, literature analysis, and experimental evaluation of software reliability.',
       contributions: [
         'Applied machine learning algorithms and software engineering methodologies to computational domain research.',
         'Executed quantitative data analysis, literature reviews, and technical research documentation.',
@@ -493,7 +493,7 @@ export const portfolioData = {
       ],
       technologies: ['React', 'Node.js', 'Express.js', 'PostgreSQL / PostGIS', 'Python', 'Geospatial Algorithms'],
       metrics: [
-        { label: 'Grade', value: '5.0 / 5.0 Thesis' },
+        { label: 'Defense', value: 'Distinction / Approved' },
         { label: 'Domain', value: 'Location-Aware Systems' }
       ],
       imageUrl: '/hotel_recommendation.png',
@@ -531,68 +531,7 @@ export const portfolioData = {
     }
   ] as ProjectItem[],
 
-  testimonials: [
-    {
-      id: 'prof-sinebe',
-      name: 'Prof. Jude Sinebe',
-      role: 'Professor & NYSC Research Supervisor',
-      organization: 'Department of Computer Science',
-      relationship: 'Research Supervisor (2025–2026)',
-      category: 'academic',
-      quote: 'Ayomikun possesses outstanding analytical rigor and technical precision. His ability to apply machine learning and software engineering methodology to intelligent computing research is exceptional for a young scholar.',
-      rating: 5,
-      avatarInitials: 'JS',
-      highlights: ['Applied Data Science', 'AI Research', 'Software Systems']
-    },
-    {
-      id: 'dr-akinsola',
-      name: 'Dr. J.E.T. Akinsola',
-      role: 'Senior Lecturer & B.Sc Thesis Supervisor',
-      organization: 'First Technical University, Ibadan',
-      relationship: 'B.Sc Thesis Supervisor & Academic Mentor',
-      category: 'academic',
-      quote: 'Quadri graduated with a perfect 5.0/5.0 Major GPA and top honors. His B.Sc. thesis on location-based recommendation systems demonstrated deep technical competence, rigorous empirical evaluation, and exemplary documentation.',
-      rating: 5,
-      avatarInitials: 'JA',
-      highlights: ['5.0/5.0 Major GPA', 'Recommendation Systems', 'Academic Excellence']
-    },
-    {
-      id: 'circo-lead',
-      name: 'Circo Digital Academy Lead',
-      role: 'Orange Internship Product Lead',
-      organization: 'Circo Digital Academy',
-      relationship: 'Frontend Team Lead Supervisor (2026)',
-      category: 'industry',
-      quote: 'Ayomikun served as the sole frontend developer for CleanReport. He designed and built a seamless, PWA-enabled civic-tech platform with offline capabilities, responsive UI, map integration, and flawless performance.',
-      rating: 5,
-      avatarInitials: 'CD',
-      highlights: ['CleanReport PWA', 'React & TypeScript', 'Civic Tech Lead']
-    },
-    {
-      id: 'codealpha-mentor',
-      name: 'CodeAlpha Technical Team',
-      role: 'Full Stack Internship Coordinator',
-      organization: 'CodeAlpha',
-      relationship: 'Full Stack Internship Supervisor (2026)',
-      category: 'industry',
-      quote: 'Quadri delivered clean, modular full-stack web applications ahead of deadlines. His DRY coding practices, REST API integrations, and problem-solving skills made him stand out among tech interns.',
-      rating: 5,
-      avatarInitials: 'CA',
-      highlights: ['Full-Stack Engineering', 'DRY Clean Code', 'REST API Architecture']
-    },
-    {
-      id: 'coast-tech-lead',
-      name: 'Coast Research Technology Lead',
-      role: 'Managing Director & Lead Data Analyst',
-      organization: 'Coast Research Technology, Ibadan',
-      relationship: 'SIWES Data Analyst Supervisor (2023)',
-      category: 'both',
-      quote: 'Ayomikun developed 10 machine learning models for financial analytics, boosting prediction accuracy by 25%. His churn prediction model and Tableau dashboard visualizations provided critical business insights.',
-      rating: 5,
-      avatarInitials: 'CR',
-      highlights: ['ML Model Development', '+25% Accuracy Boost', 'Financial Data Analytics']
-    }
-  ] as TestimonialItem[],
+  testimonials: [] as TestimonialItem[],
 
   skills: {
     aiAndData: [

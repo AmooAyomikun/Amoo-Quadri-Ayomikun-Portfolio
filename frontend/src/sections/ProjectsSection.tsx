@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { portfolioData } from '../content/portfolioData'
 import { ProjectCard } from '../components/ProjectCard'
-
-const techLogos = ['react','typescript','javascript','nodedotjs','tailwindcss','nextdotjs/white','python','postgresql','mongodb','firebase','docker','git','figma','vite']
+import { ProjectsHero } from '../components/PageHeroes'
 
 export const ProjectsSection: React.FC = () => {
   const [filter, setFilter] = useState<string>('all')
@@ -41,37 +40,10 @@ export const ProjectsSection: React.FC = () => {
   const researchProjects = filteredProjects.filter(p => p.lens === 'research')
 
   return (
-    <section id="projects" className="py-6 sm:py-10 bg-[var(--color-surface-base)]">
+    <section id="projects" className="pb-6 sm:pb-10 bg-[var(--color-surface-base)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Hero */}
-        <header className="pt-14 sm:pt-20 pb-14 sm:pb-16 text-center">
-          <p className="text-xs font-mono tracking-[0.2em] uppercase text-[var(--color-primary)]">
-            Projects
-          </p>
-          <h1 className="mt-4 text-4xl sm:text-5xl font-sans font-bold tracking-tight text-[var(--color-text-main)]">
-            Selected Work
-          </h1>
-          <p className="mt-4 text-base sm:text-lg text-[var(--color-text-muted)] max-w-xl mx-auto">
-            Products I&apos;ve designed, built and shipped, plus a little research along the way.
-          </p>
-
-          <div className="mt-12 relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
-            <div className="flex w-max gap-12 animate-[marquee_40s_linear_infinite] hover:[animation-play-state:paused]">
-              {[...techLogos, ...techLogos].map((t, i) => (
-                <img
-                  key={i}
-                  src={`https://cdn.simpleicons.org/${t}`}
-                  alt={t}
-                  title={t}
-                  loading="lazy"
-                  className="h-7 w-7 opacity-70 hover:opacity-100 transition-opacity"
-                />
-              ))}
-            </div>
-          </div>
-          <style>{`@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
-        </header>
+        <ProjectsHero />
 
         {/* Tactile Category Filter Dock */}
         <div className="flex items-center justify-between gap-4 p-2 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] mb-12 shadow-xs overflow-hidden">

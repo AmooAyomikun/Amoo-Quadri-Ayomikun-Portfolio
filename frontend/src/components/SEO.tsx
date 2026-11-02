@@ -9,7 +9,7 @@ interface SEOProps {
 }
 
 const DEFAULT_TITLE = 'Quadri Ayomikun Amoo — Software Engineer & Researcher'
-const DEFAULT_DESC = 'Full-Stack Software Engineer & Machine Learning Researcher. B.Sc. Software Engineering (5.0/5.0 Major GPA, Second-Class Upper Honors). Explore projects, publications, and experience.'
+const DEFAULT_DESC = 'Full-Stack Software Engineer & Machine Learning Researcher. B.Sc. Software Engineering (4.45/5.00 Final CGPA, Second-Class Upper Honors, Top 10%). Explore projects, publications, and experience.'
 const SITE_URL = 'https://amoo-quadri.vercel.app'
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`
 

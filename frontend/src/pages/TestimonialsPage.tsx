@@ -25,10 +25,10 @@ export default function TestimonialsPage() {
         canonicalUrl="/testimonials"
       />
       <Navbar />
-      <main id="main-content" className="pt-28 pb-16">
+      <main id="main-content" className="w-full pb-28 sm:pb-32">
         
         {/* Header Banner */}
-        <div ref={headerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-b border-[var(--color-border)]">
+        <div ref={headerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 border-b border-[var(--color-border)]">
           <span className="text-xs font-mono uppercase tracking-widest font-semibold text-[var(--color-primary)]">
             Supervisor Endorsements
           </span>

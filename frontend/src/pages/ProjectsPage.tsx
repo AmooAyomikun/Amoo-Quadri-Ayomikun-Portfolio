@@ -18,17 +18,15 @@ export default function ProjectsPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
+    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[#64ffda] selection:text-[#0a192f]">
       <SEO 
         title="Featured Projects & Architecture" 
         description="Explore real-world software engineering projects, system architectures, and case studies built by Quadri Ayomikun Amoo."
         canonicalUrl="/projects"
       />
       <Navbar />
-      <main id="main-content" className="pt-20 sm:pt-24 pb-16">
-        
+      <main id="main-content" className="w-full pb-28 sm:pb-32">
         <ProjectsSection />
-
       </main>
       <Footer />
     </div>

@@ -37,7 +37,7 @@
     "city": "Lagos",
     "lat": 6.4474,
     "lon": 3.3903,
-    "timestamp": "2026-10-27T22:49:08.053Z"
+    "timestamp": "2026-11-02T00:38:11.382Z"
   },
   {
     "id": "vis-1792577757540-ha4p",
@@ -48,5 +48,25 @@
     "lat": null,
     "lon": null,
     "timestamp": "2026-10-21T10:15:57.595Z"
+  },
+  {
+    "id": "vis-1793225758832-ltx3",
+    "ipHash": "2c4d56dfbd126850e6fe",
+    "country": "Unknown",
+    "countryCode": "UN",
+    "city": "Unknown",
+    "lat": null,
+    "lon": null,
+    "timestamp": "2026-10-28T22:15:58.832Z"
+  },
+  {
+    "id": "vis-1793485275816-r3x1",
+    "ipHash": "c8d346c6b9d6be698b02",
+    "country": "Nigeria",
+    "countryCode": "NG",
+    "city": "Unknown",
+    "lat": 10,
+    "lon": 8,
+    "timestamp": "2026-10-31T22:21:15.882Z"
   }
 ]

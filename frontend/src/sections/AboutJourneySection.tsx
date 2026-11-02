@@ -230,7 +230,7 @@ export const AboutJourneySection: React.FC = () => {
                 My journey into technology began with a deep curiosity for how software systems operate under the hood. That curiosity led me to pursue a degree in Software Engineering at <strong className="text-[var(--color-text-main)]">Abiola Ajimobi Technical University</strong>, where I recently graduated in the <strong className="text-[var(--color-primary)]">Top 10% of my class</strong> with Second-Class Upper Honors.
               </p>
               <p className="text-[var(--color-text-muted)] text-xs sm:text-base leading-relaxed">
-                During my studies, I maintained a <strong className="text-[var(--color-text-main)]">4.45 / 5.00 Final CGPA</strong> alongside a perfect <strong className="text-[var(--color-primary)]">5.0 / 5.0 Major GPA</strong>, earning four subject-specific excellence awards in Operating Systems, Human-Computer Interaction, Software Engineering Practice, and Data Structures.
+                During my studies, I maintained a <strong className="text-[var(--color-text-main)]">4.45 / 5.00 Final CGPA</strong> alongside a <strong className="text-[var(--color-primary)]">5.0 / 5.0 peak term GPA</strong>, earning four subject-specific excellence awards in Operating Systems, Human-Computer Interaction, Software Engineering Practice, and Data Structures.
               </p>
             </motion.div>
 
@@ -371,7 +371,7 @@ export const AboutJourneySection: React.FC = () => {
                 These Days
               </h3>
               <p className="text-[var(--color-text-muted)] text-xs sm:text-base leading-relaxed">
-                Currently, I serve as a Research Assistant under <strong className="text-[var(--color-text-main)]">Prof. Jude Sinebe</strong>, focusing on machine learning model validation, data-driven systems, and software reliability. When I&apos;m not writing code or evaluating models, I&apos;m publishing academic research and building open-source web tools.
+                Currently, I serve as a Research Assistant under <strong className="text-[var(--color-text-main)]">Assoc. Prof. Jude Sinebe</strong>, focusing on machine learning model validation, data-driven systems, and software reliability. When I&apos;m not writing code or evaluating models, I&apos;m publishing academic research and building open-source web tools.
               </p>
               <p className="text-[var(--color-text-muted)] text-xs sm:text-base leading-relaxed">
                 Looking ahead, I am actively seeking <strong className="text-[var(--color-primary)]">postgraduate (MSc / PhD) placements</strong> and scholarship opportunities where I can dive deeper into Applied Artificial Intelligence, Natural Language Processing, and intelligent software engineering alongside world-class faculty.

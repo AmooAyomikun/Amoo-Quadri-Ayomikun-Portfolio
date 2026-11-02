@@ -11,14 +11,14 @@ describe('AI Controller & Fallback Logic (backend/src/controllers/aiController.t
   it('handles about / bio queries', () => {
     const reply = getSmartPortfolioReply('about')
     assert.match(reply, /Quadri Ayomikun Amoo/i)
-    assert.match(reply, /5.0\/5.0 Major GPA/i)
+    assert.match(reply, /4\.45\/5\.00 Final CGPA/i)
   })
 
   it('handles education queries with accurate degree classification', () => {
     const reply = getSmartPortfolioReply('where did he study?')
     assert.match(reply, /Abiola Ajimobi Technical University/i)
     assert.match(reply, /Second-Class Upper Honors/i)
-    assert.match(reply, /5.0\/5.0 Major GPA/i)
+    assert.match(reply, /4\.45\/5\.00 Final CGPA/i)
   })
 
   it('handles skills queries', () => {

@@ -10,7 +10,7 @@ import { initialNewsData, type NewsItem } from '../content/newsData'
 
 export type { NewsItem }
 
-export const NewsSection: React.FC = () => {
+export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & Announcements' }) => {
   const [newsList, setNewsList] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null)
@@ -132,7 +132,7 @@ export const NewsSection: React.FC = () => {
               <Newspaper className="w-4 h-4" /> Latest Updates & Articles
             </span>
             <h2 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--color-text-main)] mt-1">
-              <AnimatedWords text="News & Announcements" />
+              <AnimatedWords text={heading} />
             </h2>
           </div>
 

@@ -1,11 +1,12 @@
 import React from 'react'
 import { BookOpen, ExternalLink, Activity, FileText, Trophy } from 'lucide-react'
 import { portfolioData } from '../content/portfolioData'
+import { AnimatedCounter } from '../components/AnimatedCounter'
 
 export const ResearchSection: React.FC = () => {
   return (
-    <section id="research" className="py-12 bg-[var(--color-surface-base)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <section id="research" className="py-6 sm:py-10 bg-transparent">
+      <div className="w-full space-y-12">
         
         {/* Research Focus - Redesigned to be unique */}
         <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-start py-8">
@@ -22,12 +23,12 @@ export const ResearchSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Unified Metrics Panel (Redesigned from 4 separate cards) */}
+        {/* Unified Metrics Panel with Smooth Animated Counters */}
         <div className="bg-[var(--color-surface-card)] rounded-3xl border border-[var(--color-border)] shadow-sm overflow-hidden">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[var(--color-border)]">
             
             <div className="p-8 sm:p-10 flex flex-col items-center justify-center text-center hover:bg-[var(--color-surface-elevated)] transition-colors">
-              <div className="text-5xl sm:text-6xl font-sans font-black text-[var(--color-primary)] mb-3">2</div>
+              <AnimatedCounter value={2} className="text-5xl sm:text-6xl font-sans font-black text-[var(--color-primary)] mb-3 block" />
               <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[var(--color-text-main)] uppercase tracking-widest">
                 <BookOpen className="w-4 h-4 text-[var(--color-text-muted)]" />
                 Publications
@@ -35,7 +36,7 @@ export const ResearchSection: React.FC = () => {
             </div>
 
             <div className="p-8 sm:p-10 flex flex-col items-center justify-center text-center hover:bg-[var(--color-surface-elevated)] transition-colors">
-              <div className="text-5xl sm:text-6xl font-sans font-black text-[var(--color-primary)] mb-3">1</div>
+              <AnimatedCounter value={1} className="text-5xl sm:text-6xl font-sans font-black text-[var(--color-primary)] mb-3 block" />
               <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[var(--color-text-main)] uppercase tracking-widest">
                 <FileText className="w-4 h-4 text-[var(--color-text-muted)]" />
                 B.Sc Thesis
@@ -43,9 +44,7 @@ export const ResearchSection: React.FC = () => {
             </div>
 
             <div className="p-8 sm:p-10 flex flex-col items-center justify-center text-center hover:bg-[var(--color-surface-elevated)] transition-colors">
-              <div className="text-5xl sm:text-6xl font-sans font-black text-[var(--color-primary)] mb-3">
-                10<span className="text-3xl sm:text-4xl text-[var(--color-primary)]/70">+</span>
-              </div>
+              <AnimatedCounter value={10} suffix="+" className="text-5xl sm:text-6xl font-sans font-black text-[var(--color-primary)] mb-3 block" />
               <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[var(--color-text-main)] uppercase tracking-widest">
                 <Activity className="w-4 h-4 text-[var(--color-text-muted)]" />
                 ML Models
@@ -53,7 +52,7 @@ export const ResearchSection: React.FC = () => {
             </div>
 
             <div className="p-8 sm:p-10 flex flex-col items-center justify-center text-center hover:bg-[var(--color-surface-elevated)] transition-colors">
-              <div className="text-5xl sm:text-6xl font-sans font-black text-[var(--color-primary)] mb-3">4</div>
+              <AnimatedCounter value={4} className="text-5xl sm:text-6xl font-sans font-black text-[var(--color-primary)] mb-3 block" />
               <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[var(--color-text-main)] uppercase tracking-widest">
                 <Trophy className="w-4 h-4 text-[var(--color-text-muted)]" />
                 Awards

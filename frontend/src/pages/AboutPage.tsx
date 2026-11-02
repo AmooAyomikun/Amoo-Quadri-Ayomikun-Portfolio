@@ -19,31 +19,31 @@ export default function AboutPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
+    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[#64ffda] selection:text-[#0a192f]">
       <SEO 
         title="About & Biography" 
-        description="Learn about Quadri Ayomikun Amoo, his background in Software Engineering (5.0/5.0 Major GPA), research philosophy, and engineering mindset."
+        description="Learn about Quadri Ayomikun Amoo, his background in Software Engineering (4.45/5.00 Final CGPA, Top 10%), research philosophy, and engineering mindset."
         canonicalUrl="/about"
       />
       <Navbar />
-      <main id="main-content" className="pt-28 pb-16">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-28 sm:pb-32">
         
         {/* Page Hero Header */}
-        <div ref={headerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div ref={headerRef} className="py-10 sm:py-14 border-b border-[var(--color-border)]">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             <div className="lg:col-span-8 space-y-4">
               <span className="text-xs font-mono uppercase tracking-widest font-semibold text-[var(--color-primary)]">
-                About & Statement of Purpose
+                About &amp; Statement of Purpose
               </span>
               <h1 className="text-3xl sm:text-5xl font-serif font-bold text-[var(--color-text-main)] tracking-tight">
                 Quadri Ayomikun Amoo
               </h1>
               <p className="text-lg text-[var(--color-primary)] font-serif italic font-semibold">
-                Software Engineering Scholar & Research Assistant
+                Software Engineering Scholar &amp; Research Assistant
               </p>
-              <p className="text-base text-[var(--color-text-muted)] leading-relaxed max-w-2xl">
-                Graduated in the Top 10% of class with a B.Sc. in Software Engineering (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA, Second-Class Upper Honors). Currently focused on postgraduate research in applied artificial intelligence, software reliability, and intelligent computing.
+              <p className="text-base text-[var(--color-text-muted)] leading-relaxed max-w-2xl font-sans">
+                Graduated in the Top 10% of class with a B.Sc. in Software Engineering (4.45/5.00 Final CGPA, Second-Class Upper Honors). Currently focused on postgraduate research in applied artificial intelligence, software reliability, and intelligent computing under Assoc. Prof. Jude Sinebe.
               </p>
             </div>
 
@@ -60,7 +60,6 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Detailed About Content */}
         <AboutSection />
 
       </main>

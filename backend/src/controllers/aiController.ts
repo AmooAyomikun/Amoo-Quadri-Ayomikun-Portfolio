@@ -18,9 +18,9 @@ export const handleAiChat = async (req: Request, res: Response): Promise<void> =
 Answer concisely, professionally, and enthusiastically using the following accurate details about Quadri Ayomikun Amoo:
 Full Name: ${cvData.personalInfo.fullName}
 Title: ${cvData.personalInfo.title}
-Education: B.Sc. in Software Engineering (5.0/5.0 Major GPA, 4.45/5.00 Final CGPA, Second-Class Upper Honors, Top 10% of class) from Abiola Ajimobi Technical University. Diplomas in French (Lower Credit) and Entrepreneurship (Upper Credit).
+Education: B.Sc. in Software Engineering (4.45/5.00 Final CGPA, Second-Class Upper Honors, Top 10% of class, 5.0/5.0 peak term GPA) from Abiola Ajimobi Technical University. Diplomas in French (Lower Credit) and Entrepreneurship (Upper Credit).
 Main Goal: Pursue M.Sc. and Ph.D. research in Artificial Intelligence, Software Engineering, and Natural Language Processing.
-Research: AI for Software Engineering, Geospatial Recommender Systems (B.Sc. Thesis under Dr. J.E.T. Akinsola), Research Assistant (NYSC) under Prof. Jude Sinebe at Postgraduate Research Lab.
+Research: AI for Software Engineering, Geospatial Recommender Systems (B.Sc. Thesis under Dr. J.E.T. Akinsola), Research Assistant (NYSC) under Assoc. Prof. Jude Sinebe at Postgraduate Research Lab.
 Experience: Frontend Intern @ Circo Digital / Orange (CleanReport PWA), Full Stack Intern @ CodeAlpha, Data Analyst Intern @ Coast Research Tech (10 ML models in Python/SQL & Power BI).
 Teaching: Tutored ~350 undergraduate students weekly in Data Structures & Algorithms. NASSA Assistant Academic Support Officer (taught 100 students Math & Python).
 Awards: 4 Subject Honors (Operating Systems I, HCI, Software Engineering Professional Practice, Data Structures).
@@ -101,12 +101,12 @@ export function getSmartPortfolioReply(userPrompt: string): string {
   const isGreeting = /\b(yo|wassup|what's up|sup|hi|hello|hey|heyy|howdy|hola|good morning|good afternoon|good evening|how are you|how far|wagywan)\b/i.test(lower)
   
   if (isGreeting && !/\b(study|studied|school|gpa|cgpa|education|degree|where|research|thesis|project|projects|skill|skills|job|experience|contact|email|phone|goal|goals|vision|aim|award|awards|who|about)\b/i.test(lower)) {
-    return "Yo! What's up? 👋 I'm Quadri's AI Assistant. I'm doing great! Ask me anything about Quadri's software engineering projects, AI research, 5.0/5.0 Major GPA, education, or how to get in touch!"
+    return "Yo! What's up? 👋 I'm Quadri's AI Assistant. I'm doing great! Ask me anything about Quadri's software engineering projects, AI research, education & honors, or how to get in touch!"
   }
 
   // 2. EDUCATION / DEGREE / SCHOOL / UNIVERSITY / GPA / CGPA / STUDY / WHERE
   if (/\b(study|studied|where|education|degree|university|school|college|gpa|cgpa|major|french|entrepreneurship|diploma|honors|rank|class)\b/i.test(lower)) {
-    return `Quadri earned his B.Sc. in Software Engineering from Abiola Ajimobi Technical University (formerly First Technical University), Ibadan, graduating with a 5.0/5.0 Major GPA and 4.45/5.00 Final CGPA (Second-Class Upper Honors, Top 10% of class). He also holds Diplomas in French (Lower Credit) and Entrepreneurship (Upper Credit).`
+    return `Quadri earned his B.Sc. in Software Engineering from Abiola Ajimobi Technical University (formerly First Technical University), Ibadan, graduating with a 4.45/5.00 Final CGPA (Second-Class Upper Honors, Top 10% of class) and a 5.0/5.0 single-term peak GPA. He also holds Diplomas in French (Lower Credit) and Entrepreneurship (Upper Credit).`
   }
 
   // 3. GOALS / VISION / FUTURE / CAREER / AIM / PHD / MSC / SCHOLARSHIPS
@@ -121,12 +121,12 @@ export function getSmartPortfolioReply(userPrompt: string): string {
 
   // 5. IDENTITY / BIO / WHO IS QUADRI / ABOUT
   if (/\b(who|bio|summary|background|identity|intro|overview|about)\b/i.test(lower)) {
-    return `Quadri Ayomikun Amoo is a Software Engineering Researcher & Full-Stack Engineer with a 5.0/5.0 Major GPA (4.45/5.00 CGPA, Second-Class Upper Honors, Top 10%) from Abiola Ajimobi Technical University. He specializes in AI for Software Engineering, intelligent web systems (React, TypeScript, PWA, Node.js), and data analytics.`
+    return `Quadri Ayomikun Amoo is a Software Engineering Researcher & Full-Stack Engineer with a 4.45/5.00 Final CGPA (Second-Class Upper Honors, Top 10% of class) from Abiola Ajimobi Technical University. He specializes in AI for Software Engineering, intelligent web systems (React, TypeScript, PWA, Node.js), and data analytics.`
   }
 
   // 6. RESEARCH / THESIS / SUPERVISORS / PROF SINEBE / DR AKINSOLA / HOTEL RECOMMENDER
   if (/\b(research|thesis|supervisor|supervisors|sinebe|akinsola|hotel|recommender|geospatial|lab|publication|publications|scholar)\b/i.test(lower)) {
-    return `Quadri's research focuses on AI for Software Engineering and Intelligent Systems. His B.Sc. thesis under Dr. J.E.T. Akinsola developed a location-based hotel management & recommendation engine. He also served as Research Assistant (NYSC) under Prof. Jude Sinebe at the Postgraduate Research Lab.`
+    return `Quadri's research focuses on AI for Software Engineering and Intelligent Systems. His B.Sc. thesis under Dr. J.E.T. Akinsola developed a location-based hotel management & recommendation engine. He also served as Research Assistant (NYSC) under Assoc. Prof. Jude Sinebe at the Postgraduate Research Lab.`
   }
 
   // 7. INDUSTRIAL EXPERIENCE / JOBS / INTERNSHIPS / WORK / CIRCO / ORANGE / CODEALPHA / COAST RESEARCH
@@ -165,6 +165,6 @@ export function getSmartPortfolioReply(userPrompt: string): string {
   }
 
   // 14. DEFAULT FALLBACK RESPONSE
-  return `I am Quadri's AI Portfolio Assistant! Quadri Amoo is a top-ranking Software Engineering Graduate (5.0/5.0 Major GPA, Second-Class Upper Honors) specializing in AI, React, TypeScript, and Data Science.\n\nYou can ask me about:\n• Education & GPA (e.g., "where did he study", "awards")\n• Research & Thesis (e.g., "tell me about his thesis")\n• Projects & Work Experience (e.g., "what has he built", "internships")\n• Technical Skills (e.g., "what languages does he use")\n• Future Goals (e.g., "what are his goals")\n• Contact Details (e.g., "how can I hire or email Quadri")`
+  return `I am Quadri's AI Portfolio Assistant! Quadri Amoo is a top-ranking Software Engineering Graduate (4.45/5.00 Final CGPA, Second-Class Upper Honors, Top 10% of class) specializing in AI, React, TypeScript, and Data Science.\n\nYou can ask me about:\n• Education & Honors (e.g., "where did he study", "awards")\n• Research & Thesis (e.g., "tell me about his thesis")\n• Projects & Work Experience (e.g., "what has he built", "internships")\n• Technical Skills (e.g., "what languages does he use")\n• Future Goals (e.g., "what are his goals")\n• Contact Details (e.g., "how can I hire or email Quadri")`
 }
 

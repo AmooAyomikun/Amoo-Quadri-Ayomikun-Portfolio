@@ -4,7 +4,6 @@ import { Footer } from '../components/Footer'
 import { SocialSidebars } from '../components/SocialSidebars'
 import { HeroSection } from '../sections/HeroSection'
 import { AboutJourneySection } from '../sections/AboutJourneySection'
-import { TestimonialsSection } from '../sections/TestimonialsSection'
 import { NewsSection } from '../sections/NewsSection'
 import { ContactSection } from '../sections/ContactSection'
 import { GithubActivitySection } from '../sections/GithubActivitySection'
@@ -31,8 +30,6 @@ export default function Home() {
         <VisitorMapSection />
         
         <GithubActivitySection />
-
-        <TestimonialsSection />
 
         <NewsSection />
 

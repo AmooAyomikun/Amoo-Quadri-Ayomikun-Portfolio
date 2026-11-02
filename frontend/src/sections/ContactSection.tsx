@@ -6,7 +6,7 @@ import { Button } from '../components/Button'
 import { AnimatedWords } from '../components/AnimatedWords'
 import { apiUrl } from '../lib/api'
 
-export const ContactSection: React.FC = () => {
+export const ContactSection: React.FC<{ showHeader?: boolean }> = ({ showHeader = true }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -59,11 +59,12 @@ export const ContactSection: React.FC = () => {
   const mailtoFallbackUrl = `mailto:${portfolioData.personal.email}?subject=${encodeURIComponent(formData.subject || 'Portfolio Inquiry')}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nLens: ${formData.lens}\n\n${formData.message}`)}`
 
   return (
-    <section id="contact" className="py-16 sm:py-20 bg-[var(--color-surface-card)] relative overflow-hidden">
+    <section id="contact" className={`${showHeader ? 'py-16 sm:py-20 bg-[var(--color-surface-card)]' : 'pb-16 sm:pb-20 pt-4 bg-transparent'} relative overflow-hidden`}>
       <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20 relative z-10">
-        <div className="border-t border-[#233554] pt-12 sm:pt-16">
+        <div className={showHeader ? "border-t border-[#233554] pt-12 sm:pt-16" : ""}>
         
         {/* Header with animation */}
+        {showHeader && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -83,6 +84,7 @@ export const ContactSection: React.FC = () => {
             Whether you are discussing postgraduate research positions, academic scholarships, software engineering roles, or technical collaborations, I look forward to hearing from you.
           </p>
         </motion.div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           

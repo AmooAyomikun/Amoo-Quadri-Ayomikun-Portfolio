@@ -50,7 +50,7 @@ export default function App() {
             <Route path="/research" element={<ResearchPage />} />
             <Route path="/experience" element={<ExperiencePage />} />
             <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/testimonials" element={<TestimonialsPage />} />
+            <Route path="/testimonials" element={<Navigate to="/experience" replace />} />
             <Route path="/news" element={<NewsPage />} />
             <Route path="/news/:id" element={<NewsArticlePage />} />
             <Route path="/guestbook" element={<GuestbookPage />} />

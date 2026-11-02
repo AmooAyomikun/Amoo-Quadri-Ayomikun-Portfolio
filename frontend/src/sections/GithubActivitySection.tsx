@@ -50,8 +50,9 @@ export const GithubActivitySection: React.FC = () => {
   // Fetch real GitHub contribution graph from backend API
   useEffect(() => {
     let isMounted = true;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const fetchRealContributions = async () => {
+    const fetchRealContributions = async (isRetry = false) => {
       try {
         const res = await fetch(apiUrl(`/api/github-contributions?year=${selectedYear}`));
         if (res.ok) {
@@ -76,9 +77,14 @@ export const GithubActivitySection: React.FC = () => {
               daysMap: map
             });
           }
+        } else if (!isRetry && isMounted) {
+          retryTimer = setTimeout(() => fetchRealContributions(true), 2500);
         }
       } catch (err) {
         console.warn('Real GitHub contribution fetch fallback active:', err);
+        if (!isRetry && isMounted) {
+          retryTimer = setTimeout(() => fetchRealContributions(true), 2500);
+        }
       }
     };
 
@@ -86,6 +92,7 @@ export const GithubActivitySection: React.FC = () => {
 
     return () => {
       isMounted = false;
+      if (retryTimer) clearTimeout(retryTimer);
     };
   }, [selectedYear]);
 

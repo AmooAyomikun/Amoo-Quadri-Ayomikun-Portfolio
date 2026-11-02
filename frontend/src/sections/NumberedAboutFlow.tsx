@@ -42,10 +42,10 @@ export const NumberedAboutFlow: React.FC = () => {
       icon: <GraduationCap className="w-4 h-4 shrink-0" />,
       textHtml: (
         <>
-          I recently graduated in the top 10% of my cohort with a <strong>B.Sc. in Software Engineering (Second-Class Honors, Upper Division)</strong> from Abiola Ajimobi Technical University. During my studies, I maintained a <strong>4.45 / 5.00 Final CGPA</strong> alongside a perfect <strong>5.0/5.0 Major GPA</strong>, and earned four subject-specific excellence awards (including OS and Data Structures). I also broadened my skill set by completing diplomas in both French and Entrepreneurship.
+          I recently graduated in the top 10% of my cohort with a <strong>B.Sc. in Software Engineering (Second-Class Honors, Upper Division)</strong> from Abiola Ajimobi Technical University. During my studies, I maintained a <strong>4.45 / 5.00 Final CGPA</strong> alongside a <strong>5.0 / 5.0 peak term GPA</strong>, and earned four subject-specific excellence awards (including OS and Data Structures). I also broadened my skill set by completing diplomas in both French and Entrepreneurship.
         </>
       ),
-      highlights: ['4.45 / 5.00 CGPA', '5.0/5.0 Major GPA', '4 Subject Excellence Awards']
+      highlights: ['4.45 / 5.00 CGPA', 'Top 10% Cohort', '4 Subject Excellence Awards']
     },
     {
       num: '03',

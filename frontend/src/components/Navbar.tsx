@@ -58,17 +58,39 @@ export const Navbar: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode])
 
-  // Collapse the name banner into a monogram once the user scrolls
+  // Sticky hide-on-scroll header logic
+  const [isVisible, setIsVisible] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
+
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 60)
+    let lastScrollY = window.scrollY
+
+    const onScroll = () => {
+      const currentScrollY = window.scrollY
+      setIsScrolled(currentScrollY > 40)
+
+      // Always keep header visible at the top of the page
+      if (currentScrollY <= 50) {
+        setIsVisible(true)
+      } else if (currentScrollY > lastScrollY + 8) {
+        // Scrolling down -> hide header to maximize reading room
+        setIsVisible(false)
+      } else if (currentScrollY < lastScrollY - 8) {
+        // Scrolling up -> reveal header instantly
+        setIsVisible(true)
+      }
+
+      lastScrollY = Math.max(0, currentScrollY)
+    }
+
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Close mobile drawer on route navigation
+  // Close mobile drawer and reveal header on route navigation
   useEffect(() => {
+    setIsVisible(true)
     setMobileMenuOpen(false)
   }, [location.pathname, location.hash])
 
@@ -189,8 +211,10 @@ export const Navbar: React.FC = () => {
           TOP HEADER: Fully responsive, zero-overflow sticky name banner
       ========================================================================= */}
       <header
-        className={`sticky top-0 z-50 w-full border-b-2 border-[var(--color-text-main)] transition-[background-color,backdrop-filter] duration-500 ${
-          isScrolled ? 'bg-[var(--color-surface-base)]/85 backdrop-blur-md' : 'bg-[var(--color-surface-base)]'
+        className={`sticky top-0 z-50 w-full border-b-2 border-[var(--color-text-main)] transition-all duration-300 ease-in-out ${
+          isVisible || mobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
+        } ${
+          isScrolled ? 'bg-[var(--color-surface-base)]/85 backdrop-blur-md shadow-sm' : 'bg-[var(--color-surface-base)]'
         }`}
       >
         <div
