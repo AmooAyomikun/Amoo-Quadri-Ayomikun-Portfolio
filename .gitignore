@@ -9,6 +9,7 @@ dist
 # Data and privacy sensitive storage
 backend/src/data/visitors.json
 backend/src/data/guestbook.json
+backend/src/data/news.json
 backend/src/data/messages.json
 backend/src/data/subscribers.json
 backend/firebase-key.json

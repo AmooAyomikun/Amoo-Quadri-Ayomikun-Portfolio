@@ -207,7 +207,7 @@ export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & 
         </div>
       </div>
 
-      {/* Reader Modal (Issue 3.9) */}
+      {/* Article Reader Modal */}
       <AnimatePresence>
         {selectedNews && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
@@ -262,7 +262,7 @@ export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & 
         )}
       </AnimatePresence>
 
-      {/* Quick Publish Modal (Issue 3.9 & 2.1) */}
+      {/* Quick Article Publish Modal (Admin) */}
       <AnimatePresence>
         {publishModalOpen && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">

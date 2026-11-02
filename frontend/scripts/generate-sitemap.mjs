@@ -5,7 +5,7 @@
  * Excludes redirecting routes (/about, /testimonials) and restricted routes (/admin).
  */
 
-import { writeFile, mkdir } from 'fs/promises'
+import { writeFile } from 'fs/promises'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { existsSync } from 'fs'

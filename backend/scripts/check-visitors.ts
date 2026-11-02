@@ -1,4 +1,4 @@
-import { db } from './src/config/firebase.js';
+import { db } from '../src/config/firebase.js';
 
 async function checkVisitors() {
   if (!db) {
