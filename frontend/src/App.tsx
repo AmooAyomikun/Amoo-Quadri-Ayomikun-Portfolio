@@ -4,14 +4,13 @@ import { ThemeProvider } from './lib/theme'
 import { LensProvider } from './lib/lens'
 import { Preloader } from './components/Preloader'
 import { BackToTop } from './components/BackToTop'
+import { useBackendKeepAlive } from './hooks/useBackendKeepAlive'
 
 const Home = lazy(() => import('./pages/Home'))
-const AboutPage = lazy(() => import('./pages/AboutPage'))
 const EducationPage = lazy(() => import('./pages/EducationPage'))
 const ResearchPage = lazy(() => import('./pages/ResearchPage'))
 const ExperiencePage = lazy(() => import('./pages/ExperiencePage'))
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'))
-const TestimonialsPage = lazy(() => import('./pages/TestimonialsPage'))
 const NewsPage = lazy(() => import('./pages/NewsPage'))
 const ContactPage = lazy(() => import('./pages/ContactPage'))
 const GuestbookPage = lazy(() => import('./pages/GuestbookPage'))
@@ -24,6 +23,9 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 export default function App() {
+  // Silent background keep-alive ping to wake Render backend and prevent cold-starts (Issue 5.5)
+  useBackendKeepAlive()
+
   // Show preloader only on the first visit per session to speed up subsequent first paint (Issue 4.4)
   const [loading, setLoading] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {

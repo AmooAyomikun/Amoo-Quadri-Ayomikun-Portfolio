@@ -117,7 +117,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
 
     res.setHeader(
       'Content-Security-Policy',
-      "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; frame-ancestors 'self' https://amooquadri.dev https://www.amooquadri.dev http://localhost:5173 http://localhost:3000;"
+      "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; frame-ancestors 'self' https://amoo-quadri.vercel.app https://amooquadri.dev https://www.amooquadri.dev http://localhost:5173 http://localhost:3000;"
     )
     res.setHeader('X-Content-Type-Options', 'nosniff')
     res.type('html').send(html)

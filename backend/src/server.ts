@@ -31,6 +31,8 @@ const defaultAllowedOrigins = [
   'http://localhost:4173',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:3000',
+  'https://amoo-quadri.vercel.app',
+  'https://www.amoo-quadri.vercel.app',
   'https://amooquadri.dev',
   'https://www.amooquadri.dev'
 ]

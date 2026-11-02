@@ -8,7 +8,8 @@ export class AiService {
     // If Gemini API Key is configured in environment, call live Gemini LLM API
     if (process.env.GEMINI_API_KEY) {
       try {
-        const systemInstructionText = `You are Quadri's AI Terminal Assistant on his portfolio website (amooquadri.dev).
+        const canonicalDomain = process.env.CANONICAL_DOMAIN || 'amoo-quadri.vercel.app'
+        const systemInstructionText = `You are Quadri's AI Terminal Assistant on his portfolio website (${canonicalDomain}).
 Answer concisely, professionally, and enthusiastically using the following accurate details about Quadri Ayomikun Amoo:
 Full Name: ${cvData.personalInfo.fullName}
 Title: ${cvData.personalInfo.title}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { MapPin, Loader2 } from 'lucide-react'
 import { AnimatedWords } from '../components/AnimatedWords'
@@ -44,9 +44,27 @@ export const VisitorMapSection: React.FC = () => {
   const leaderboard = data.topCountries.slice(0, 5)
   const maxCount = Math.max(1, ...leaderboard.map((c) => c.count))
 
+  const [isWakingServer, setIsWakingServer] = useState(false)
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null
+    if (connectionStatus === 'connecting') {
+      timer = setTimeout(() => {
+        setIsWakingServer(true)
+      }, 2500)
+    } else {
+      setIsWakingServer(false)
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [connectionStatus])
+
   const statusLabel =
     connectionStatus === 'connected'
       ? 'Live'
+      : isWakingServer
+      ? 'Waking Server (~25s)'
       : connectionStatus === 'connecting'
       ? 'Connecting'
       : 'Offline'
@@ -54,6 +72,8 @@ export const VisitorMapSection: React.FC = () => {
   const statusDot =
     connectionStatus === 'connected'
       ? 'bg-[#64ffda]'
+      : isWakingServer
+      ? 'bg-amber-400 animate-ping'
       : connectionStatus === 'connecting'
       ? 'bg-amber-400'
       : 'bg-[#495670]'
@@ -101,7 +121,14 @@ export const VisitorMapSection: React.FC = () => {
           </motion.header>
 
           {/* Figures */}
-          <dl className="mt-8 sm:mt-10 grid grid-cols-3 border-y border-[var(--color-border)] divide-x divide-[var(--color-border)]">
+          {isWakingServer && (
+            <div className="mt-6 px-3.5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono flex items-center gap-2.5 animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0" />
+              <span>⚡ Waking backend telemetry server (Render free-tier cold start, takes ~20–30s on first request)...</span>
+            </div>
+          )}
+
+          <dl className="mt-6 sm:mt-8 grid grid-cols-3 border-y border-[var(--color-border)] divide-x divide-[var(--color-border)]">
             {stats.map((s) => (
               <div key={s.label} className="py-4 sm:py-5 px-2.5 sm:px-8 first:pl-0">
                 <dt className="text-[10px] sm:text-xs font-mono text-[var(--color-text-muted)] truncate">{s.label}</dt>

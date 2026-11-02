@@ -1,17 +1,21 @@
 /**
- * Centralized API configuration and client helpers
+ * Centralized API configuration and client helpers (Issue 5.4)
  */
 
 export const getApiBaseUrl = (): string => {
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL
+  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL
+  if (envUrl) {
+    return envUrl
   }
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL
+
+  if (import.meta.env.PROD) {
+    console.warn(
+      '[Config Warning] VITE_API_URL was not specified at build time. Falling back to default backend URL.'
+    )
+    return 'https://portfolio-backend-st78.onrender.com'
   }
-  return import.meta.env.PROD
-    ? 'https://portfolio-backend-st78.onrender.com'
-    : 'http://localhost:5000'
+
+  return 'http://localhost:5000'
 }
 
 export const apiUrl = (endpoint: string): string => {

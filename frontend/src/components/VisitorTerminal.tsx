@@ -36,9 +36,18 @@ export const VisitorTerminal: React.FC = () => {
       return
     }
 
+    const processingMsg = 'AI: PROCESSING...'
+    const wakingMsg = 'AI: Waking backend server (Render cold-start ~20-30s)...'
+
     setTerminalLogs((prev) => [...prev, { text: `$ ${rawInput}`, type: 'input' }])
     setTerminalInput('')
-    setTerminalLogs((prev) => [...prev, { text: 'AI: PROCESSING...', type: 'output' }])
+    setTerminalLogs((prev) => [...prev, { text: processingMsg, type: 'output' }])
+
+    const wakeTimer = setTimeout(() => {
+      setTerminalLogs((prev) =>
+        prev.map((l) => (l.text === processingMsg ? { ...l, text: wakingMsg } : l))
+      )
+    }, 2500)
 
     try {
       const res = await fetch(apiUrl('/api/chat'), {
@@ -59,12 +68,12 @@ export const VisitorTerminal: React.FC = () => {
       }
 
       setTerminalLogs((prev) => {
-        const filtered = prev.filter((l) => l.text !== 'AI: PROCESSING...')
+        const filtered = prev.filter((l) => l.text !== processingMsg && l.text !== wakingMsg)
         return [...filtered, { text: reply, type: 'output' }]
       })
     } catch {
       setTerminalLogs((prev) => {
-        const filtered = prev.filter((l) => l.text !== 'AI: PROCESSING...')
+        const filtered = prev.filter((l) => l.text !== processingMsg && l.text !== wakingMsg)
         return [
           ...filtered,
           {
@@ -73,6 +82,8 @@ export const VisitorTerminal: React.FC = () => {
           }
         ]
       })
+    } finally {
+      clearTimeout(wakeTimer)
     }
 
     setTimeout(() => {
@@ -89,7 +100,7 @@ export const VisitorTerminal: React.FC = () => {
       className="mt-12 rounded-lg border border-[#233554] bg-[#0b1d36]"
     >
       <div className="flex items-center justify-between px-5 py-3 border-b border-[#233554]">
-        <span className="font-mono text-xs text-[#8892b0]">guest@amooquadri.dev</span>
+        <span className="font-mono text-xs text-[#8892b0]">guest@amoo-quadri.vercel.app</span>
         <span className="text-xs text-[#495670] hidden sm:inline">Ask about my work, or pick a command</span>
       </div>
 

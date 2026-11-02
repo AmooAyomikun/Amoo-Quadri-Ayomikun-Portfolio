@@ -62,6 +62,13 @@ async function main() {
     }
   }
 
+  if (process.env.CHECK_API_URL === 'true' && !process.env.VITE_API_URL) {
+    console.error(
+      '\n✖  Build blocked: VITE_API_URL environment variable must be specified for production build.\n',
+    )
+    process.exit(1)
+  }
+
   if (violations > 0) {
     console.error(
       `\n✖  Build blocked: ${violations} [CONFIRM] marker${violations === 1 ? '' : 's'} must be resolved before production build.\n`,
