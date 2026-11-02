@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
-  Sun,
-  Moon,
-  Monitor,
   Home,
   FlaskConical,
   FolderGit2,
@@ -13,32 +10,22 @@ import {
   Mail,
   BookOpen,
   Menu,
-  X,
-  FileText,
-  Sparkles,
+  FileText
 } from 'lucide-react'
 import { useTheme } from '../lib/theme'
-import { motion, AnimatePresence } from 'framer-motion'
-
-type NavItem = {
-  num: string
-  name: string
-  path: string
-  isHash: boolean
-  icon: React.ComponentType<{ className?: string }>
-}
-
-type ThemeMode = 'system' | 'light' | 'dark'
+import { motion } from 'framer-motion'
+import { HeaderThemeButton, type ThemeMode } from './NavThemeToggle'
+import { NavMobileMenu, type NavItem } from './NavMobileMenu'
 
 export const Navbar: React.FC = () => {
   const { theme, setTheme } = useTheme()
   const location = useLocation()
   const isHome = location.pathname === '/'
 
-  // Theme mode (system / light / dark) layered on top of the existing theme provider
+  // Theme mode (system / light / dark)
   const [mode, setMode] = useState<ThemeMode>(() => {
     const saved = localStorage.getItem('aq-theme-mode') as ThemeMode | null
-    return saved === 'system' || saved === 'light' || saved === 'dark' ? saved : theme
+    return saved === 'system' || saved === 'light' || saved === 'dark' ? saved : (theme as ThemeMode)
   })
 
   // Mobile navigation drawer sheet state
@@ -55,8 +42,7 @@ export const Navbar: React.FC = () => {
     apply()
     mq.addEventListener('change', apply)
     return () => mq.removeEventListener('change', apply)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode])
+  }, [mode, setTheme])
 
   // Sticky hide-on-scroll header logic
   const [isVisible, setIsVisible] = useState(true)
@@ -69,14 +55,11 @@ export const Navbar: React.FC = () => {
       const currentScrollY = window.scrollY
       setIsScrolled(currentScrollY > 40)
 
-      // Always keep header visible at the top of the page
       if (currentScrollY <= 50) {
         setIsVisible(true)
       } else if (currentScrollY > lastScrollY + 8) {
-        // Scrolling down -> hide header to maximize reading room
         setIsVisible(false)
       } else if (currentScrollY < lastScrollY - 8) {
-        // Scrolling up -> reveal header instantly
         setIsVisible(true)
       }
 
@@ -88,13 +71,11 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Close mobile drawer and reveal header on route navigation
   useEffect(() => {
     setIsVisible(true)
     setMobileMenuOpen(false)
   }, [location.pathname, location.hash])
 
-  // Leave room at the bottom of every page so the dock never covers content
   useEffect(() => {
     const prev = document.body.style.paddingBottom
     document.body.style.paddingBottom = '96px'
@@ -113,10 +94,9 @@ export const Navbar: React.FC = () => {
     isHome
       ? { num: '06', name: 'Contact', path: '/#contact', isHash: true, icon: Mail }
       : { num: '06', name: 'Contact', path: '/contact', isHash: false, icon: Mail },
-    { num: '07', name: 'Guestbook', path: '/guestbook', isHash: false, icon: BookOpen },
+    { num: '07', name: 'Guestbook', path: '/guestbook', isHash: false, icon: BookOpen }
   ]
 
-  // Primary mobile bar shortcuts (first 4 key destinations)
   const mobilePrimaryLinks = navLinks.slice(0, 4)
 
   const scrollToHash = (path: string) => {
@@ -135,7 +115,6 @@ export const Navbar: React.FC = () => {
     return currentPath === link.path || currentPath.startsWith(`${link.path}/`)
   }
 
-  // Check if current page is one of the secondary items in the "More" drawer
   const isSecondaryActive = navLinks.slice(4).some(isActiveLink)
 
   const renderDockItem = (link: NavItem) => {
@@ -199,17 +178,9 @@ export const Navbar: React.FC = () => {
     )
   }
 
-  const modes: { key: ThemeMode; icon: React.ComponentType<{ className?: string }>; label: string }[] = [
-    { key: 'system', icon: Monitor, label: 'System theme' },
-    { key: 'light', icon: Sun, label: 'Light theme' },
-    { key: 'dark', icon: Moon, label: 'Dark theme' },
-  ]
-
   return (
     <>
-      {/* =========================================================================
-          TOP HEADER: Fully responsive, zero-overflow sticky name banner
-      ========================================================================= */}
+      {/* Top sticky banner */}
       <header
         className={`sticky top-0 z-50 w-full border-b-2 border-[var(--color-text-main)] transition-all duration-300 ease-in-out ${
           isVisible || mobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
@@ -238,7 +209,7 @@ export const Navbar: React.FC = () => {
                   fontSize: isScrolled
                     ? 'clamp(0.95rem, 2.6vw, 1.75rem)'
                     : 'clamp(0.88rem, 4.2vw, 4rem)',
-                  transitionDelay: `${i * 90}ms`,
+                  transitionDelay: `${i * 90}ms`
                 }}
               >
                 <span className="name-fill" style={{ transitionDelay: `${i * 110}ms` }}>
@@ -249,7 +220,7 @@ export const Navbar: React.FC = () => {
                   style={{
                     maxWidth: isScrolled ? '0' : '12ch',
                     opacity: isScrolled ? 0 : 1,
-                    transitionDelay: `${i * 110}ms`,
+                    transitionDelay: `${i * 110}ms`
                   }}
                 >
                   {word.slice(1)}
@@ -263,33 +234,14 @@ export const Navbar: React.FC = () => {
             ))}
           </Link>
 
-          {/* Quick theme toggle button in header */}
-          <button
-            id="header-theme-toggle"
+          <HeaderThemeButton
+            theme={theme}
             onClick={() => setMode(theme === 'dark' ? 'light' : 'dark')}
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="group shrink-0 grid place-items-center w-8 h-8 sm:w-11 sm:h-11 rounded-full border-2 border-[var(--color-text-main)] text-[var(--color-text-main)] hover:bg-[var(--color-text-main)] hover:text-[var(--color-surface-base)] transition-colors cursor-pointer overflow-hidden active:scale-95"
-          >
-            <motion.span
-              key={theme}
-              initial={{ rotate: -90, scale: 0.4, opacity: 0 }}
-              animate={{ rotate: 0, scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 18 }}
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-              ) : (
-                <Moon className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-              )}
-            </motion.span>
-          </button>
+          />
         </div>
       </header>
 
-      {/* =========================================================================
-          DESKTOP FLOATING DOCK (>= 768px): Full menu with all destinations
-      ========================================================================= */}
+      {/* Desktop Floating Dock */}
       <motion.nav
         aria-label="Desktop Primary"
         initial={{ y: 60, opacity: 0 }}
@@ -299,10 +251,7 @@ export const Navbar: React.FC = () => {
       >
         <div className="flex items-center gap-1 p-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-base)]/80 backdrop-blur-xl shadow-[0_12px_40px_-12px_rgba(0,0,0,0.6)]">
           {navLinks.map(renderDockItem)}
-          
           <span className="mx-1 h-5 w-px shrink-0 bg-[var(--color-border)]" />
-          
-          {/* Direct Resume CTA */}
           <a
             href="/Amoo_Quadri_CV.pdf"
             target="_blank"
@@ -315,10 +264,7 @@ export const Navbar: React.FC = () => {
         </div>
       </motion.nav>
 
-      {/* =========================================================================
-          MOBILE DOCK (< 768px): 4 primary shortcuts + "More" drawer trigger
-          Guaranteed 100% responsive, finger-friendly, zero accidental horizontal overflow
-      ========================================================================= */}
+      {/* Mobile Dock */}
       <motion.nav
         aria-label="Mobile Navigation"
         initial={{ y: 60, opacity: 0 }}
@@ -329,7 +275,6 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center justify-around p-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-card)]/90 backdrop-blur-xl shadow-[0_10px_30px_-8px_rgba(0,0,0,0.6)]">
           {mobilePrimaryLinks.map(renderDockItem)}
 
-          {/* "More" Sheet Trigger Button */}
           <button
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open full menu"
@@ -355,148 +300,20 @@ export const Navbar: React.FC = () => {
         </div>
       </motion.nav>
 
-      {/* =========================================================================
-          MOBILE BOTTOM SHEET DRAWER: Smooth native app slide-up menu
-      ========================================================================= */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => setMobileMenuOpen(false)}
-              className="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs"
-              aria-hidden="true"
-            />
-
-            {/* Slide-up Sheet */}
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="md:hidden fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] bg-[var(--color-surface-base)] border-t border-[var(--color-border)] rounded-t-3xl shadow-2xl p-6 overflow-y-auto no-scrollbar"
-              role="dialog"
-              aria-label="Navigation Menu"
-            >
-              {/* Sheet Drag Handle */}
-              <div className="w-12 h-1.5 bg-[var(--color-border)] rounded-full mx-auto mb-4" />
-
-              {/* Sheet Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-[var(--color-border)]">
-                <div>
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-primary)] font-bold">
-                    PORTFOLIO INDEX
-                  </span>
-                  <h3 className="font-sans font-bold text-lg text-[var(--color-text-main)]">
-                    Navigation &amp; Actions
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] transition-colors cursor-pointer"
-                  aria-label="Close menu"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Full Route Grid */}
-              <div className="grid grid-cols-2 gap-2.5 py-5">
-                {navLinks.map((link) => {
-                  const active = isActiveLink(link)
-                  const Icon = link.icon
-
-                  if (link.isHash) {
-                    return (
-                      <a
-                        key={link.name}
-                        href={link.path}
-                        onClick={(e) => {
-                          setMobileMenuOpen(false)
-                          if (isHome) {
-                            e.preventDefault()
-                            window.history.replaceState(null, '', link.path)
-                            scrollToHash(link.path)
-                          }
-                        }}
-                        className={`p-3 rounded-xl border flex items-center gap-2.5 transition-all cursor-pointer ${
-                          active
-                            ? 'bg-[var(--color-primary)]/15 border-[var(--color-primary)] text-[var(--color-primary)] font-bold'
-                            : 'bg-[var(--color-surface-card)] border-[var(--color-border)] text-[var(--color-text-main)] hover:border-[var(--color-primary)]'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4 shrink-0" />
-                        <span className="text-xs font-mono">{link.name}</span>
-                      </a>
-                    )
-                  }
-
-                  return (
-                    <Link
-                      key={link.name}
-                      to={link.path}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`p-3 rounded-xl border flex items-center gap-2.5 transition-all cursor-pointer ${
-                        active
-                          ? 'bg-[var(--color-primary)]/15 border-[var(--color-primary)] text-[var(--color-primary)] font-bold'
-                          : 'bg-[var(--color-surface-card)] border-[var(--color-border)] text-[var(--color-text-main)] hover:border-[var(--color-primary)]'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4 shrink-0" />
-                      <span className="text-xs font-mono">{link.name}</span>
-                    </Link>
-                  )
-                })}
-              </div>
-
-              {/* Action Buttons: Resume & Theme */}
-              <div className="pt-4 border-t border-[var(--color-border)] space-y-3">
-                <a
-                  href="/Amoo_Quadri_CV.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-3 px-4 rounded-xl border border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-mono text-xs font-bold flex items-center justify-center gap-2 hover:bg-[var(--color-primary)]/20 transition-colors"
-                >
-                  <FileText className="w-4 h-4" />
-                  <span>Download Full Curriculum Vitae (PDF)</span>
-                </a>
-
-                {/* Theme Selector Segmented Pill */}
-                <div className="flex items-center justify-between p-2 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)]">
-                  <span className="text-xs font-mono text-[var(--color-text-muted)] flex items-center gap-1.5 pl-2">
-                    <Sparkles className="w-3.5 h-3.5 text-[var(--color-primary)]" />
-                    <span>Theme</span>
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {modes.map(({ key, icon: Icon, label }) => {
-                      const active = mode === key
-                      return (
-                        <button
-                          key={key}
-                          onClick={() => setMode(key)}
-                          className={`px-3 py-1.5 rounded-lg font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
-                            active
-                              ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold shadow-xs'
-                              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-main)]'
-                          }`}
-                          aria-label={label}
-                        >
-                          <Icon className="w-3.5 h-3.5" />
-                          <span className="capitalize">{key}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Mobile Drawer Sheet */}
+      <NavMobileMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        navLinks={navLinks}
+        isActiveLink={isActiveLink}
+        isHome={isHome}
+        scrollToHash={scrollToHash}
+        theme={theme}
+        mode={mode}
+        setMode={setMode}
+      />
     </>
   )
 }
+
+export default Navbar

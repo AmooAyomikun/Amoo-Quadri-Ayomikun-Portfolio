@@ -7,6 +7,7 @@ import { Footer } from '../components/Footer'
 import { Badge } from '../components/Badge'
 import { SEO } from '../components/SEO'
 import { InteractiveAppPreview } from '../components/InteractiveAppPreview'
+import { PageContainer } from '../components/PageContainer'
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -42,10 +43,8 @@ export default function ProjectDetailPage() {
       />
       <Navbar />
 
-      <main className="flex-grow pt-20 sm:pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          {/* Back Navigation Breadcrumb */}
+      <PageContainer as="main" id="main-content" className="flex-grow pt-20 sm:pt-24 pb-16">
+        {/* Back Navigation Breadcrumb */}
           <div className="mb-4">
             <Link 
               to="/projects" 
@@ -269,8 +268,7 @@ export default function ProjectDetailPage() {
             </div>
 
           </div>
-        </div>
-      </main>
+      </PageContainer>
 
       <Footer />
     </div>

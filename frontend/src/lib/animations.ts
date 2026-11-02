@@ -1,39 +1,34 @@
-import gsap from 'gsap'
+import type { Variants } from 'framer-motion'
 
 /**
- * Animate elements on page mount with slide up & fade effect.
+ * Standard staggered fade-in up variants for Framer Motion.
  */
-export const animateFadeInUp = (target: string | Element | Element[], delay = 0) => {
-  if (typeof window === 'undefined') return
-  gsap.fromTo(
-    target,
-    { opacity: 0, y: 25 },
-    {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      delay,
-      ease: 'power3.out',
-      stagger: 0.12
+export const fadeInUpVariants: Variants = {
+  hidden: { opacity: 0, y: 25 },
+  visible: (customDelay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+      delay: customDelay,
+      ease: [0.16, 1, 0.3, 1] as const
     }
-  )
+  })
 }
 
 /**
- * Animate text reveal character / word stagger.
+ * Text reveal variant with slight scale and vertical translate.
  */
-export const animateTextReveal = (target: string | Element, delay = 0) => {
-  if (typeof window === 'undefined') return
-  gsap.fromTo(
-    target,
-    { opacity: 0, y: 30, scale: 0.98 },
-    {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      duration: 0.9,
-      delay,
-      ease: 'cubic-bezier(0.16, 1, 0.3, 1)'
+export const textRevealVariants: Variants = {
+  hidden: { opacity: 0, y: 20, scale: 0.98 },
+  visible: (customDelay = 0) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.8,
+      delay: customDelay,
+      ease: [0.16, 1, 0.3, 1] as const
     }
-  )
+  })
 }

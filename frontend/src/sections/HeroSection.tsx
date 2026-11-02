@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, GraduationCap, Briefcase, Download } from 'lucide-react'
+import { motion, type Variants } from 'framer-motion'
 import { AnimatedWords } from '../components/AnimatedWords'
-import gsap from 'gsap'
+import { useTypewriter } from '../hooks/useTypewriter'
 
 const TYPEWRITER_PHRASES = [
   'intelligent systems.',
@@ -11,88 +12,82 @@ const TYPEWRITER_PHRASES = [
   'scalable software.'
 ]
 
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1
+    }
+  }
+}
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }
+  }
+}
+
 export const HeroSection: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  // Typewriter effect states
-  const [phraseIndex, setPhraseIndex] = useState(0)
-  const [currentText, setCurrentText] = useState('')
-  const [isDeleting, setIsDeleting] = useState(false)
-
-  // Typewriter animation loop
-  useEffect(() => {
-    const targetPhrase = TYPEWRITER_PHRASES[phraseIndex]
-    const typingSpeed = isDeleting ? 35 : 70
-
-    if (!isDeleting && currentText === targetPhrase) {
-      // Pause at full phrase before deleting
-      const pauseTimer = setTimeout(() => setIsDeleting(true), 1800)
-      return () => clearTimeout(pauseTimer)
-    }
-
-    if (isDeleting && currentText === '') {
-      // Completed backspacing, advance to next phrase
-      setIsDeleting(false)
-      setPhraseIndex((prev) => (prev + 1) % TYPEWRITER_PHRASES.length)
-      return
-    }
-
-    const charTimer = setTimeout(() => {
-      setCurrentText((prev) =>
-        isDeleting
-          ? targetPhrase.substring(0, prev.length - 1)
-          : targetPhrase.substring(0, prev.length + 1)
-      )
-    }, typingSpeed)
-
-    return () => clearTimeout(charTimer)
-  }, [currentText, isDeleting, phraseIndex])
-
-  useEffect(() => {
-    if (!containerRef.current) return
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.gsap-hero-item',
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' }
-      )
-    }, containerRef)
-
-    return () => ctx.revert()
-  }, [])
+  const { currentText } = useTypewriter(TYPEWRITER_PHRASES)
 
   return (
     <section
-      ref={containerRef}
       className="relative pt-6 sm:pt-12 pb-8 sm:pb-12 lg:min-h-[calc(100vh-70px)] lg:flex lg:flex-col lg:justify-center bg-[var(--color-surface-base)] text-[var(--color-text-main)] overflow-hidden transition-colors duration-200"
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-12 lg:px-16 w-full flex flex-col justify-center">
-        <div className="flex flex-col items-start text-left space-y-3 sm:space-y-4 md:space-y-4 max-w-4xl">
-          
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col items-start text-left space-y-3 sm:space-y-4 md:space-y-4 max-w-4xl"
+        >
           {/* Subtitle / Intro Greeting */}
-          <div className="gsap-hero-item font-mono text-[var(--color-primary)] text-xs sm:text-sm tracking-wide font-medium">
+          <motion.div
+            variants={itemVariants}
+            className="font-mono text-[var(--color-primary)] text-xs sm:text-sm tracking-wide font-medium"
+          >
             Hi, my name is
-          </div>
+          </motion.div>
 
           {/* Huge Main Name Header */}
-          <h1 className="gsap-hero-item text-3xl sm:text-5xl lg:text-6xl font-sans font-bold text-[var(--color-text-main)] tracking-tight leading-tight break-words">
+          <motion.h1
+            variants={itemVariants}
+            className="text-3xl sm:text-5xl lg:text-6xl font-sans font-bold text-[var(--color-text-main)] tracking-tight leading-tight break-words"
+          >
             <AnimatedWords text="Quadri Ayomikun Amoo." />
-          </h1>
+          </motion.h1>
 
           {/* Second Headline with Synchronized Typewriter Effect */}
-          <h2 className="gsap-hero-item text-xl sm:text-3xl lg:text-4xl font-sans font-bold text-[var(--color-text-muted)] tracking-tight leading-snug">
+          <motion.h2
+            variants={itemVariants}
+            className="text-xl sm:text-3xl lg:text-4xl font-sans font-bold text-[var(--color-text-muted)] tracking-tight leading-snug"
+          >
             <span>I build things for the web &amp;&nbsp;</span>
             <span className="text-[var(--color-primary)] inline">{currentText}</span>
-            <span className="inline-block w-[3px] h-[0.85em] bg-[var(--color-primary)] ml-1 align-baseline animate-pulse" />
-          </h2>
+            <span
+              className="inline-block w-[3px] h-[0.85em] bg-[var(--color-primary)] ml-1 align-baseline animate-pulse"
+              aria-hidden="true"
+            />
+          </motion.h2>
 
           {/* Subtitle / Bio Paragraph */}
-          <p className="gsap-hero-item text-[var(--color-text-muted)] text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl font-sans pt-1">
+          <motion.p
+            variants={itemVariants}
+            className="text-[var(--color-text-muted)] text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl font-sans pt-1"
+          >
             I am a software engineer specializing in building high-performance web applications with a strong focus on creating fast, intuitive, and accessible user experiences. While frontend is where I do my best work, I also build complete full-stack applications and engage in applied academic research in machine learning, data-driven systems, and intelligent computing.
-          </p>
+          </motion.p>
 
           {/* CTA Buttons */}
-          <div className="gsap-hero-item pt-2 sm:pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-3.5 w-full sm:w-auto">
+          <motion.div
+            variants={itemVariants}
+            className="pt-2 sm:pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-3.5 w-full sm:w-auto"
+          >
             <Link
               to="/projects"
               className="inline-flex items-center justify-center px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg border border-[var(--color-primary)] text-[var(--color-primary)] font-mono text-xs sm:text-sm font-semibold hover:bg-[var(--color-primary-light)] transition-all duration-200 group text-center"
@@ -109,10 +104,13 @@ export const HeroSection: React.FC = () => {
               <Download className="w-4 h-4 text-[var(--color-primary)]" />
               <span>Download CV (PDF)</span>
             </a>
-          </div>
+          </motion.div>
 
           {/* Quick Links in font-mono */}
-          <div className="gsap-hero-item pt-4 sm:pt-5 border-t border-[var(--color-border)] w-full flex flex-wrap items-center gap-4 sm:gap-7 font-mono text-[11px] sm:text-xs text-[var(--color-text-muted)]">
+          <motion.div
+            variants={itemVariants}
+            className="pt-4 sm:pt-5 border-t border-[var(--color-border)] w-full flex flex-wrap items-center gap-4 sm:gap-7 font-mono text-[11px] sm:text-xs text-[var(--color-text-muted)]"
+          >
             <a href="#about" className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 cursor-pointer">
               <GraduationCap className="w-3.5 h-3.5 text-[var(--color-primary)]" />
               <span>Read Biography</span>
@@ -124,9 +122,8 @@ export const HeroSection: React.FC = () => {
             <a href="#contact" className="hover:text-[var(--color-primary)] transition-colors">
               <span>Get in Touch →</span>
             </a>
-          </div>
-
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   )

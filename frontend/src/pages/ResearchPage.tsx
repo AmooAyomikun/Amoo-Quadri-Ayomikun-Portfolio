@@ -5,6 +5,8 @@ import { ResearchSection } from '../sections/ResearchSection'
 import { ResearchHero } from '../components/PageHeroes'
 import { SEO } from '../components/SEO'
 
+import { PageContainer } from '../components/PageContainer'
+
 export default function ResearchPage() {
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[#64ffda] selection:text-[#0a192f]">
@@ -14,10 +16,10 @@ export default function ResearchPage() {
         canonicalUrl="/research"
       />
       <Navbar />
-      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-28 sm:pb-32">
+      <PageContainer as="main" id="main-content" className="pb-28 sm:pb-32">
         <ResearchHero />
         <ResearchSection />
-      </main>
+      </PageContainer>
       <Footer />
     </div>
   )

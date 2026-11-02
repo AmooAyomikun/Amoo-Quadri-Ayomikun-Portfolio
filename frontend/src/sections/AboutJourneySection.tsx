@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useMotionValueEvent, useSpring } from 'framer-motion'
-import profileImg from '../assets/profile.png'
+import profileImg from '../assets/profile.webp'
 
 interface PhotoCardProps {
   imgSrc: string
@@ -25,6 +25,9 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imgSrc, alt, tilt }) => {
       <img
         src={imgSrc}
         alt={alt}
+        loading="lazy"
+        width={202}
+        height={287}
         className={`absolute left-0 top-0 w-[178px] h-[252px] sm:w-[202px] sm:h-[287px] rounded-xl object-cover object-top shadow-2xl border border-[var(--color-border)] transition-all duration-500 ease-out filter contrast-[1.05] group-hover:rotate-0 group-hover:scale-[1.02] group-hover:border-[var(--color-primary)]/50 ${
           isLeft ? 'rotate-[-5deg] sm:rotate-[-6deg]' : 'rotate-[5deg] sm:rotate-[6deg]'
         }`}

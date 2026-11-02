@@ -49,10 +49,10 @@ export const ContactSection: React.FC<{ showHeader?: boolean }> = ({ showHeader 
       } else {
         throw new Error(result.error || 'Server rejected message submission')
       }
-    } catch (err: any) {
+    } catch (err) {
       console.warn('Backend contact submission error:', err)
       setStatus('error')
-      setStatusMsg(err.message || 'Unable to deliver message through the contact server right now.')
+      setStatusMsg(err instanceof Error ? err.message : 'Unable to deliver message through the contact server right now.')
     }
   }
 

@@ -163,6 +163,9 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
             <img
               src={imageUrl}
               alt={title}
+              loading="lazy"
+              width={1280}
+              height={720}
               className="w-full h-full object-cover object-top"
             />
             {demoUrl && (

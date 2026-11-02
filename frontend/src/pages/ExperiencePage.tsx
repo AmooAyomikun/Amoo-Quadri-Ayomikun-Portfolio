@@ -6,6 +6,8 @@ import { SkillsSection } from '../sections/SkillsSection'
 import { ExperienceHero } from '../components/PageHeroes'
 import { SEO } from '../components/SEO'
 
+import { PageContainer } from '../components/PageContainer'
+
 export default function ExperiencePage() {
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[#64ffda] selection:text-[#0a192f]">
@@ -15,11 +17,11 @@ export default function ExperiencePage() {
         canonicalUrl="/experience"
       />
       <Navbar />
-      <main id="main-content" className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20 w-full pb-28 sm:pb-32">
+      <PageContainer as="main" id="main-content" className="pb-28 sm:pb-32">
         <ExperienceHero />
         <ExperienceSection />
         <SkillsSection />
-      </main>
+      </PageContainer>
       <Footer />
     </div>
   )

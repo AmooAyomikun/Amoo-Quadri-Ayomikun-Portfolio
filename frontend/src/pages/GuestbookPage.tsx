@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
-import gsap from 'gsap'
 import SignatureCanvas from 'react-signature-canvas'
 import { PenTool, CheckCircle, RefreshCw, AlertCircle } from 'lucide-react'
 import { apiUrl } from '../lib/api'
 import { useTheme } from '../lib/theme'
 import { SEO } from '../components/SEO'
 import { GuestbookHero } from '../components/PageHeroes'
+import { PageContainer } from '../components/PageContainer'
 
 interface GuestbookEntry {
   id: string
@@ -66,14 +66,6 @@ export default function GuestbookPage() {
 
   useEffect(() => {
     fetchEntries()
-
-    if (headerRef.current) {
-      gsap.fromTo(
-        headerRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
-      )
-    }
   }, [])
 
   const fetchEntries = async () => {
@@ -176,7 +168,7 @@ export default function GuestbookPage() {
       />
       <Navbar />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-28 sm:pb-32">
+      <PageContainer as="main" id="main-content" className="pb-28 sm:pb-32">
         <GuestbookHero />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -327,7 +319,7 @@ export default function GuestbookPage() {
           </div>
           
         </div>
-      </main>
+      </PageContainer>
       <Footer />
     </div>
   )

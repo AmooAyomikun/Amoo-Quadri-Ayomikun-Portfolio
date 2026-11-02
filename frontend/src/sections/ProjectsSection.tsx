@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { portfolioData } from '../content/portfolioData'
 import { ProjectCard } from '../components/ProjectCard'
 import { ProjectsHero } from '../components/PageHeroes'
+import { PageContainer } from '../components/PageContainer'
 
 export const ProjectsSection: React.FC = () => {
   const [filter, setFilter] = useState<string>('all')
@@ -41,8 +42,7 @@ export const ProjectsSection: React.FC = () => {
 
   return (
     <section id="projects" className="pb-6 sm:pb-10 bg-[var(--color-surface-base)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+      <PageContainer>
         <ProjectsHero />
 
         {/* Tactile Category Filter Dock */}
@@ -113,7 +113,7 @@ export const ProjectsSection: React.FC = () => {
           </div>
         )}
 
-      </div>
+      </PageContainer>
     </section>
   )
 }

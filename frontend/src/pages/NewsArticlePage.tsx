@@ -7,6 +7,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react'
 import { initialNewsData, formatNewsDate, type NewsItem } from '../content/newsData'
 import { apiUrl } from '../lib/api'
 import { SEO } from '../components/SEO'
+import { PageContainer } from '../components/PageContainer'
 
 export default function NewsArticlePage() {
   const { id } = useParams()
@@ -70,7 +71,7 @@ export default function NewsArticlePage() {
         type="article"
       />
       <Navbar />
-      <main className="flex-grow pt-24 sm:pt-32 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+      <PageContainer as="main" id="main-content" className="flex-grow pt-24 sm:pt-32 pb-16 sm:pb-20">
         <button 
           onClick={() => navigate('/news')} 
           className="flex items-center gap-2 text-xs font-mono text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors mb-6 sm:mb-8"
@@ -117,7 +118,7 @@ export default function NewsArticlePage() {
             ))}
           </div>
         </article>
-      </main>
+      </PageContainer>
       <Footer />
     </div>
   )

@@ -1,22 +1,12 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
+import { motion } from 'framer-motion'
 import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { TestimonialsSection } from '../sections/TestimonialsSection'
-import gsap from 'gsap'
 import { SEO } from '../components/SEO'
+import { PageContainer } from '../components/PageContainer'
 
 export default function TestimonialsPage() {
-  const headerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!headerRef.current) return
-    gsap.fromTo(
-      headerRef.current,
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
-    )
-  }, [])
-
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
       <SEO 
@@ -28,17 +18,23 @@ export default function TestimonialsPage() {
       <main id="main-content" className="w-full pb-28 sm:pb-32">
         
         {/* Header Banner */}
-        <div ref={headerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 border-b border-[var(--color-border)]">
-          <span className="text-xs font-mono uppercase tracking-widest font-semibold text-[var(--color-primary)]">
-            Supervisor Endorsements
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-serif font-bold text-[var(--color-text-main)] mt-2">
-            Testimonials & Reviews
-          </h1>
-          <p className="text-base text-[var(--color-text-muted)] leading-relaxed max-w-3xl mt-3">
-            Read testimonials from academic supervisors, NYSC research mentors, product leads, and internship engineering managers who have worked with Quadri Ayomikun Amoo.
-          </p>
-        </div>
+        <PageContainer className="py-10 sm:py-14 border-b border-[var(--color-border)]">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          >
+            <span className="text-xs font-mono uppercase tracking-widest font-semibold text-[var(--color-primary)]">
+              Supervisor Endorsements
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-serif font-bold text-[var(--color-text-main)] mt-2">
+              Testimonials & Reviews
+            </h1>
+            <p className="text-base text-[var(--color-text-muted)] leading-relaxed max-w-3xl mt-3">
+              Read testimonials from academic supervisors, NYSC research mentors, product leads, and internship engineering managers who have worked with Quadri Ayomikun Amoo.
+            </p>
+          </motion.div>
+        </PageContainer>
 
         <TestimonialsSection />
 

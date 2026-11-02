@@ -1,33 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { portfolioData } from '../content/portfolioData'
 import { TestimonialCard } from '../components/TestimonialCard'
 import { AnimatedWords } from '../components/AnimatedWords'
 import { Code, ChevronLeft, ChevronRight } from 'lucide-react'
 import { apiUrl } from '../lib/api'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 
 export const TestimonialsSection: React.FC = () => {
   const [testimonials, setTestimonials] = useState(portfolioData.testimonials)
   const [filter, setFilter] = useState<'all' | 'academic' | 'industry'>('all')
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const trackRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [currentIndex, setCurrentIndex] = useState(0)
 
+  // Fetch testimonials with AbortController for request cancellation
   useEffect(() => {
-    fetch(apiUrl('/api/testimonials'))
+    const controller = new AbortController()
+
+    fetch(apiUrl('/api/testimonials'), { signal: controller.signal })
       .then(res => res.json())
       .then(json => {
         if (json?.success && Array.isArray(json.data) && json.data.length > 0) {
           setTestimonials(json.data)
         }
       })
-      .catch(() => {
-        // Fallback cleanly to static portfolioData.testimonials
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          // Fallback cleanly to static portfolioData.testimonials
+        }
       })
+
+    return () => controller.abort()
   }, [])
 
   const filteredTestimonials = testimonials.filter(t => {
@@ -35,79 +37,48 @@ export const TestimonialsSection: React.FC = () => {
     return t.category === filter || t.category === 'both'
   })
 
-  useEffect(() => {
-    // Only enable GSAP pinning on desktop (width >= 1024px)
-    if (window.innerWidth < 1024) return
-
-    const section = sectionRef.current
-    const track = trackRef.current
-    if (!section || !track) return
-
-    const parent = track.parentElement
-    if (!parent) return
-
-    // Create GSAP context synchronously so cleanup is guaranteed
-    const ctx = gsap.context(() => {
-      const parentWidth = parent.clientWidth
-      const trackWidth = track.scrollWidth
-      const totalScroll = Math.max(0, trackWidth - parentWidth)
-
-      if (totalScroll <= 0) {
-        gsap.set(track, { x: 0 })
-        setScrollProgress(100)
-        return
-      }
-
-      gsap.to(track, {
-        x: -totalScroll,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: section,
-          pin: true,
-          scrub: 0.8,
-          start: 'top top+=64',
-          end: () => `+=${totalScroll}`,
-          invalidateOnRefresh: true,
-          anticipatePin: 1,
-          onUpdate: (self) => {
-            const progress = Math.round(self.progress * 100)
-            setScrollProgress(progress)
-            const cardCount = filteredTestimonials.length
-            const idx = Math.min(cardCount - 1, Math.floor(self.progress * cardCount))
-            setCurrentIndex(idx)
-          }
-        }
-      })
-    }, section)
-
-    const timer = setTimeout(() => {
-      ScrollTrigger.refresh()
-    }, 50)
-
-    return () => {
-      clearTimeout(timer)
-      ctx.revert()
+  // Track scroll position to update progress bar and card index
+  const handleScroll = useCallback(() => {
+    const el = scrollContainerRef.current
+    if (!el) return
+    const maxScroll = el.scrollWidth - el.clientWidth
+    if (maxScroll <= 0) {
+      setScrollProgress(100)
+      setCurrentIndex(0)
+      return
     }
-  }, [filter, filteredTestimonials.length])
+    const current = el.scrollLeft
+    const progress = Math.min(100, Math.max(0, Math.round((current / maxScroll) * 100)))
+    setScrollProgress(progress)
+
+    const cardWidth = 460
+    const activeIndex = Math.min(
+      filteredTestimonials.length - 1,
+      Math.max(0, Math.round(current / cardWidth))
+    )
+    setCurrentIndex(activeIndex)
+  }, [filteredTestimonials.length])
+
+  useEffect(() => {
+    const el = scrollContainerRef.current
+    if (!el) return
+    el.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [handleScroll])
 
   const handleManualScroll = (direction: 'left' | 'right') => {
-    const track = trackRef.current
-    if (!track) return
-    const cardWidth = 320
+    const el = scrollContainerRef.current
+    if (!el) return
+    const cardWidth = 460
     const scrollDelta = direction === 'right' ? cardWidth : -cardWidth
-
-    if (window.innerWidth < 1024 && track.parentElement) {
-      track.parentElement.scrollBy({ left: scrollDelta, behavior: 'smooth' })
-    } else {
-      window.scrollBy({ top: scrollDelta, behavior: 'smooth' })
-    }
+    el.scrollBy({ left: scrollDelta, behavior: 'smooth' })
   }
 
   return (
     <section 
       id="testimonials" 
-      ref={sectionRef} 
-      className="py-10 sm:py-16 bg-[var(--color-surface-base)] relative overflow-hidden flex flex-col justify-center min-h-0 lg:min-h-[90vh]"
+      className="py-10 sm:py-16 bg-[var(--color-surface-base)] relative overflow-hidden flex flex-col justify-center"
     >
       <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20 w-full">
         <div className="border-t border-[#233554] pt-8 sm:pt-12">
@@ -148,23 +119,22 @@ export const TestimonialsSection: React.FC = () => {
               </button>
             </div>
 
-            {/* Scroll Progress Indicator */}
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-mono text-[var(--color-text-muted)]">
-                {currentIndex + 1} / {filteredTestimonials.length}
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] text-[var(--color-text-subtle)]">
+                {String(currentIndex + 1).padStart(2, '0')} / {String(filteredTestimonials.length).padStart(2, '0')}
               </span>
-              <div className="w-28 h-1.5 bg-[var(--color-surface-card)] rounded-full overflow-hidden border border-[var(--color-border)]">
-                <div
-                  className="h-full bg-[var(--color-primary)] transition-all duration-150"
-                  style={{ width: `${Math.max(10, scrollProgress)}%` }}
+              <div className="w-24 sm:w-32 h-1 bg-[var(--color-surface-elevated)] rounded-full overflow-hidden border border-[var(--color-border)]">
+                <div 
+                  className="h-full bg-[var(--color-primary)] transition-all duration-150 ease-out rounded-full"
+                  style={{ width: `${scrollProgress}%` }}
                 />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Filter Toggle Buttons */}
-        <div className="flex items-center gap-2 mb-4 overflow-x-auto scrollbar-none pb-1">
+        {/* Category Filters */}
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none">
           <button
             onClick={() => setFilter('all')}
             className={`px-3.5 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer whitespace-nowrap font-bold ${
@@ -198,25 +168,24 @@ export const TestimonialsSection: React.FC = () => {
         </div>
 
         {/* Horizontal Scroll Track Wrapper */}
-        <div className="overflow-x-auto lg:overflow-hidden scrollbar-none py-1 snap-x snap-mandatory">
-          <div 
-            ref={trackRef} 
-            className="flex gap-4 sm:gap-6 items-stretch w-max"
-          >
+        <div 
+          ref={scrollContainerRef}
+          className="overflow-x-auto scrollbar-none py-2 snap-x snap-mandatory scroll-smooth"
+        >
+          <div className="flex gap-4 sm:gap-6 items-stretch w-max pb-2">
             {filteredTestimonials.map((testimonial) => (
               <div 
                 key={testimonial.id} 
-                className="w-[280px] sm:w-[440px] lg:w-[500px] shrink-0 snap-start flex flex-col"
+                className="w-[280px] sm:w-[440px] lg:w-[480px] shrink-0 snap-start flex flex-col"
               >
                 <TestimonialCard testimonial={testimonial} />
               </div>
             ))}
           </div>
         </div>
+
         </div>
       </div>
     </section>
   )
 }
-
-

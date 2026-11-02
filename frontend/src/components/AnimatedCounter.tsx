@@ -20,11 +20,26 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
 }) => {
   const ref = useRef<HTMLSpanElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-40px' })
-  const [displayValue, setDisplayValue] = useState<string>(
-    decimals > 0 ? (0).toFixed(decimals) : '0'
-  )
+
+  // Check prefers-reduced-motion for accessibility (Issue 4.8)
+  const prefersReducedMotion = typeof window !== 'undefined'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const finalString = decimals > 0 ? value.toFixed(decimals) : value.toString()
+
+  // Initialize directly to finalString for reduced-motion or SSR, otherwise 0
+  const [displayValue, setDisplayValue] = useState<string>(() => {
+    if (prefersReducedMotion) return finalString
+    return decimals > 0 ? (0).toFixed(decimals) : '0'
+  })
 
   useEffect(() => {
+    // If user prefers reduced motion, skip the animation loop entirely
+    if (prefersReducedMotion) {
+      setDisplayValue(finalString)
+      return
+    }
+
     if (!isInView) return
 
     let startTime: number | null = null
@@ -46,7 +61,7 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
       if (progress < 1) {
         animationFrameId = requestAnimationFrame(step)
       } else {
-        setDisplayValue(decimals > 0 ? value.toFixed(decimals) : value.toString())
+        setDisplayValue(finalString)
       }
     }
 
@@ -55,13 +70,18 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId)
     }
-  }, [isInView, value, decimals, duration])
+  }, [isInView, value, decimals, duration, prefersReducedMotion, finalString])
 
   return (
-    <span ref={ref} className={className}>
-      {prefix}
-      {displayValue}
-      {suffix}
+    <span
+      ref={ref}
+      className={className}
+      aria-label={`${prefix}${finalString}${suffix}`}
+      role="text"
+    >
+      <span aria-hidden="true">{prefix}</span>
+      <span aria-hidden="true">{displayValue}</span>
+      <span aria-hidden="true">{suffix}</span>
     </span>
   )
 }

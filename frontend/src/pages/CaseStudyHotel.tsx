@@ -5,6 +5,7 @@ import { Footer } from '../components/Footer'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { SEO } from '../components/SEO'
+import { PageContainer } from '../components/PageContainer'
 
 export default function CaseStudyHotel() {
   return (
@@ -15,10 +16,8 @@ export default function CaseStudyHotel() {
         canonicalUrl="/case-study/hotel-recommendation"
       />
       <Navbar />
-      <main id="main-content" className="pt-32 pb-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <Button href="/projects" variant="ghost" size="sm" icon={<ArrowLeft className="w-4 h-4" />} className="mb-6">
+      <PageContainer as="main" id="main-content" className="pt-32 pb-20">
+        <Button href="/projects" variant="ghost" size="sm" icon={<ArrowLeft className="w-4 h-4" />} className="mb-6">
             Back to Projects
           </Button>
 
@@ -69,8 +68,7 @@ export default function CaseStudyHotel() {
             </div>
           </div>
 
-        </div>
-      </main>
+      </PageContainer>
       <Footer />
     </div>
   )

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Newspaper, Calendar, Clock, PlusCircle, X, CheckCircle2, ArrowRight, Loader2, BookOpen } from 'lucide-react'
+import { Newspaper, Calendar, Clock, PlusCircle, X, CheckCircle2, ArrowRight, Loader2 } from 'lucide-react'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { AnimatedWords } from '../components/AnimatedWords'
@@ -112,9 +112,9 @@ export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & 
       } else {
         throw new Error(data.error || 'Failed to publish announcement')
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Publish news failed:', err)
-      setPublishError(err.message || 'Error: Could not connect to publish server.')
+      setPublishError(err instanceof Error ? err.message : 'Error: Could not connect to publish server.')
     } finally {
       setPublishing(false)
     }
@@ -316,7 +316,7 @@ export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & 
                     <label className="block text-xs font-mono text-[var(--color-text-subtle)] mb-1">CATEGORY</label>
                     <select
                       value={form.category}
-                      onChange={e => setForm(prev => ({ ...prev, category: e.target.value as any }))}
+                      onChange={e => setForm(prev => ({ ...prev, category: e.target.value as NewsItem['category'] }))}
                       className="w-full bg-[var(--color-surface-base)] border border-[var(--color-border)] rounded-xl px-3 py-2 text-xs text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)]"
                     >
                       <option value="Research">Research</option>

@@ -6,6 +6,7 @@ import { portfolioData } from '../content/portfolioData'
 import { Badge } from '../components/Badge'
 import { NewsHero } from '../components/PageHeroes'
 import { SEO } from '../components/SEO'
+import { PageContainer } from '../components/PageContainer'
 
 export default function NewsPage() {
 
@@ -22,7 +23,7 @@ export default function NewsPage() {
 
         <NewsSection heading="All entries" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mt-8 border-t border-[var(--color-border)]">
+        <PageContainer className="py-16 mt-8 border-t border-[var(--color-border)]">
           <h2 className="text-3xl font-serif font-bold text-[var(--color-text-main)] mb-8">
             Published Research & Papers
           </h2>
@@ -46,7 +47,7 @@ export default function NewsPage() {
               </div>
             ))}
           </div>
-        </div>
+        </PageContainer>
 
       </main>
       <Footer />

@@ -24,11 +24,20 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 export default function App() {
-  // Always show preloader on page reload/refresh
-  const [loading, setLoading] = useState(true)
+  // Show preloader only on the first visit per session to speed up subsequent first paint (Issue 4.4)
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const hasSeen = sessionStorage.getItem('portfolio_preloader_seen')
+      return !hasSeen
+    }
+    return false
+  })
 
   const handlePreloaderComplete = useCallback(() => {
     setLoading(false)
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('portfolio_preloader_seen', 'true')
+    }
   }, [])
 
   const location = useLocation()

@@ -132,4 +132,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .name-fill, .name-word { transition: none !important; }
+  .animate-marquee {
+    animation: none !important;
+  }
 }
+

@@ -1,37 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, Newspaper, Plus, ShieldCheck, Trash2, Mail, MessageSquare, Loader2, Calendar, Clock, RefreshCw, Menu, X } from 'lucide-react'
-import { Button } from '../components/Button'
-import { Badge } from '../components/Badge'
+import { LogOut, Newspaper, ShieldCheck, Mail, MessageSquare, Loader2, RefreshCw, Menu, X } from 'lucide-react'
 import { apiUrl, getAdminToken, clearAdminToken } from '../lib/api'
 import { SEO } from '../components/SEO'
-
-interface ContactMessage {
-  id: string
-  name: string
-  email: string
-  subject: string
-  message: string
-  lens?: string
-  timestamp: string
-}
-
-interface NewsItem {
-  id: string
-  title: string
-  date: string
-  category: string
-  summary: string
-  content: string
-}
-
-interface GuestbookEntry {
-  id: string
-  name: string
-  message: string
-  signatureData: string
-  timestamp: string
-}
+import { AdminNewsTab, type NewsItem } from '../components/admin/AdminNewsTab'
+import { AdminMessagesTab, type ContactMessage } from '../components/admin/AdminMessagesTab'
+import { AdminGuestbookTab, type GuestbookEntry } from '../components/admin/AdminGuestbookTab'
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
@@ -39,15 +13,6 @@ export default function AdminDashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [adminToken, setAdminTokenState] = useState<string | null>(null)
   const [loadingVerify, setLoadingVerify] = useState(true)
-
-  // News Form State
-  const [title, setTitle] = useState('')
-  const [summary, setSummary] = useState('')
-  const [content, setContent] = useState('')
-  const [category, setCategory] = useState('Research')
-  const [tags, setTags] = useState('Research, AI')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [feedback, setFeedback] = useState('')
 
   // Data collections
   const [newsArticles, setNewsArticles] = useState<NewsItem[]>([])
@@ -85,7 +50,7 @@ export default function AdminDashboard() {
     verifyToken()
   }, [navigate])
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     if (!adminToken) return
     setLoadingData(true)
     try {
@@ -116,105 +81,17 @@ export default function AdminDashboard() {
     } finally {
       setLoadingData(false)
     }
-  }
+  }, [adminToken])
 
   useEffect(() => {
     if (adminToken) {
       fetchDashboardData()
     }
-  }, [adminToken])
+  }, [adminToken, fetchDashboardData])
 
   const handleLogout = () => {
     clearAdminToken()
     navigate('/')
-  }
-
-  const handlePublishNews = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!title || !summary || !content) {
-      setFeedback('Error: All fields are required.')
-      return
-    }
-
-    setIsSubmitting(true)
-    setFeedback('')
-
-    try {
-      const res = await fetch(apiUrl('/api/news'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${adminToken}`
-        },
-        body: JSON.stringify({
-          title,
-          summary,
-          content,
-          category,
-          tags: tags.split(',').map(t => t.trim())
-        })
-      })
-
-      const data = await res.json()
-      if (res.ok && data.success) {
-        setFeedback('Success! News article published live.')
-        setTitle('')
-        setSummary('')
-        setContent('')
-        fetchDashboardData()
-      } else {
-        setFeedback(`Failed: ${data.error || 'Server rejected article'}`)
-      }
-    } catch {
-      setFeedback('Error: Failed to connect to server.')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const handleDeleteNews = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this news article?')) return
-    try {
-      const res = await fetch(apiUrl(`/api/admin/news/${id}`), {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${adminToken}` }
-      })
-      if (res.ok) {
-        setNewsArticles(prev => prev.filter(n => n.id !== id))
-      }
-    } catch (err) {
-      console.error('Delete news error:', err)
-    }
-  }
-
-  const handleDeleteMessage = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this message?')) return
-    try {
-      const res = await fetch(apiUrl(`/api/admin/messages/${id}`), {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${adminToken}` }
-      })
-      if (res.ok) {
-        setMessages(prev => prev.filter(m => m.id !== id))
-      }
-    } catch (err) {
-      console.error('Delete message error:', err)
-    }
-  }
-
-  const handleDeleteGuestbook = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this guestbook signature?')) return
-    try {
-      const res = await fetch(apiUrl(`/api/admin/guestbook/${id}`), {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${adminToken}` }
-      })
-      if (res.ok) {
-        setGuestbookEntries(prev => prev.filter(g => g.id !== id))
-      }
-    } catch (err) {
-      console.error('Delete guestbook error:', err)
-    }
   }
 
   if (loadingVerify || !adminToken) {
@@ -228,7 +105,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col md:flex-row">
       <SEO title="Admin Dashboard" description="Portfolio content and telemetry management." canonicalUrl="/admin/dashboard" />
-      {/* Sidebar (Issue 5.11: Fully responsive on mobile with toggleable drawer) */}
+      {/* Sidebar */}
       <aside className="w-full md:w-64 bg-[var(--color-surface-card)] border-r border-[var(--color-border)] flex flex-col shrink-0">
         <div className="p-4 sm:p-6 border-b border-[var(--color-border)] flex items-center justify-between">
           <div>
@@ -246,7 +123,7 @@ export default function AdminDashboard() {
               <RefreshCw className={`w-3.5 h-3.5 ${loadingData ? 'animate-spin' : ''}`} />
             </button>
             <button
-              onClick={() => setMobileMenuOpen(prev => !prev)}
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
               aria-label="Toggle navigation menu"
               className="md:hidden p-1.5 rounded-lg border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] cursor-pointer"
             >
@@ -328,247 +205,30 @@ export default function AdminDashboard() {
 
       {/* Main Content Area */}
       <main className="flex-grow p-6 sm:p-10 overflow-y-auto">
-        
-        {/* --- TAB 1: NEWS PUBLISHING & MANAGEMENT --- */}
         {activeTab === 'news' && (
-          <div className="space-y-10 max-w-4xl">
-            {/* Create New Announcement Form */}
-            <div className="bg-[var(--color-surface-card)] rounded-3xl border border-[var(--color-border)] p-6 sm:p-8 shadow-xl">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center">
-                  <Plus className="w-5 h-5 text-[var(--color-primary)]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-serif font-bold">Publish New Announcement</h2>
-                  <p className="text-xs font-mono text-[var(--color-text-muted)]">Post research milestones, news, and project releases live</p>
-                </div>
-              </div>
-
-              <form onSubmit={handlePublishNews} className="space-y-5">
-                <div>
-                  <label className="block text-xs font-mono text-[var(--color-text-subtle)] mb-1.5 uppercase">Article Title *</label>
-                  <input
-                    type="text"
-                    value={title}
-                    onChange={e => setTitle(e.target.value)}
-                    className="w-full bg-[var(--color-surface-base)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)]"
-                    placeholder="e.g. Published Paper on Geospatial Recommender Systems..."
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-mono text-[var(--color-text-subtle)] mb-1.5 uppercase">Category</label>
-                    <select
-                      value={category}
-                      onChange={e => setCategory(e.target.value)}
-                      className="w-full bg-[var(--color-surface-base)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)]"
-                    >
-                      <option value="Research">Research</option>
-                      <option value="Industry">Industry</option>
-                      <option value="Academics">Academics</option>
-                      <option value="Awards">Awards</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-mono text-[var(--color-text-subtle)] mb-1.5 uppercase">Tags (comma-separated)</label>
-                    <input
-                      type="text"
-                      value={tags}
-                      onChange={e => setTags(e.target.value)}
-                      className="w-full bg-[var(--color-surface-base)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)]"
-                      placeholder="e.g. AI, NLP, Research"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-mono text-[var(--color-text-subtle)] mb-1.5 uppercase">Short Summary (Preview Card) *</label>
-                  <textarea
-                    value={summary}
-                    onChange={e => setSummary(e.target.value)}
-                    rows={2}
-                    className="w-full bg-[var(--color-surface-base)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)] resize-none"
-                    placeholder="Brief 1-2 sentence overview shown on the home page."
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-mono text-[var(--color-text-subtle)] mb-1.5 uppercase">Full Article Content *</label>
-                  <textarea
-                    value={content}
-                    onChange={e => setContent(e.target.value)}
-                    rows={6}
-                    className="w-full bg-[var(--color-surface-base)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)] resize-none"
-                    placeholder="Full detailed article text. Supports multiple paragraphs with line breaks."
-                    required
-                  />
-                </div>
-
-                <div className="flex items-center justify-between pt-2">
-                  <span className={`text-xs font-mono ${feedback.includes('Error') || feedback.includes('Failed') ? 'text-red-400' : 'text-green-400'}`}>
-                    {feedback}
-                  </span>
-                  <Button type="submit" variant="primary" disabled={isSubmitting}>
-                    {isSubmitting ? 'Publishing live...' : 'Publish Announcement'}
-                  </Button>
-                </div>
-              </form>
-            </div>
-
-            {/* List of Existing Articles */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-serif font-bold">Currently Published Articles ({newsArticles.length})</h3>
-              <div className="space-y-3">
-                {newsArticles.map(article => (
-                  <div
-                    key={article.id}
-                    className="p-4 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge variant="primary" size="sm">{article.category}</Badge>
-                        <span className="text-xs font-mono text-[var(--color-text-subtle)]">{article.date}</span>
-                      </div>
-                      <h4 className="font-serif font-bold text-base text-[var(--color-text-main)]">{article.title}</h4>
-                      <p className="text-xs text-[var(--color-text-muted)] mt-1 line-clamp-1">{article.summary}</p>
-                    </div>
-
-                    <button
-                      onClick={() => handleDeleteNews(article.id)}
-                      className="self-end sm:self-center p-2 rounded-xl text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors"
-                      title="Delete Article"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <AdminNewsTab
+            adminToken={adminToken}
+            newsArticles={newsArticles}
+            setNewsArticles={setNewsArticles}
+            onRefresh={fetchDashboardData}
+          />
         )}
 
-        {/* --- TAB 2: CONTACT MESSAGES --- */}
         {activeTab === 'messages' && (
-          <div className="space-y-6 max-w-4xl">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-2xl font-serif font-bold">Contact Inquiries ({messages.length})</h2>
-                <p className="text-xs font-mono text-[var(--color-text-muted)]">Real submissions received from the contact form</p>
-              </div>
-            </div>
-
-            {messages.length === 0 ? (
-              <div className="p-12 text-center bg-[var(--color-surface-card)] rounded-2xl border border-[var(--color-border)]">
-                <Mail className="w-10 h-10 text-[var(--color-text-muted)] mx-auto mb-3" />
-                <p className="text-sm font-mono text-[var(--color-text-muted)]">No messages received yet.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {messages.map(msg => (
-                  <div
-                    key={msg.id}
-                    className="p-6 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl space-y-3"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[var(--color-border)]">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-serif font-bold text-base">{msg.name}</span>
-                          <span className="text-xs font-mono text-[var(--color-primary)]">
-                            &lt;{msg.email}&gt;
-                          </span>
-                        </div>
-                        <div className="text-xs font-mono text-[var(--color-text-muted)] mt-0.5 flex items-center gap-2">
-                          <span>Subject: {msg.subject}</span>
-                          {msg.lens && <span>• [{msg.lens.toUpperCase()}]</span>}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <span className="text-[11px] font-mono text-[var(--color-text-subtle)] flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> {new Date(msg.timestamp).toLocaleString()}
-                        </span>
-                        <a
-                          href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject)}`}
-                          className="px-3 py-1 rounded-lg text-xs font-mono bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/20"
-                        >
-                          Reply
-                        </a>
-                        <button
-                          onClick={() => handleDeleteMessage(msg.id)}
-                          className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
-                          title="Delete message"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <p className="text-xs sm:text-sm text-[var(--color-text-main)] whitespace-pre-wrap leading-relaxed font-sans pt-1">
-                      {msg.message}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <AdminMessagesTab
+            adminToken={adminToken}
+            messages={messages}
+            setMessages={setMessages}
+          />
         )}
 
-        {/* --- TAB 3: GUESTBOOK MODERATION --- */}
         {activeTab === 'guestbook' && (
-          <div className="space-y-6 max-w-4xl">
-            <div>
-              <h2 className="text-2xl font-serif font-bold">Guestbook Moderation ({guestbookEntries.length})</h2>
-              <p className="text-xs font-mono text-[var(--color-text-muted)]">Manage public visitor signatures and messages</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {guestbookEntries.map(entry => (
-                <div
-                  key={entry.id}
-                  className="p-5 bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-sm text-[var(--color-text-main)]">{entry.name}</span>
-                      <button
-                        onClick={() => handleDeleteGuestbook(entry.id)}
-                        className="text-red-400 hover:text-red-300 p-1 rounded"
-                        title="Delete entry"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    {entry.message && (
-                      <p className="text-xs text-[var(--color-text-muted)] mb-3 italic">
-                        "{entry.message}"
-                      </p>
-                    )}
-
-                    {entry.signatureData && (
-                      <div className="p-2 bg-neutral-900 rounded-lg mb-2 flex justify-center">
-                        <img
-                          src={entry.signatureData}
-                          alt={`${entry.name}'s signature`}
-                          className="h-12 object-contain"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <span className="text-[10px] font-mono text-[var(--color-text-subtle)] pt-2 border-t border-[var(--color-border)]">
-                    {new Date(entry.timestamp).toLocaleDateString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <AdminGuestbookTab
+            adminToken={adminToken}
+            guestbookEntries={guestbookEntries}
+            setGuestbookEntries={setGuestbookEntries}
+          />
         )}
-
       </main>
     </div>
   )

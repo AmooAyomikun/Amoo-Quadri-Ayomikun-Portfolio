@@ -1,23 +1,13 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
+import { motion } from 'framer-motion'
 import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { AboutSection } from '../sections/AboutSection'
-import profileImg from '../assets/profile.png'
-import gsap from 'gsap'
+import profileImg from '../assets/profile.webp'
 import { SEO } from '../components/SEO'
+import { PageContainer } from '../components/PageContainer'
 
 export default function AboutPage() {
-  const headerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!headerRef.current) return
-    gsap.fromTo(
-      headerRef.current,
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
-    )
-  }, [])
-
   return (
     <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[#64ffda] selection:text-[#0a192f]">
       <SEO 
@@ -26,10 +16,14 @@ export default function AboutPage() {
         canonicalUrl="/about"
       />
       <Navbar />
-      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-28 sm:pb-32">
-        
+      <PageContainer as="main" id="main-content" className="pb-28 sm:pb-32">
         {/* Page Hero Header */}
-        <div ref={headerRef} className="py-10 sm:py-14 border-b border-[var(--color-border)]">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="py-10 sm:py-14 border-b border-[var(--color-border)]"
+        >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             <div className="lg:col-span-8 space-y-4">
@@ -53,16 +47,19 @@ export default function AboutPage() {
                   src={profileImg}
                   alt="Quadri Ayomikun Amoo"
                   className="w-full h-full object-cover object-top"
+                  loading="lazy"
+                  width={208}
+                  height={208}
                 />
               </div>
             </div>
 
           </div>
-        </div>
+        </motion.div>
 
         <AboutSection />
 
-      </main>
+      </PageContainer>
       <Footer />
     </div>
   )

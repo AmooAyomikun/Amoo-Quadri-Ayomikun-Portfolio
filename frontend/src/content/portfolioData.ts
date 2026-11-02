@@ -351,7 +351,7 @@ export const portfolioData = {
         { label: 'Role', value: 'Frontend' },
         { label: 'Domain', value: 'Logistics' }
       ],
-      imageUrl: '/dispatchlane.png',
+      imageUrl: '/dispatchlane.webp',
       demoUrl: 'https://dispatch-lane-delivery-and-dispatch.vercel.app/',
       tourRoutes: ['/', '/features', '/how-it-works', '/pricing', '/track'],
       githubUrl: 'https://github.com/AmooAyomikun/DispatchLane-delivery-and-dispatch-tracker',
@@ -379,7 +379,7 @@ export const portfolioData = {
         { label: 'Role', value: 'Frontend' },
         { label: 'Domain', value: 'E-Commerce' }
       ],
-      imageUrl: '/koraapp.png',
+      imageUrl: '/koraapp.webp',
       demoUrl: 'https://kora-e-commerce-website.vercel.app/',
       tourRoutes: ['/', '/products', '/cart', '/sell-on-kora'],
       githubUrl: 'https://github.com/AmooAyomikun/Kora-E-commerce-Website',
@@ -435,7 +435,7 @@ export const portfolioData = {
         { label: 'Role', value: 'Frontend' },
         { label: 'Domain', value: 'EdTech' }
       ],
-      imageUrl: '/pathly.png',
+      imageUrl: '/pathly.webp',
       demoUrl: 'https://pathly-online-learnig-platform.vercel.app/',
       tourRoutes: ['/', '/courses', '/instructors', '/pricing'],
       githubUrl: 'https://github.com/AmooAyomikun/Pathly-Online-Learnig-Platform-',
