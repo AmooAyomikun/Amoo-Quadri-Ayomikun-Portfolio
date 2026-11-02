@@ -77,25 +77,51 @@ export const getNews = async (req: Request, res: Response): Promise<void> => {
 export const publishNews = async (req: Request, res: Response): Promise<void> => {
   const { title, category, summary, content, tags, externalUrl } = req.body as Partial<NewsItem>
 
-  if (!title || !summary || !content) {
+  if (
+    typeof title !== 'string' ||
+    typeof summary !== 'string' ||
+    typeof content !== 'string' ||
+    !title.trim() ||
+    !summary.trim() ||
+    !content.trim()
+  ) {
     res.status(400).json({
       success: false,
-      error: 'Missing required fields: title, summary, and content are required.'
+      error: 'Missing or invalid required fields: title, summary, and content must be non-empty strings.'
     })
     return
   }
 
+  // Safe externalUrl check (block javascript: or malformed URLs)
+  let safeExternalUrl: string | undefined = undefined
+  if (typeof externalUrl === 'string' && externalUrl.trim()) {
+    try {
+      const parsedUrl = new URL(externalUrl.trim())
+      if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+        safeExternalUrl = parsedUrl.href
+      }
+    } catch {
+      // Ignore invalid URL
+    }
+  }
+
+  const safeTags = Array.isArray(tags)
+    ? tags.filter((t): t is string => typeof t === 'string').map(t => t.trim().slice(0, 50)).slice(0, 10)
+    : ['News Update']
+
   const newArticle: NewsItem = {
     id: `news-${Date.now()}`,
-    title: title.trim(),
+    title: title.trim().slice(0, 200),
     date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-    category: (category as NewsItem['category']) || 'Research',
-    summary: summary.trim(),
-    content: content.trim(),
+    category: (typeof category === 'string' && ['Research', 'Industry', 'Awards', 'Technical', 'General'].includes(category))
+      ? (category as NewsItem['category'])
+      : 'Research',
+    summary: summary.trim().slice(0, 500),
+    content: content.trim().slice(0, 20000),
     author: 'Quadri Ayomikun Amoo',
-    readTime: `${Math.max(1, Math.ceil(content.split(' ').length / 150))} min read`,
-    tags: Array.isArray(tags) ? tags : ['News Update'],
-    externalUrl,
+    readTime: `${Math.max(1, Math.ceil(content.split(/\s+/).length / 150))} min read`,
+    tags: safeTags.length > 0 ? safeTags : ['News Update'],
+    externalUrl: safeExternalUrl,
     isPinned: false
   }
 

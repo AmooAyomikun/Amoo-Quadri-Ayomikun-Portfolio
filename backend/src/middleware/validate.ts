@@ -28,16 +28,16 @@ export const validateBody = (schema: ZodSchema) => {
 
 // 1. News publishing schema (Protects against non-string crashes & stored XSS via javascript: URLs)
 export const publishNewsSchema = z.object({
-  title: z.string({ required_error: 'Title is required' })
+  title: z.string()
     .trim()
     .min(3, 'Title must be at least 3 characters')
     .max(200, 'Title cannot exceed 200 characters'),
   category: z.enum(['Research', 'Industry', 'Awards', 'Technical', 'General']).default('Research'),
-  summary: z.string({ required_error: 'Summary is required' })
+  summary: z.string()
     .trim()
     .min(10, 'Summary must be at least 10 characters')
     .max(500, 'Summary cannot exceed 500 characters'),
-  content: z.string({ required_error: 'Content is required' })
+  content: z.string()
     .trim()
     .min(20, 'Content must be at least 20 characters')
     .max(20000, 'Content cannot exceed 20,000 characters'),
@@ -62,16 +62,16 @@ export const publishNewsSchema = z.object({
 
 // 2. Contact message submission schema
 export const contactMessageSchema = z.object({
-  name: z.string({ required_error: 'Name is required' })
+  name: z.string()
     .trim()
     .min(2, 'Name must be at least 2 characters')
     .max(100, 'Name cannot exceed 100 characters'),
-  email: z.string({ required_error: 'Email is required' })
+  email: z.string()
     .trim()
     .email('Invalid email address')
     .max(120, 'Email cannot exceed 120 characters'),
   subject: z.string().trim().max(150, 'Subject cannot exceed 150 characters').optional().default('General Inquiry'),
-  message: z.string({ required_error: 'Message is required' })
+  message: z.string()
     .trim()
     .min(5, 'Message must be at least 5 characters')
     .max(3000, 'Message cannot exceed 3,000 characters')
@@ -79,7 +79,7 @@ export const contactMessageSchema = z.object({
 
 // 3. Newsletter subscription schema
 export const subscribeSchema = z.object({
-  email: z.string({ required_error: 'Email is required' })
+  email: z.string()
     .trim()
     .email('Invalid email address')
     .max(120, 'Email cannot exceed 120 characters')
@@ -87,11 +87,11 @@ export const subscribeSchema = z.object({
 
 // 4. Guestbook signature schema
 export const guestbookSignatureSchema = z.object({
-  name: z.string({ required_error: 'Name is required' })
+  name: z.string()
     .trim()
     .min(2, 'Name must be at least 2 characters')
     .max(60, 'Name cannot exceed 60 characters'),
-  message: z.string({ required_error: 'Message is required' })
+  message: z.string()
     .trim()
     .min(2, 'Message must be at least 2 characters')
     .max(280, 'Message cannot exceed 280 characters'),
@@ -101,7 +101,7 @@ export const guestbookSignatureSchema = z.object({
 
 // 5. AI Chat input schema (Capped at 500 chars to prevent cost abuse)
 export const aiChatSchema = z.object({
-  message: z.string({ required_error: 'Message is required' })
+  message: z.string()
     .trim()
     .min(1, 'Message cannot be empty')
     .max(500, 'Message length must not exceed 500 characters')
@@ -118,5 +118,5 @@ export const visitorLogSchema = z.object({
 
 // 7. Admin login schema
 export const adminLoginSchema = z.object({
-  password: z.string({ required_error: 'Password is required' }).min(1, 'Password is required')
+  password: z.string().min(1, 'Password is required')
 })

@@ -4,6 +4,7 @@ import path from 'path'
 import crypto from 'crypto'
 import { fileURLToPath } from 'url'
 import { db } from '../config/firebase.js'
+import { env } from '../config/env.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -32,7 +33,7 @@ interface CachedStats {
 let memoryStatsCache: CachedStats | null = null
 const CACHE_TTL_MS = 60 * 1000 // 60 seconds
 
-const HASH_SALT = process.env.VISITOR_SALT || 'amoo-quadri-visitor-salt'
+const HASH_SALT: string = env.VISITOR_SALT || 'amoo-quadri-visitor-salt'
 
 const hashIp = (ip: string): string => {
   return crypto.createHmac('sha256', HASH_SALT).update(ip).digest('hex').substring(0, 20)
@@ -112,26 +113,23 @@ const computeStats = (visitors: VisitorRecord[]) => {
 
 export const logVisitor = async (req: Request, res: Response): Promise<void> => {
   try {
-    // 1. Extract client IP from headers
-    const ipHeader = req.headers['x-forwarded-for'] || req.headers['cf-connecting-ip'] || req.headers['x-real-ip'] || req.socket.remoteAddress || ''
-    let ip = ''
-    if (Array.isArray(ipHeader)) {
-      ip = ipHeader[0].split(',')[0].trim()
-    } else if (typeof ipHeader === 'string') {
-      ip = ipHeader.split(',')[0].trim()
-    }
+    // 1. Extract client IP using Express req.ip (trusted proxy enabled)
+    const rawIp = req.ip || req.socket.remoteAddress || ''
+    let ip = rawIp.replace(/^::ffff:/, '').trim()
 
-    if (ip.startsWith('::ffff:')) {
-      ip = ip.substring(7)
-    }
-
-    // 2. Client-side hint may be passed from client-side geo lookup (get.geojs.io)
+    // 2. Validate client-side hint (lat in [-90,90], lon in [-180,180], cap string lengths)
     const clientHint = req.body ?? {}
-    let country = clientHint.country ? String(clientHint.country).trim() : ''
-    let countryCode = clientHint.countryCode ? String(clientHint.countryCode).trim().toUpperCase() : ''
-    let city = clientHint.city ? String(clientHint.city).trim() : ''
-    let lat: number | null = typeof clientHint.lat === 'number' && !isNaN(clientHint.lat) ? clientHint.lat : null
-    let lon: number | null = typeof clientHint.lon === 'number' && !isNaN(clientHint.lon) ? clientHint.lon : null
+    let country = typeof clientHint.country === 'string' ? clientHint.country.trim().slice(0, 60) : ''
+    let countryCode = typeof clientHint.countryCode === 'string' ? clientHint.countryCode.trim().toUpperCase().slice(0, 3) : ''
+    let city = typeof clientHint.city === 'string' ? clientHint.city.trim().slice(0, 60) : ''
+    let lat: number | null = (typeof clientHint.lat === 'number' && !isNaN(clientHint.lat) && clientHint.lat >= -90 && clientHint.lat <= 90) ? clientHint.lat : null
+    let lon: number | null = (typeof clientHint.lon === 'number' && !isNaN(clientHint.lon) && clientHint.lon >= -180 && clientHint.lon <= 180) ? clientHint.lon : null
+
+    // If client supplied incomplete or invalid coordinates, discard them so server geolocates
+    if (lat === null || lon === null || !country || !city) {
+      lat = null
+      lon = null
+    }
 
     const isPrivateIp = !ip || ip === '::1' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')
     let resolvedIp = ip

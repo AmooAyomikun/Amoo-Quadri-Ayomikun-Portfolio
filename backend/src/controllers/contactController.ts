@@ -107,9 +107,8 @@ export const submitContact = async (req: Request, res: Response): Promise<void> 
 
   console.log('[Contact API Submission Saved]', {
     id: newMessage.id,
-    name: newMessage.name,
-    email: newMessage.email,
-    subject: newMessage.subject
+    lens: newMessage.lens,
+    timestamp: newMessage.timestamp
   })
 
   res.status(200).json({

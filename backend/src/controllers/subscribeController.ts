@@ -78,7 +78,7 @@ export const subscribeNewsletter = async (req: Request, res: Response): Promise<
     }
   }
 
-  console.log('[Newsletter Subscribed]:', cleanEmail)
+  console.log('[Newsletter Subscribed] Total count:', subscribers.length)
 
   res.status(201).json({
     success: true,

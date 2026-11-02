@@ -10,6 +10,10 @@ export const handleAiChat = async (req: Request, res: Response): Promise<void> =
     }
 
     const userPrompt = message.trim()
+    if (userPrompt.length > 500) {
+      res.status(400).json({ error: 'Message exceeds maximum length of 500 characters' })
+      return
+    }
 
     // If Gemini API Key is present in environment, call live Gemini LLM API
     if (process.env.GEMINI_API_KEY) {
@@ -63,8 +67,7 @@ Keep responses under 3-4 sentences, styled like a smart CLI output.`
                 break
               }
             } else {
-              const errBody = await apiRes.text()
-              console.warn(`Gemini model ${model} response not ok: ${apiRes.status}`, errBody.slice(0, 150))
+              console.warn(`Gemini model ${model} returned HTTP ${apiRes.status}`)
             }
           } catch (modelErr) {
             console.warn(`Error querying model ${model}:`, modelErr)
