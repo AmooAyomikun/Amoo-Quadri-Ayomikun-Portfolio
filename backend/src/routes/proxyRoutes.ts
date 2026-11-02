@@ -1,7 +1,16 @@
 import { Router, Request, Response } from 'express'
+import rateLimit from 'express-rate-limit'
 import { env } from '../config/env.js'
 
 const router = Router()
+
+const proxyLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 60,
+  message: { error: 'Too many proxy preview requests. Please wait a few minutes before retrying.' },
+  standardHeaders: true,
+  legacyHeaders: false
+})
 
 const ALLOWED_DEMO_HOSTS = new Set([
   'cleanreport-frontend.vercel.app',
@@ -25,7 +34,7 @@ function isPrivateOrInternalHost(hostname: string): boolean {
   )
 }
 
-router.get('/', async (req: Request, res: Response): Promise<void> => {
+router.get('/', proxyLimiter, async (req: Request, res: Response): Promise<void> => {
   const targetUrl = req.query.url as string
   if (!targetUrl || typeof targetUrl !== 'string') {
     res.status(400).json({ error: 'Missing or invalid url query parameter' })

@@ -186,6 +186,8 @@ describe('Backend Integration Test Suite (Issues 3.1 - 3.9)', () => {
   it('GET /api/proxy blocks disallowed third-party hostnames', async () => {
     const res = await request(app).get('/api/proxy?url=https://attacker-controlled-site.com')
     assert.strictEqual(res.status, 403)
+    // Rate limiter standard headers
+    assert.ok(res.headers['ratelimit-limit'] !== undefined)
   })
 
   // 8. AI Chat Route (Length capping and cost abuse protection) (Issue 2.5, 3.9)

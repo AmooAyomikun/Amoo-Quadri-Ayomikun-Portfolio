@@ -32,7 +32,7 @@ jobs:
         run: npm run build --prefix backend
 
       - name: Typecheck Frontend
-        run: npx tsc -b frontend/tsconfig.app.json
+        run: npm run typecheck --prefix frontend
 
       - name: Lint Frontend (oxlint)
         run: npm run lint --prefix frontend

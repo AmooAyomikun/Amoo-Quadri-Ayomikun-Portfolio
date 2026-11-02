@@ -4,6 +4,7 @@ import { ThemeProvider } from './lib/theme'
 import { LensProvider } from './lib/lens'
 import { Preloader } from './components/Preloader'
 import { BackToTop } from './components/BackToTop'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { useBackendKeepAlive } from './hooks/useBackendKeepAlive'
 
 const Home = lazy(() => import('./pages/Home'))
@@ -53,29 +54,31 @@ export default function App() {
     <ThemeProvider>
       <LensProvider>
         {loading && <Preloader onComplete={handlePreloaderComplete} />}
-        <Suspense fallback={<div className="min-h-screen bg-[var(--color-surface-base)]" />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<Navigate to="/#about" replace />} />
-            <Route path="/education" element={<EducationPage />} />
-            <Route path="/research" element={<ResearchPage />} />
-            <Route path="/experience" element={<ExperiencePage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/testimonials" element={<Navigate to="/experience" replace />} />
-            <Route path="/news" element={<NewsPage />} />
-            <Route path="/news/:id" element={<NewsArticlePage />} />
-            <Route path="/guestbook" element={<GuestbookPage />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/case-study/clean-report" element={<CaseStudyCleanReport />} />
-            <Route path="/case-study/hotel-recommendation" element={<CaseStudyHotel />} />
-            <Route path="/projects/:id" element={<ProjectDetailPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<div className="min-h-screen bg-[var(--color-surface-base)]" />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<Navigate to="/#about" replace />} />
+              <Route path="/education" element={<EducationPage />} />
+              <Route path="/research" element={<ResearchPage />} />
+              <Route path="/experience" element={<ExperiencePage />} />
+              <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/testimonials" element={<Navigate to="/experience" replace />} />
+              <Route path="/news" element={<NewsPage />} />
+              <Route path="/news/:id" element={<NewsArticlePage />} />
+              <Route path="/guestbook" element={<GuestbookPage />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/case-study/clean-report" element={<CaseStudyCleanReport />} />
+              <Route path="/case-study/hotel-recommendation" element={<CaseStudyHotel />} />
+              <Route path="/projects/:id" element={<ProjectDetailPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
         <BackToTop />
       </LensProvider>
     </ThemeProvider>
