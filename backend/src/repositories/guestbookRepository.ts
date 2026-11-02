@@ -70,7 +70,7 @@ export class GuestbookRepository {
         const hasMore = docs.length > limit
         const resultDocs = hasMore ? docs.slice(0, limit) : docs
 
-        const entries = resultDocs.map(doc => ({
+        const entries = resultDocs.map((doc: any) => ({
           id: doc.id,
           ...doc.data()
         })) as GuestbookEntry[]

@@ -46,7 +46,7 @@ export class NewsRepository {
           .get()
 
         if (!snapshot.empty) {
-          return snapshot.docs.map(doc => ({
+          return snapshot.docs.map((doc: any) => ({
             id: doc.id,
             ...doc.data()
           })) as NewsItem[]

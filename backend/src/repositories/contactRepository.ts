@@ -72,7 +72,7 @@ export class ContactRepository {
         const hasMore = docs.length > limit
         const resultDocs = hasMore ? docs.slice(0, limit) : docs
 
-        const data = resultDocs.map(doc => ({
+        const data = resultDocs.map((doc: any) => ({
           id: doc.id,
           ...doc.data()
         })) as ContactSubmission[]

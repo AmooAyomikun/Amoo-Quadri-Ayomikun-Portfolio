@@ -10,7 +10,19 @@ import { initialNewsData, formatNewsDate, type NewsItem } from '../content/newsD
 
 export type { NewsItem }
 
-export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & Announcements' }) => {
+interface NewsSectionProps {
+  heading?: string
+  badgeText?: string
+  limit?: number
+  showViewAll?: boolean
+}
+
+export const NewsSection: React.FC<NewsSectionProps> = ({
+  heading = 'News & Announcements',
+  badgeText = '// TIMELINE & DISPATCHES',
+  limit,
+  showViewAll = false
+}) => {
   const [newsList, setNewsList] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null)
@@ -34,7 +46,16 @@ export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & 
       const res = await fetch(apiUrl('/api/news'))
       const data = await res.json()
       if (res.ok && data.success && Array.isArray(data.data)) {
-        setNewsList(data.data)
+        // Merge server articles with initial flagship articles so that real articles are never missing
+        const combined = [...data.data, ...initialNewsData]
+        const seen = new Set<string>()
+        const unique = combined.filter((item: NewsItem) => {
+          const key = (item.title || '').trim().toLowerCase()
+          if (!key || seen.has(key)) return false
+          seen.add(key)
+          return true
+        })
+        setNewsList(unique.length > 0 ? unique : initialNewsData)
       } else {
         throw new Error('API response invalid')
       }
@@ -120,6 +141,8 @@ export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & 
     }
   }
 
+  const displayList = typeof limit === 'number' && limit > 0 ? newsList.slice(0, limit) : newsList
+
   return (
     <section id="news" className="py-12 sm:py-16 bg-[var(--color-surface-base)] relative">
       <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20">
@@ -129,7 +152,7 @@ export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & 
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div>
             <span className="text-xs font-mono uppercase tracking-widest text-[var(--color-primary)] font-semibold flex items-center gap-1.5">
-              <Newspaper className="w-4 h-4" /> Latest Updates & Articles
+              <Newspaper className="w-4 h-4" /> {badgeText}
             </span>
             <h2 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--color-text-main)] mt-1">
               <AnimatedWords text={heading} />
@@ -154,9 +177,9 @@ export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & 
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
           }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          className={`grid grid-cols-1 sm:grid-cols-2 ${displayList.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-5 sm:gap-6`}
         >
-          {newsList.map((item) => (
+          {displayList.map((item) => (
             <motion.div 
               variants={{
                 hidden: { opacity: 0, y: 30 },
@@ -204,6 +227,18 @@ export const NewsSection: React.FC<{ heading?: string }> = ({ heading = 'News & 
             </motion.div>
           ))}
         </motion.div>
+
+        {showViewAll && (
+          <div className="mt-10 sm:mt-12 flex justify-center">
+            <Link
+              to="/news"
+              className="group inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-elevated)] border border-[var(--color-border)] hover:border-[var(--color-primary)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] font-mono text-xs sm:text-sm font-semibold transition-all duration-300 shadow-sm hover:shadow-lg active:scale-95"
+            >
+              <span>Explore All News & Timeline</span>
+              <ArrowRight className="w-4 h-4 text-[var(--color-primary)] transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+          </div>
+        )}
         </div>
       </div>
 

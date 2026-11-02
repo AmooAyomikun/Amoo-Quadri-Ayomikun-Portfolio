@@ -90,16 +90,46 @@ export const findCountryCount = (geoName: string, stats: Record<string, number>)
   return 0
 }
 
+const CACHED_STATS_KEY = 'portfolio_visitor_stats_cache'
+
+const BASELINE_DATA: VisitorResponse = {
+  userCountry: 'Nigeria',
+  userCountryCode: 'NG',
+  userCity: 'Lagos',
+  userCountryCount: 5,
+  totalVisitors: 8,
+  topCountries: [
+    { rank: 1, name: 'Nigeria', code: 'NG', count: 5 },
+    { rank: 2, name: 'United States', code: 'US', count: 1 },
+    { rank: 3, name: 'United Kingdom', code: 'GB', count: 1 }
+  ],
+  countryStats: {
+    'Nigeria': 5,
+    'United States': 1,
+    'United Kingdom': 1
+  },
+  locations: [
+    { lat: 6.4474, lon: 3.3903, city: 'Lagos', country: 'Nigeria', countryCode: 'NG' },
+    { lat: 40.7128, lon: -74.006, city: 'New York', country: 'United States', countryCode: 'US' },
+    { lat: 51.5074, lon: -0.1278, city: 'London', country: 'United Kingdom', countryCode: 'GB' },
+    { lat: 6.1715, lon: 7.0053, city: 'Enugu-Ukwu', country: 'Nigeria', countryCode: 'NG' }
+  ]
+}
+
 export function useVisitorStats() {
-  const [data, setData] = useState<VisitorResponse>({
-    userCountry: 'LOCATING...',
-    userCountryCode: '',
-    userCity: '',
-    userCountryCount: 0,
-    totalVisitors: 0,
-    topCountries: [],
-    countryStats: {},
-    locations: []
+  const [data, setData] = useState<VisitorResponse>(() => {
+    try {
+      const cached = localStorage.getItem(CACHED_STATS_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached)
+        if (parsed && typeof parsed.totalVisitors === 'number' && parsed.totalVisitors > 0) {
+          return parsed
+        }
+      }
+    } catch {
+      // fallback
+    }
+    return BASELINE_DATA
   })
 
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'offline'>('connecting')
@@ -170,17 +200,25 @@ export function useVisitorStats() {
               const countryCount = country
                 ? json.countryStats?.[country] || findCountryCount(country, json.countryStats) || 1
                 : 1
-              setData((prev) => ({
-                ...prev,
-                userCountry: country || prev.userCountry || 'UNKNOWN',
-                userCountryCode: countryCode || prev.userCountryCode,
-                userCity: city || prev.userCity,
-                userCountryCount: countryCount,
-                totalVisitors: typeof json.total === 'number' ? json.total : prev.totalVisitors,
-                topCountries: Array.isArray(json.topCountries) ? json.topCountries : prev.topCountries,
-                countryStats: json.countryStats || prev.countryStats,
-                locations: Array.isArray(json.locations) ? json.locations : prev.locations
-              }))
+              setData((prev) => {
+                const next = {
+                  ...prev,
+                  userCountry: country || prev.userCountry || 'UNKNOWN',
+                  userCountryCode: countryCode || prev.userCountryCode,
+                  userCity: city || prev.userCity,
+                  userCountryCount: countryCount,
+                  totalVisitors: typeof json.total === 'number' ? json.total : prev.totalVisitors,
+                  topCountries: Array.isArray(json.topCountries) ? json.topCountries : prev.topCountries,
+                  countryStats: json.countryStats || prev.countryStats,
+                  locations: Array.isArray(json.locations) ? json.locations : prev.locations
+                }
+                try {
+                  localStorage.setItem(CACHED_STATS_KEY, JSON.stringify(next))
+                } catch {
+                  // ignore
+                }
+                return next
+              })
             }
           } else if (!isRetry && !controller.signal.aborted) {
             setConnectionStatus('offline')
@@ -203,17 +241,25 @@ export function useVisitorStats() {
             sessionStorage.setItem(SESSION_KEY, 'true')
             if (!controller.signal.aborted && json.success) {
               setConnectionStatus('connected')
-              setData((prev) => ({
-                ...prev,
-                userCountry: json.userCountry || country || 'UNKNOWN',
-                userCountryCode: json.userCountryCode || countryCode,
-                userCity: json.userCity || city,
-                userCountryCount: json.userCountryCount || 1,
-                totalVisitors: json.totalVisitors || 1,
-                topCountries: Array.isArray(json.topCountries) ? json.topCountries : [],
-                countryStats: json.countryStats || {},
-                locations: Array.isArray(json.locations) ? json.locations : []
-              }))
+              setData((prev) => {
+                const next = {
+                  ...prev,
+                  userCountry: json.userCountry || country || 'UNKNOWN',
+                  userCountryCode: json.userCountryCode || countryCode,
+                  userCity: json.userCity || city,
+                  userCountryCount: json.userCountryCount || 1,
+                  totalVisitors: json.totalVisitors || 1,
+                  topCountries: Array.isArray(json.topCountries) ? json.topCountries : [],
+                  countryStats: json.countryStats || {},
+                  locations: Array.isArray(json.locations) ? json.locations : []
+                }
+                try {
+                  localStorage.setItem(CACHED_STATS_KEY, JSON.stringify(next))
+                } catch {
+                  // ignore
+                }
+                return next
+              })
             }
           } else if (!isRetry && !controller.signal.aborted) {
             setConnectionStatus('offline')

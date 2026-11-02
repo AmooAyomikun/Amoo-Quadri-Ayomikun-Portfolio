@@ -5,6 +5,7 @@ import { SocialSidebars } from '../components/SocialSidebars'
 import { HeroSection } from '../sections/HeroSection'
 import { AboutJourneySection } from '../sections/AboutJourneySection'
 import { NewsSection } from '../sections/NewsSection'
+import { QuestionsSection } from '../sections/QuestionsSection'
 import { ContactSection } from '../sections/ContactSection'
 import { GithubActivitySection } from '../sections/GithubActivitySection'
 import { VisitorMapSection } from '../sections/VisitorMapSection'
@@ -31,7 +32,14 @@ export default function Home() {
         
         <GithubActivitySection />
 
-        <NewsSection />
+        <NewsSection 
+          limit={3} 
+          showViewAll={true} 
+          badgeText="// LATEST UPDATES"
+          heading="News & Announcements"
+        />
+
+        <QuestionsSection />
 
         <ContactSection />
       </main>

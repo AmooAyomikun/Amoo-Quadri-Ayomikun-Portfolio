@@ -86,15 +86,9 @@ export const AboutJourneySection: React.FC = () => {
     return () => clearTimeout(timer)
   }, [])
 
-  // Braydon Coyer Serpentine Circuit Path:
-  // Left track is at x = 4, Right track is at x = 272. Midpoint is at x = 138 (container center 50%).
-  // M1: starts y=64, ends y=444. Crossover 1 at y=556 (in Gap 1->2).
-  // M2: starts y=564, ends y=944.
-  // Crossover 2 in Gap 2->3 (y=944 to 1124): diagonal 951->1038, horizontal at y=1042.6, transitions to left track by y=1058.6.
-  // M3: starts y=1124, ends y=1504. Wire travels safely down left track at x=4, completely clear of 'Life Beyond Code' heading.
-  // Crossover 3 in Gap 3->4 (y=1504 to 1644): horizontal at y=1586.
-  // M4: starts y=1644, docks into photo card at x=325, y=1840.
-  const serpentinePathD = `M145 0.5 L145 10 C145 14.4 141.4 18 137 18 L20 18 C11.2 18 4 25.2 4 34 L4 540 C4 548.8 11.2 556 20 556 L256 556 C264.8 556 272 563.2 272 572 L272 940 C272 944.2 270.3 948.3 267.3 951.3 L180.7 1037.9 C177.7 1040.9 173.6 1042.6 169.4 1042.6 L20 1042.6 C11.2 1042.6 4 1049.8 4 1058.6 L4 1570 C4 1578.8 11.2 1586 20 1586 L256 1586 C264.8 1586 272 1593.2 272 1602 L272 1825 C272 1833.8 279.2 1840 288 1840 L325 1840`
+  // Calibrated Serpentine Circuit Path:
+  // Clean crossovers precisely centered in the milestone transition gaps
+  const serpentinePathD = `M145 0.5 L145 10 C145 14.4 141.4 18 137 18 L20 18 C11.2 18 4 25.2 4 34 L4 458 C4 466.8 11.2 474 20 474 L256 474 C264.8 474 272 481.2 272 490 L272 875 C272 879.2 270.3 883.3 267.3 886.3 L180.7 942.9 C177.7 945.9 173.6 947.6 169.4 947.6 L20 947.6 C11.2 947.6 4 954.8 4 963.6 L4 1348 C4 1356.8 11.2 1364 20 1364 L256 1364 C264.8 1364 272 1371.2 272 1380 L272 1565 C272 1573.8 279.2 1580 288 1580 L325 1580`
 
   return (
     <section
@@ -130,12 +124,12 @@ export const AboutJourneySection: React.FC = () => {
             (Rendered at z-30 with pointer-events-none so wire & terminal dot cleanly join with the cards)
         ========================================================================= */}
         <div
-          className="pointer-events-none absolute top-0 h-[2020px] w-[380px] hidden lg:block z-30"
+          className="pointer-events-none absolute top-0 h-[1780px] w-[380px] hidden lg:block z-30"
           style={{ left: 'calc(50% - 138px)' }}
         >
           <svg
-            className="w-[380px] h-[2020px]"
-            viewBox="-10 -10 400 2040"
+            className="w-[380px] h-[1780px]"
+            viewBox="-10 -10 400 1800"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -173,8 +167,8 @@ export const AboutJourneySection: React.FC = () => {
             />
 
             {/* Terminal Docking Junction onto the final Photo Card */}
-            <circle cx="325" cy="1840" r="5" className="fill-[var(--color-primary)]" />
-            <circle cx="325" cy="1840" r="8" fill="none" stroke="var(--color-border)" strokeWidth="2" />
+            <circle cx="325" cy="1580" r="5" className="fill-[var(--color-primary)]" />
+            <circle cx="325" cy="1580" r="8" fill="none" stroke="var(--color-border)" strokeWidth="2" />
 
             {/* THE INTERACTIVE MOVING GLOWING DOT */}
             <g transform={`translate(${dotPos.x}, ${dotPos.y})`}>
@@ -241,7 +235,7 @@ export const AboutJourneySection: React.FC = () => {
         </div>
 
         {/* Transition gap between 1 and 2 on desktop */}
-        <div className="hidden lg:block h-[120px]" />
+        <div className="hidden lg:block h-[60px]" />
 
         {/* =========================================================================
             MILESTONE 2: Finding My Way to Web
@@ -289,7 +283,7 @@ export const AboutJourneySection: React.FC = () => {
         </div>
 
         {/* Transition gap between 2 and 3 on desktop */}
-        <div className="hidden lg:block h-[180px]" />
+        <div className="hidden lg:block h-[70px]" />
 
         {/* =========================================================================
             MILESTONE 3: Life Beyond Code
@@ -337,7 +331,7 @@ export const AboutJourneySection: React.FC = () => {
         </div>
 
         {/* Transition gap between 3 and 4 on desktop */}
-        <div className="hidden lg:block h-[140px]" />
+        <div className="hidden lg:block h-[60px]" />
 
         {/* =========================================================================
             MILESTONE 4: These Days

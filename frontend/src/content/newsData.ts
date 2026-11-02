@@ -71,5 +71,17 @@ These accolades are not just a reflection of academic grades, but a validation o
     readTime: '2 min read',
     tags: ['Academic Excellence', 'Subject Honors', 'Valedictory', 'Top 10%'],
     isPinned: false
+  },
+  {
+    id: 'news-thesis-recommendation-engine',
+    title: 'Completed Undergraduate Research Thesis: Intelligent Location-Based Recommendation Systems',
+    date: '2024-07-28T14:00:00.000Z',
+    category: 'Research',
+    summary: 'Under the supervision of Dr. J.E.T. Akinsola, engineered a hybrid recommendation engine bridging empirical machine learning with scalable web architecture.',
+    content: `My undergraduate thesis marked a critical milestone in connecting theoretical Computer Science research with tangible, accessible web applications. Supervised by Dr. J.E.T. Akinsola, the research investigated algorithmic approaches to intelligent, location-aware recommendation engines.\n\nThe project focused on overcoming cold-start sparsity and spatial latency by combining collaborative filtering heuristics with geospatial distance metrics. I architected the full experimental prototype, evaluating response times and accuracy benchmarks across diverse query densities. This foundation continues to inform my interest in applied artificial intelligence and resilient software engineering.`,
+    author: 'Quadri Ayomikun Amoo',
+    readTime: '3 min read',
+    tags: ['Recommendation Systems', 'Machine Learning', 'Dr. J.E.T. Akinsola', 'Undergraduate Thesis'],
+    isPinned: false
   }
 ]
