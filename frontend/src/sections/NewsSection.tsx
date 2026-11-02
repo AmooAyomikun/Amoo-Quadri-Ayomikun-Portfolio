@@ -24,7 +24,6 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
   showViewAll = false
 }) => {
   const [newsList, setNewsList] = useState<NewsItem[]>([])
-  const [loading, setLoading] = useState(true)
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null)
   const [publishModalOpen, setPublishModalOpen] = useState(false)
 
@@ -62,8 +61,6 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
     } catch (err) {
       console.warn('Backend news API unavailable, using fallback:', err)
       setNewsList(initialNewsData)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -159,13 +156,15 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
             </h2>
           </div>
 
-          <button
-            onClick={() => setPublishModalOpen(true)}
-            className="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-semibold bg-[var(--color-surface-card)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all cursor-pointer shadow-xs active:scale-95"
-          >
-            <PlusCircle className="w-4 h-4 text-[var(--color-primary)]" />
-            <span>Post Update</span>
-          </button>
+          {Boolean(getAdminToken()) && (
+            <button
+              onClick={() => setPublishModalOpen(true)}
+              className="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-semibold bg-[var(--color-surface-card)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all cursor-pointer shadow-xs active:scale-95"
+            >
+              <PlusCircle className="w-4 h-4 text-[var(--color-primary)]" />
+              <span>Post Update (Admin)</span>
+            </button>
+          )}
         </div>
 
         {/* News Items Grid */}

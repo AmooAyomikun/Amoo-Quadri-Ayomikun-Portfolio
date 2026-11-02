@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, ChevronLeft, ChevronRight, X, Send, Loader2, Sparkles, MessageCircle } from 'lucide-react'
+import { Plus, ChevronLeft, ChevronRight, X, Send, Loader2, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { apiUrl } from '../lib/api'
 
@@ -12,84 +12,87 @@ interface FAQItem {
 
 const ALL_FAQS: FAQItem[] = [
   {
-    id: 'who-is-quadri',
-    question: 'Who is Quadri Ayomikun Amoo?',
+    id: 'core-specialization',
+    question: 'What is your core specialization in web engineering and applied AI?',
     answer: (
       <div className="space-y-2 text-xs sm:text-sm text-[var(--color-text-muted)] leading-relaxed">
         <p>
-          I am a Software Engineer and Applied AI Researcher. I graduated in the <strong className="text-[var(--color-text-main)]">Top 10%</strong> of my class with a <strong className="text-[var(--color-primary)]">4.45 / 5.00 Final CGPA</strong> (Second-Class Upper Honors) in Software Engineering from <strong className="text-[var(--color-text-main)]">Abiola Ajimobi Technical University</strong>.
+          I specialize in building high-performance, accessible web systems and researching machine learning model validation. I graduated in the <strong className="text-[var(--color-text-main)]">Top 10%</strong> of my class with a <strong className="text-[var(--color-primary)]">4.45 / 5.00 Final CGPA</strong> (Second-Class Upper Honors) in Software Engineering from <strong className="text-[var(--color-text-main)]">Abiola Ajimobi Technical University</strong>.
         </p>
         <p>
-          Currently, I serve as an NYSC Research Assistant under <strong className="text-[var(--color-text-main)]">Assoc. Prof. Jude Sinebe</strong>, investigating empirical machine learning model validation and building performant full-stack web applications.
+          Currently, I serve as an NYSC Research Assistant under <strong className="text-[var(--color-text-main)]">Assoc. Prof. Jude Sinebe</strong>, investigating empirical model validation and developing full-stack software architectures.
         </p>
       </div>
     )
   },
   {
-    id: 'postgrad-positions',
-    question: 'Are you open to MSc / PhD research positions or collaborations?',
+    id: 'graduate-research-directions',
+    question: 'What research directions are you prioritizing for prospective graduate studies?',
     answer: (
       <div className="space-y-2 text-xs sm:text-sm text-[var(--color-text-muted)] leading-relaxed">
         <p>
-          <strong className="text-[var(--color-primary)]">Yes, absolutely!</strong> I am actively seeking postgraduate (MSc / PhD) research opportunities and scholarships in Applied Artificial Intelligence, Natural Language Processing, and intelligent software engineering.
+          <strong className="text-[var(--color-primary)]">I am actively applying for MSc / PhD placements</strong> and competitive scholarship opportunities in Applied Artificial Intelligence, Natural Language Processing, and intelligent software engineering.
         </p>
         <p>
-          I am also enthusiastic about collaborating on empirical research papers and benchmarking studies. Feel free to explore my <Link to="/research" className="text-[var(--color-primary)] hover:underline">Research Page</Link>.
+          I am also enthusiastic about collaborating with faculty and fellow researchers on empirical computing benchmarks, model evaluation, and peer-reviewed papers. Feel free to explore my <Link to="/research" className="text-[var(--color-primary)] hover:underline">Research Page</Link>.
         </p>
       </div>
     )
   },
   {
-    id: 'featured-projects',
-    question: 'What featured projects have you engineered?',
+    id: 'offline-first-architectures',
+    question: 'How do you design offline-first and performance-driven web systems?',
     answer: (
       <div className="space-y-2 text-xs sm:text-sm text-[var(--color-text-muted)] leading-relaxed">
         <p>
-          Key highlights include <strong className="text-[var(--color-text-main)]">CleanReport</strong> (a civic-tech sanitation PWA with offline-first sync via Service Workers and IndexedDB), an <strong className="text-[var(--color-text-main)]">Intelligent Hotel Recommendation Engine</strong> (supervised by Dr. J.E.T. Akinsola), and <strong className="text-[var(--color-text-main)]">Kynda AI Study Assistant</strong>.
+          I prioritize resilience and minimal latency across all layers of the stack. Examples include <strong className="text-[var(--color-text-main)]">CleanReport</strong> (a civic-tech sanitation PWA with offline queueing via Service Workers and IndexedDB), my undergraduate thesis on <strong className="text-[var(--color-text-main)]">Location-Based Hybrid Recommendation Systems</strong>, and <strong className="text-[var(--color-text-main)]">Kynda AI Study Assistant</strong>.
         </p>
         <div className="pt-1">
           <Link to="/projects" className="text-xs font-mono text-[var(--color-primary)] font-semibold hover:underline">
-            View all engineered projects →
+            Inspect all project architectures →
           </Link>
         </div>
       </div>
     )
   },
   {
-    id: 'consultancy-freelance',
-    question: 'Are you available for technical consultancy or freelance work?',
+    id: 'contract-consultancy',
+    question: 'How do you collaborate with engineering teams, startups, and client projects?',
     answer: (
       <div className="space-y-2 text-xs sm:text-sm text-[var(--color-text-muted)] leading-relaxed">
         <p>
-          Yes, I selectively take on contract development, frontend system redesigns, and AI integration architecture.
+          I selectively partner on contract software engineering, frontend architecture reviews (React, TypeScript, Next.js), and AI model integration workflows.
         </p>
         <p>
-          Reach out anytime at <a href="mailto:amooquadri555@gmail.com" className="text-[var(--color-primary)] hover:underline font-mono">amooquadri555@gmail.com</a> or leave a message below.
+          If your team or startup has an engineering initiative, reach out directly at <a href="mailto:amooquadri555@gmail.com" className="text-[var(--color-primary)] hover:underline font-mono">amooquadri555@gmail.com</a> or use the inquiry box below.
         </p>
       </div>
     )
   },
   {
-    id: 'technical-stack',
-    question: 'What technical stack and tools do you rely on daily?',
+    id: 'technologies-toolchains',
+    question: 'Which technologies and development toolchains do you build with daily?',
     answer: (
       <div className="space-y-2 text-xs sm:text-sm text-[var(--color-text-muted)] leading-relaxed">
         <p>
-          <strong className="text-[var(--color-text-main)]">Frontend:</strong> TypeScript, React, Next.js, Tailwind CSS, Framer Motion, PWAs.
+          <strong className="text-[var(--color-text-main)]">Frontend:</strong> TypeScript, React, Next.js, Tailwind CSS, Framer Motion, and Service Workers / PWAs.
         </p>
         <p>
-          <strong className="text-[var(--color-text-main)]">Backend & ML:</strong> Node.js, Express, Python (scikit-learn, PyTorch fundamentals, pandas), PostgreSQL, MongoDB, Docker, Git.
+          <strong className="text-[var(--color-text-main)]">Backend & Research:</strong> Node.js, Express, Python (scikit-learn, PyTorch fundamentals, pandas/NumPy), PostgreSQL, MongoDB, Docker, and Linux.
         </p>
       </div>
     )
   },
   {
-    id: 'leadership-mentorship',
-    question: 'What is your background in leadership and peer mentorship?',
+    id: 'mentorship-impact',
+    question: 'How did mentoring 350+ peers and academic honors shape your career?',
     answer: (
       <div className="space-y-2 text-xs sm:text-sm text-[var(--color-text-muted)] leading-relaxed">
         <p>
-          As an Academic Support Officer with NASSA, I mentored over 350 peers in weekly tutorials covering Data Structures, Algorithms, Discrete Math, and Operating Systems, and organized foundational developer workshops for 100+ students.
+          As an Academic Support Officer with NASSA, I led weekly tutorial workshops in Data Structures, Algorithms, Discrete Mathematics, and Operating Systems for over 350 peers, and organized foundational developer bootcamps for 100+ students.
+        </p>
+        <p>
+          Teaching foundational computing concepts solidified my problem-solving discipline and reinforced my commitment to clear, empathetic communication in engineering.
         </p>
       </div>
     )
