@@ -31,6 +31,31 @@ export const Navbar: React.FC = () => {
   // Mobile menu open state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  // Abbreviate header name on scroll down; return to full name on scroll up or top
+  const [isAbbreviated, setIsAbbreviated] = useState(false)
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY
+
+    const onScroll = () => {
+      const currentScrollY = window.scrollY
+
+      if (currentScrollY <= 40) {
+        setIsAbbreviated(false)
+      } else if (currentScrollY > lastScrollY + 6) {
+        // Scrolling down -> Abbreviate to Q · A · A
+        setIsAbbreviated(true)
+      } else if (currentScrollY < lastScrollY - 6) {
+        // Scrolling up -> Return to normal QUADRI AYOMIKUN AMOO
+        setIsAbbreviated(false)
+      }
+      lastScrollY = currentScrollY
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   useEffect(() => {
     localStorage.setItem('aq-theme-mode', mode)
     if (mode !== 'system') {
@@ -152,24 +177,50 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Top static banner - locked permanently at the top of the viewport */}
-      <header className="sticky top-0 z-40 w-full border-b-2 border-[var(--color-text-main)] bg-[var(--color-surface-base)]/95 backdrop-blur-md shadow-xs">
-        <div className="flex items-center justify-between gap-2 sm:gap-6 px-3 sm:px-8 py-2.5 sm:py-3.5">
+      {/* Top sticky banner - locked permanently at the top, abbreviates on scroll down, expands on scroll up */}
+      <header className="sticky top-0 z-40 w-full border-b-2 border-[var(--color-text-main)] bg-[var(--color-surface-base)]/95 backdrop-blur-md shadow-xs transition-colors duration-300">
+        <div
+          className={`flex items-center justify-between gap-2 sm:gap-6 px-3 sm:px-8 transition-[padding] duration-500 ease-[cubic-bezier(.7,0,.2,1)] ${
+            isAbbreviated ? 'py-1.5 sm:py-2' : 'py-2.5 sm:py-3.5'
+          }`}
+        >
           <Link
             to="/"
             aria-label="Home - Quadri Ayomikun Amoo"
-            className="name-banner group flex flex-1 items-center justify-between gap-1.5 sm:gap-4 min-w-0 focus:outline-none"
+            className={`name-banner group flex flex-1 items-center min-w-0 focus:outline-none transition-all duration-500 ${
+              isAbbreviated ? 'justify-start gap-1 sm:gap-2' : 'justify-between gap-1.5 sm:gap-4'
+            }`}
           >
-            {['Quadri', 'Ayomikun', 'Amoo'].map((word) => (
+            {['Quadri', 'Ayomikun', 'Amoo'].map((word, i) => (
               <span
                 key={word}
-                className="name-word font-black uppercase leading-none tracking-tight inline-flex shrink-0"
+                className="name-word font-black uppercase leading-none tracking-tight inline-flex items-center shrink-0 transition-all duration-500 ease-[cubic-bezier(.7,0,.2,1)]"
                 style={{
                   fontFamily: "'Archivo Black', 'Inter', system-ui, sans-serif",
-                  fontSize: 'clamp(1.15rem, 4vw, 3.5rem)'
+                  fontSize: isAbbreviated
+                    ? 'clamp(1.1rem, 3vw, 2.2rem)'
+                    : 'clamp(1.15rem, 4vw, 3.5rem)',
+                  transitionDelay: `${i * 60}ms`
                 }}
               >
-                <span className="name-fill">{word}</span>
+                <span className="name-fill" style={{ transitionDelay: `${i * 70}ms` }}>
+                  {word[0]}
+                </span>
+                <span
+                  className="name-fill overflow-hidden whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(.7,0,.2,1)] inline-block"
+                  style={{
+                    maxWidth: isAbbreviated ? '0' : '14ch',
+                    opacity: isAbbreviated ? 0 : 1,
+                    transitionDelay: `${i * 70}ms`
+                  }}
+                >
+                  {word.slice(1)}
+                </span>
+                {isAbbreviated && i < 2 && (
+                  <span className="ml-1 sm:ml-2 text-[var(--color-primary)] font-bold inline-block" aria-hidden>
+                    ·
+                  </span>
+                )}
               </span>
             ))}
           </Link>

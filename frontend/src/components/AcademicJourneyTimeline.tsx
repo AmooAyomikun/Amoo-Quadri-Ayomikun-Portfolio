@@ -28,6 +28,7 @@ export interface MilestoneItem {
 export const AcademicJourneyTimeline: React.FC = () => {
   const [filter, setFilter] = useState<string>('all')
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLDivElement>(null)
 
   const milestones: MilestoneItem[] = [
     {
@@ -197,27 +198,53 @@ export const AcademicJourneyTimeline: React.FC = () => {
     scrollContainerRef.current.scrollLeft = scrollLeftPos - walk
   }
 
-  // Wheel horizontal scroll: scrolling mouse wheel over timeline scrolls horizontally,
-  // but seamlessly returns back to normal vertical page scroll once reaching the boundary!
+  // Wheel horizontal scroll:
+  // Must show fully first before scrolling horizontally!
+  // Once the section has scrolled fully into position (rect.top <= 100),
+  // scrolling down scrolls the timeline horizontally until the end.
+  // Once it reaches the end, vertical page scroll seamlessly resumes down!
+  // When scrolling up, it scrolls the timeline backwards, and once at start resumes vertical scroll up.
   React.useEffect(() => {
+    const sectionEl = sectionRef.current
     const el = scrollContainerRef.current
-    if (!el) return
+    if (!sectionEl || !el) return
+
     const onWheel = (e: WheelEvent) => {
       if (e.deltaY === 0 || e.shiftKey) return
       const maxScroll = el.scrollWidth - el.clientWidth
       if (maxScroll <= 0) return
 
-      const canScrollRight = e.deltaY > 0 && el.scrollLeft < maxScroll - 4
-      const canScrollLeft = e.deltaY < 0 && el.scrollLeft > 4
+      const rect = sectionEl.getBoundingClientRect()
 
-      if (canScrollRight || canScrollLeft) {
-        e.preventDefault()
-        el.scrollLeft += e.deltaY * 1.15
+      if (e.deltaY > 0) {
+        // Scrolling DOWN:
+        // Must show fully first (rect.top <= 100px means section is at top of viewport under sticky header)
+        // If rect.top > 100px, it is still coming into view vertically — allow natural vertical scroll!
+        const isFullyInView = rect.top <= 100 && rect.bottom >= window.innerHeight * 0.4
+        const canScrollRight = el.scrollLeft < maxScroll - 4
+
+        if (isFullyInView && canScrollRight) {
+          e.preventDefault()
+          el.scrollLeft += e.deltaY * 1.15
+          return
+        }
+        // At the end or before showing fully, allow default vertical scroll!
+      } else if (e.deltaY < 0) {
+        // Scrolling UP:
+        const isInView = rect.top <= 120 && rect.bottom >= window.innerHeight * 0.35
+        const canScrollLeft = el.scrollLeft > 4
+
+        if (isInView && canScrollLeft) {
+          e.preventDefault()
+          el.scrollLeft += e.deltaY * 1.15
+          return
+        }
+        // At the beginning or out of view, allow default vertical scroll!
       }
-      // When at start or end, default vertical page scrolling continues smoothly!
     }
-    el.addEventListener('wheel', onWheel, { passive: false })
-    return () => el.removeEventListener('wheel', onWheel)
+
+    sectionEl.addEventListener('wheel', onWheel, { passive: false })
+    return () => sectionEl.removeEventListener('wheel', onWheel)
   }, [filteredMilestones.length])
 
   const scrollLeft = () => {
@@ -233,7 +260,7 @@ export const AcademicJourneyTimeline: React.FC = () => {
   }
 
   return (
-    <div className="w-full my-16">
+    <div ref={sectionRef} className="w-full my-16">
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-[var(--color-border)] gap-4">
         <div>
