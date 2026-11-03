@@ -233,9 +233,9 @@ export const AcademicJourneyTimeline: React.FC = () => {
       } else if (e.deltaY < 0) {
         // Scrolling UP:
         // When coming from below, trackRect.top starts negative (above viewport).
-        // Must wait until the track has scrolled down into full view (trackRect.top >= 45px && trackRect.top <= 125px)
-        // so the top cards are NOT cut off at the top before horizontal scrolling starts!
-        const isTrackFullyInView = trackRect.top >= 45 && trackRect.top <= 125 && trackRect.bottom >= window.innerHeight * 0.4
+        // Must wait until the track has scrolled down into full view (trackRect.top >= 82px && trackRect.top <= 135px)
+        // so the top cards and category badges are completely clear of the header before horizontal scrolling starts!
+        const isTrackFullyInView = trackRect.top >= 82 && trackRect.top <= 135 && trackRect.bottom >= window.innerHeight * 0.4
         const canScrollLeft = el.scrollLeft > 4
 
         if (isTrackFullyInView && canScrollLeft) {
