@@ -37,21 +37,21 @@ const Eyebrow: React.FC<EyebrowProps> = ({ children }) => (
 
 export const ResearchHero: React.FC = () => {
   return (
-    <header className="pt-10 sm:pt-14 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
+    <header className="pt-6 sm:pt-14 pb-6 sm:pb-12 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span>🔬</span> // EMPIRICAL RESEARCH &amp; SCHOLARSHIP
+        <span className="text-xs">🔬</span> // EMPIRICAL RESEARCH &amp; SCHOLARSHIP
       </Eyebrow>
 
       <motion.h1
         {...rise(0.08)}
-        className="font-sans font-extrabold text-3xl sm:text-5xl md:text-6xl text-[var(--color-text-main)] tracking-tight leading-tight"
+        className="font-serif font-bold text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-[var(--color-text-main)] tracking-tight leading-tight mt-2"
       >
         Research &amp; Scientific Publications
       </motion.h1>
 
       <motion.p
         {...rise(0.16)}
-        className="mt-4 text-sm sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed"
+        className="mt-3 sm:mt-4 text-xs sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed px-1 sm:px-0"
       >
         Peer-reviewed papers, empirical investigations, and algorithmic software engineering models spanning machine learning, recommender systems, and fairness in AI.
       </motion.p>
@@ -59,24 +59,28 @@ export const ResearchHero: React.FC = () => {
       {/* Quick highlight tags */}
       <motion.div
         {...rise(0.24)}
-        className="mt-6 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-mono"
+        className="mt-5 sm:mt-7 flex flex-wrap items-center justify-center gap-1.5 sm:gap-3 text-[11px] sm:text-xs font-mono"
       >
-        <span className="px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
-          2 Peer-Reviewed Papers
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] shrink-0" />
+          <span>2 Peer-Reviewed Papers</span>
         </span>
-        <span className="px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
-          1 B.Sc. Thesis
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />
+          <span>1 B.Sc. Thesis</span>
         </span>
-        <span className="px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
-          4 Departmental Awards
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+          <span>4 Departmental Awards</span>
         </span>
         <a
           href={portfolioData.personal.googleScholar}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 text-[var(--color-primary)] font-semibold hover:bg-[var(--color-primary)]/20 transition-colors"
+          className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 text-[var(--color-primary)] font-semibold hover:bg-[var(--color-primary)]/20 transition-all hover:scale-105"
         >
-          Google Scholar <ExternalLink className="w-3 h-3" />
+          <span>Google Scholar</span>
+          <ExternalLink className="w-3 h-3" />
         </a>
       </motion.div>
     </header>
