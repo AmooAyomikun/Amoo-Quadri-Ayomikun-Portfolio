@@ -594,27 +594,59 @@ export const AcademicJourneyTimeline: React.FC = () => {
                 </p>
               </div>
 
-              {/* Curved Dashed Connector Arrow between cards */}
+              {/* Stylish Curved Dashed Connector Arrow between cards */}
               {!isLast && (
-                <div className="flex justify-center my-2 select-none pointer-events-none">
+                <div className="flex justify-center my-3.5 select-none pointer-events-none">
                   <svg
-                    className={`w-12 h-10 text-[var(--color-primary)]/40 ${index % 2 === 1 ? '-scale-x-100' : ''}`}
-                    viewBox="0 0 56 44"
+                    className="w-20 h-14 text-[var(--color-primary)] drop-shadow-[0_2px_8px_rgba(100,255,218,0.2)]"
+                    viewBox="0 0 100 56"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
+                    <defs>
+                      <linearGradient id={`milestone-grad-${item.id}`} x1="36%" y1="0%" x2="64%" y2="100%">
+                        <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="0.35" />
+                        <stop offset="60%" stopColor="var(--color-primary)" stopOpacity="0.85" />
+                        <stop offset="100%" stopColor="var(--color-primary)" stopOpacity="1" />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Subtle background glow path */}
                     <path
-                      d="M 16 0 V 14 C 16 28, 40 18, 40 34"
-                      stroke="currentColor"
-                      strokeWidth="1.75"
-                      strokeDasharray="3 3"
+                      d="M 36 2 C 36 26, 64 26, 64 48"
+                      stroke="var(--color-primary)"
+                      strokeWidth="3.5"
+                      strokeOpacity="0.15"
+                      strokeLinecap="round"
+                      fill="none"
                     />
+
+                    {/* Top origin glowing anchor dot */}
+                    <circle 
+                      cx="36" 
+                      cy="3" 
+                      r="2.5" 
+                      fill="var(--color-primary)" 
+                    />
+
+                    {/* Main smooth S-curve with rounded dashed strokes */}
                     <path
-                      d="M 35 29 L 40 36 L 45 29"
-                      stroke="currentColor"
-                      strokeWidth="1.75"
+                      d="M 36 2 C 36 26, 64 26, 64 48"
+                      stroke={`url(#milestone-grad-${item.id})`}
+                      strokeWidth="2"
+                      strokeDasharray="4 4"
+                      strokeLinecap="round"
+                      fill="none"
+                    />
+
+                    {/* Downward pointing arrowhead entering bottom card */}
+                    <path
+                      d="M 58 43 L 64 52 L 70 43"
+                      stroke="var(--color-primary)"
+                      strokeWidth="2.25"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      fill="none"
                     />
                   </svg>
                 </div>
