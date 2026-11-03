@@ -23,7 +23,7 @@ import {
   MessageSquare,
   Send
 } from 'lucide-react'
-import { initialNewsData, formatNewsDate, type NewsItem } from '../content/newsData'
+import { initialNewsData, formatFullNewsDate, type NewsItem } from '../content/newsData'
 import { apiUrl } from '../lib/api'
 import { SEO } from '../components/SEO'
 import { PageContainer } from '../components/PageContainer'
@@ -396,13 +396,13 @@ export default function NewsArticlePage() {
               {/* Date */}
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-muted)]">
                 <Calendar className="w-3.5 h-3.5 text-[var(--color-primary)]" />
-                <span>{formatNewsDate(news.date)}</span>
+                <span>{formatFullNewsDate(news.date)}</span>
               </span>
 
               {/* Readers count */}
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-muted)]">
                 <Users className="w-3.5 h-3.5 text-[var(--color-primary)]" />
-                <span>{readersCount} readers</span>
+                <span>{news.readersCount || readersCount} readers</span>
               </span>
 
               {/* Reading time */}
@@ -413,7 +413,7 @@ export default function NewsArticlePage() {
 
               {/* Category */}
               <Badge variant="primary" size="sm" className="ml-auto sm:ml-0">
-                {news.category}
+                {news.type === 'blog' ? 'Blog Post' : news.category}
               </Badge>
             </div>
 
@@ -832,10 +832,10 @@ export default function NewsArticlePage() {
 
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <Badge variant="subtle" size="sm">
-                      {other.category}
+                      {other.type === 'blog' ? 'Blog' : other.category}
                     </Badge>
                     <span className="text-[11px] font-mono text-[var(--color-text-subtle)] flex items-center gap-1">
-                      <Calendar className="w-3 h-3" /> {formatNewsDate(other.date)}
+                      <Calendar className="w-3 h-3" /> {formatFullNewsDate(other.date)}
                     </span>
                   </div>
 

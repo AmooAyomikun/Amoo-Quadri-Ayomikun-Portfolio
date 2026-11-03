@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Newspaper, Calendar, Clock, PlusCircle, X, CheckCircle2, ArrowRight, Loader2 } from 'lucide-react'
+import { Newspaper, BookOpen, Sparkles, PlusCircle, X, CheckCircle2, ArrowRight, Loader2 } from 'lucide-react'
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { AnimatedWords } from '../components/AnimatedWords'
 import { apiUrl, getAdminToken, setAdminToken } from '../lib/api'
-import { initialNewsData, formatNewsDate, type NewsItem } from '../content/newsData'
+import { initialNewsData, formatFullNewsDate, type NewsItem } from '../content/newsData'
 
 export type { NewsItem }
 
@@ -15,14 +15,17 @@ interface NewsSectionProps {
   badgeText?: string
   limit?: number
   showViewAll?: boolean
+  initialTab?: 'all' | 'news' | 'blog'
 }
 
 export const NewsSection: React.FC<NewsSectionProps> = ({
   heading = 'News & Announcements',
   badgeText = '// TIMELINE & DISPATCHES',
   limit,
-  showViewAll = false
+  showViewAll = false,
+  initialTab = 'all'
 }) => {
+  const [activeTab, setActiveTab] = useState<'all' | 'news' | 'blog'>(initialTab)
   const [newsList, setNewsList] = useState<NewsItem[]>([])
   const [publishModalOpen, setPublishModalOpen] = useState(false)
 
@@ -139,7 +142,16 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
     }
   }
 
-  const displayList = typeof limit === 'number' && limit > 0 ? newsList.slice(0, limit) : newsList
+  const filteredList = newsList.filter(item => {
+    if (activeTab === 'news') return (item.type || 'news') === 'news'
+    if (activeTab === 'blog') return item.type === 'blog'
+    return true
+  })
+
+  const displayList = typeof limit === 'number' && limit > 0 ? filteredList.slice(0, limit) : filteredList
+
+  const newsCount = newsList.filter(i => (i.type || 'news') === 'news').length
+  const blogCount = newsList.filter(i => i.type === 'blog').length
 
   return (
     <section id="news" className="py-12 sm:py-16 bg-[var(--color-surface-base)] relative">
@@ -147,7 +159,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
         <div className="border-t border-[#233554] pt-12">
         
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
           <div>
             <span className="text-xs font-mono uppercase tracking-widest text-[var(--color-primary)] font-semibold flex items-center gap-1.5">
               <Newspaper className="w-4 h-4" /> {badgeText}
@@ -168,32 +180,69 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
           )}
         </div>
 
-        {/* News Items Grid */}
+        {/* Tab Controls: Separating News from Blogs */}
+        <div className="flex flex-wrap items-center gap-2 mb-8">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
+              activeTab === 'all'
+                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm'
+                : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>All Entries ({newsList.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('news')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
+              activeTab === 'news'
+                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm'
+                : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
+            }`}
+          >
+            <Newspaper className="w-3.5 h-3.5" />
+            <span>News & Announcements ({newsCount})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('blog')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
+              activeTab === 'blog'
+                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm'
+                : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Blog Posts & Tech Articles ({blogCount})</span>
+          </button>
+        </div>
+
+        {/* News Items Grid: Exactly 3 in a row, compact card layout */}
         <motion.div 
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
           variants={{
             hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+            visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
           }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {displayList.map((item) => (
             <motion.div 
               variants={{
-                hidden: { opacity: 0, y: 30 },
+                hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
               }}
-              whileHover={{ y: -5, scale: 1.01 }}
+              whileHover={{ y: -4 }}
               key={item.id} 
-              className="card-elevated p-5 sm:p-6 bg-[var(--color-surface-card)] flex flex-col justify-between h-full rounded-2xl border border-[var(--color-border)] shadow-sm hover:shadow-xl hover:border-[var(--color-primary)] transition-all duration-300 group"
+              className="card-elevated p-4 sm:p-5 bg-[var(--color-surface-card)] flex flex-col justify-between h-full rounded-2xl border border-[var(--color-border)] shadow-sm hover:shadow-lg hover:border-[var(--color-primary)]/70 transition-all duration-300 group"
             >
               <div>
                 {item.imageUrl && (
                   <Link 
                     to={`/news/${item.id}`} 
-                    className="block overflow-hidden rounded-xl mb-4 aspect-[16/10] bg-[var(--color-surface-base)] border border-[var(--color-border)]/60 group/thumb"
+                    className="block overflow-hidden rounded-xl mb-3 aspect-[16/9] max-h-40 bg-[var(--color-surface-base)] border border-[var(--color-border)]/60 group/thumb"
                   >
                     <img 
                       src={item.imageUrl} 
@@ -204,35 +253,39 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
                   </Link>
                 )}
 
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <Badge variant="primary" size="sm">{item.category}</Badge>
-                  <span className="text-xs font-mono text-[var(--color-text-subtle)] flex items-center gap-1">
-                    <Calendar className="w-3 h-3" /> {formatNewsDate(item.date)}
+                {/* Relatable metadata format: October 6th, 2026 • 9 min read • 10 readers */}
+                <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-mono text-[var(--color-text-subtle)] mb-2">
+                  <span className="font-semibold text-[var(--color-primary)] uppercase tracking-wider text-[10px]">
+                    {item.type === 'blog' ? 'Blog Post' : 'News'}
                   </span>
+                  <span>•</span>
+                  <span>{formatFullNewsDate(item.date)}</span>
+                  <span>•</span>
+                  <span>{item.readTime}</span>
+                  <span>•</span>
+                  <span>{item.readersCount || 15} readers</span>
                 </div>
 
                 <Link 
                   to={`/news/${item.id}`}
-                  className="text-base sm:text-lg font-serif font-bold text-[var(--color-text-main)] mb-2 leading-snug hover:text-[var(--color-primary)] transition-colors block line-clamp-2"
+                  className="text-base font-serif font-bold text-[var(--color-text-main)] mb-1.5 leading-snug hover:text-[var(--color-primary)] transition-colors block line-clamp-2"
                 >
                   {item.title}
                 </Link>
 
-                <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mb-4 line-clamp-3">
+                <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mb-3 line-clamp-2">
                   {item.summary}
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-[var(--color-border)] flex items-center justify-between gap-2">
-                <span className="text-[11px] font-mono text-[var(--color-text-subtle)] flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> {item.readTime}
-                </span>
+              <div className="pt-3 border-t border-[var(--color-border)] flex items-center justify-between gap-2">
+                <Badge variant="primary" size="sm">{item.category}</Badge>
                 
                 <Link
                   to={`/news/${item.id}`}
                   className="text-xs font-mono text-[var(--color-primary)] font-semibold hover:underline flex items-center gap-1"
                 >
-                  <span>Read Article</span>
+                  <span>{item.type === 'blog' ? 'Read Blog' : 'Read Article'}</span>
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
