@@ -197,21 +197,21 @@ export const ProjectsHero: React.FC = () => {
 
 export const ExperienceHero: React.FC = () => {
   return (
-    <header className="pt-10 sm:pt-14 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
+    <header className="pt-6 sm:pt-14 pb-4 sm:pb-12 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span>💼</span> // CAREER &amp; ENGINEERING TIMELINE
+        <span className="text-xs">💼</span> // CAREER &amp; ENGINEERING TIMELINE
       </Eyebrow>
 
       <motion.h1
         {...rise(0.08)}
-        className="font-sans font-extrabold text-3xl sm:text-5xl md:text-6xl text-[var(--color-text-main)] tracking-tight leading-tight"
+        className="font-serif sm:font-sans font-bold sm:font-extrabold text-2xl sm:text-5xl md:text-6xl text-[var(--color-text-main)] tracking-tight leading-tight mt-1 sm:mt-0"
       >
         Work Experience &amp; Track Record
       </motion.h1>
 
       <motion.p
         {...rise(0.16)}
-        className="mt-4 text-sm sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed"
+        className="mt-2.5 sm:mt-4 text-xs sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed px-1 sm:px-0"
       >
         Detailed overview of software engineering engagements, machine learning research fellowships, and university teaching track records.
       </motion.p>
@@ -219,16 +219,19 @@ export const ExperienceHero: React.FC = () => {
       {/* Clean metrics row */}
       <motion.div
         {...rise(0.24)}
-        className="mt-6 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-mono"
+        className="mt-4 sm:mt-6 flex flex-wrap items-center justify-center gap-1.5 sm:gap-3 text-[11px] sm:text-xs font-mono"
       >
-        <span className="px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
-          3+ Years Software Engineering
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] shrink-0" />
+          <span>3+ Years Software Engineering</span>
         </span>
-        <span className="px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
-          5 Industry &amp; Academic Roles
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />
+          <span>5 Industry &amp; Academic Roles</span>
         </span>
-        <span className="px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
-          500+ Undergraduates Tutored
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+          <span>500+ Undergraduates Tutored</span>
         </span>
       </motion.div>
     </header>

@@ -131,9 +131,9 @@ export const SkillsSection: React.FC = () => {
   ]
 
   return (
-    <section id="skills" className="w-full mt-20 pt-16 border-t border-[var(--color-border)] scroll-mt-24">
+    <section id="skills" className="w-full mt-12 sm:mt-20 pt-10 sm:pt-16 border-t border-[var(--color-border)] scroll-mt-24">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-8 sm:mb-10">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]" />
@@ -156,13 +156,13 @@ export const SkillsSection: React.FC = () => {
       </div>
 
       {/* 4 Clean Domain Panels (2x2 Grid) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {domains.map((domain) => {
           const Icon = domain.icon
           return (
             <div
               key={domain.index}
-              className="bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)]/40 rounded-2xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 shadow-xs hover:shadow-md"
+              className="bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)]/40 rounded-2xl p-4 sm:p-7 flex flex-col justify-between transition-all duration-200 shadow-xs hover:shadow-md"
             >
               <div>
                 {/* Header: Index, Title & Category Icon */}
@@ -228,7 +228,7 @@ export const SkillsSection: React.FC = () => {
               </div>
 
               {/* Applied Evidence Footer */}
-              <div className="pt-4 border-t border-[var(--color-border)]/80 bg-[var(--color-surface-base)]/50 -mx-6 -mb-6 sm:-mx-7 sm:-mb-7 p-4 sm:p-5 rounded-b-2xl">
+              <div className="pt-4 border-t border-[var(--color-border)]/80 bg-[var(--color-surface-base)]/50 -mx-4 -mb-4 sm:-mx-7 sm:-mb-7 p-3.5 sm:p-5 rounded-b-2xl">
                 <div className="flex items-start gap-2 text-[11px] text-[var(--color-text-muted)] leading-relaxed font-sans">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0 mt-0.5" />
                   <span><strong className="text-[var(--color-text-main)] font-mono font-medium">Applied Track:</strong> {domain.appliedNote}</span>
