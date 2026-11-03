@@ -214,16 +214,17 @@ export const AcademicJourneyTimeline: React.FC = () => {
       const maxScroll = el.scrollWidth - el.clientWidth
       if (maxScroll <= 0) return
 
-      const rect = sectionEl.getBoundingClientRect()
+      const trackRect = el.getBoundingClientRect()
 
       if (e.deltaY > 0) {
         // Scrolling DOWN:
-        // Must show fully first (rect.top <= 100px means section is at top of viewport under sticky header)
-        // If rect.top > 100px, it is still coming into view vertically — allow natural vertical scroll!
-        const isFullyInView = rect.top <= 100 && rect.bottom >= window.innerHeight * 0.4
+        // Must show fully first: the card track itself must have scrolled up under the header (trackRect.top <= 80px).
+        // If trackRect.top > 80px (e.g. Screenshot 2 where header/filters take up space and bottom cards are cut off),
+        // do NOT intercept — let normal vertical page scroll continue until the track is fully in view (Screenshot 1)!
+        const isTrackFullyInView = trackRect.top <= 80 && trackRect.bottom >= window.innerHeight * 0.4
         const canScrollRight = el.scrollLeft < maxScroll - 4
 
-        if (isFullyInView && canScrollRight) {
+        if (isTrackFullyInView && canScrollRight) {
           e.preventDefault()
           el.scrollLeft += e.deltaY * 1.15
           return
@@ -231,10 +232,10 @@ export const AcademicJourneyTimeline: React.FC = () => {
         // At the end or before showing fully, allow default vertical scroll!
       } else if (e.deltaY < 0) {
         // Scrolling UP:
-        const isInView = rect.top <= 120 && rect.bottom >= window.innerHeight * 0.35
+        const isTrackInView = trackRect.top <= 90 && trackRect.bottom >= window.innerHeight * 0.4
         const canScrollLeft = el.scrollLeft > 4
 
-        if (isInView && canScrollLeft) {
+        if (isTrackInView && canScrollLeft) {
           e.preventDefault()
           el.scrollLeft += e.deltaY * 1.15
           return
