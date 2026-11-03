@@ -181,10 +181,10 @@ export const AcademicJourneyTimeline: React.FC = () => {
     return () => window.removeEventListener('resize', updateMaxScroll)
   }, [filteredMilestones.length])
 
-  // Scroll progress through the track (pinned once it reaches top-[70px] under navbar)
+  // Scroll progress through the track (pinned once it reaches top-[65px] under navbar)
   const { scrollYProgress } = useScroll({
     target: trackRef as React.RefObject<HTMLElement>,
-    offset: ['start 70px', 'end end']
+    offset: ['start 65px', 'end end']
   })
 
   // Synchronize active card index with scroll progress
@@ -212,8 +212,8 @@ export const AcademicJourneyTimeline: React.FC = () => {
     return -t * maxScroll
   })
 
-  // Track height based on number of milestones: 280vh for full deck, 180vh for filtered subsets
-  const trackHeight = filteredMilestones.length <= 4 ? '180vh' : '280vh'
+  // Track height based on number of milestones: 240vh for full deck, 160vh for filtered subsets
+  const trackHeight = filteredMilestones.length <= 4 ? '160vh' : '240vh'
 
   // Drag & Touch support that smoothly shifts page vertical scroll
   const [isDragging, setIsDragging] = useState(false)
@@ -232,7 +232,7 @@ export const AcademicJourneyTimeline: React.FC = () => {
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging || !trackRef.current) return
     const deltaX = dragStartX.current - e.clientX
-    const totalTravel = trackRef.current.offsetHeight - window.innerHeight + 70
+    const totalTravel = trackRef.current.offsetHeight - window.innerHeight + 65
     if (totalTravel <= 0 || maxScroll <= 0) return
 
     const scrollRatio = (totalTravel * 0.84) / maxScroll
@@ -247,7 +247,7 @@ export const AcademicJourneyTimeline: React.FC = () => {
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!trackRef.current) return
     const deltaX = touchStartX.current - e.touches[0].clientX
-    const totalTravel = trackRef.current.offsetHeight - window.innerHeight + 70
+    const totalTravel = trackRef.current.offsetHeight - window.innerHeight + 65
     if (totalTravel <= 0 || maxScroll <= 0) return
 
     const scrollRatio = (totalTravel * 0.84) / maxScroll
@@ -266,7 +266,7 @@ export const AcademicJourneyTimeline: React.FC = () => {
       // Only intercept if user is intentionally swiping horizontally with trackpad
       if (absX > absY && absX > 2 && trackRef.current) {
         e.preventDefault()
-        const totalTravel = trackRef.current.offsetHeight - window.innerHeight + 70
+        const totalTravel = trackRef.current.offsetHeight - window.innerHeight + 65
         if (totalTravel > 0 && maxScroll > 0) {
           const scrollRatio = (totalTravel * 0.84) / maxScroll
           window.scrollBy({ top: e.deltaX * scrollRatio })
@@ -281,8 +281,8 @@ export const AcademicJourneyTimeline: React.FC = () => {
   const jumpToCard = (index: number) => {
     if (!trackRef.current) return
     const rect = trackRef.current.getBoundingClientRect()
-    const pinTop = window.pageYOffset + rect.top - 70
-    const totalTravel = trackRef.current.offsetHeight - window.innerHeight + 70
+    const pinTop = window.pageYOffset + rect.top - 65
+    const totalTravel = trackRef.current.offsetHeight - window.innerHeight + 65
     if (totalTravel <= 0) return
 
     const targetT = index / Math.max(1, filteredMilestones.length - 1)
@@ -297,216 +297,195 @@ export const AcademicJourneyTimeline: React.FC = () => {
   const scrollRight = () => jumpToCard(Math.min(filteredMilestones.length - 1, currentCardIndex + 1))
 
   return (
-    <div id="academic-journey" className="w-full my-8 sm:my-16 scroll-mt-20">
-      {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-[var(--color-border)] gap-3 sm:gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/25 text-[var(--color-primary)] text-[10px] sm:text-xs font-mono font-semibold uppercase mb-2 select-none">
-            <Sparkles className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-            <span>// CHRONOLOGICAL MILESTONES &amp; HONORS</span>
+    <div 
+      id="academic-journey" 
+      ref={trackRef} 
+      className="relative w-full my-4 sm:my-8"
+      style={{ height: trackHeight }}
+    >
+      {/* Sticky Stage: Seamlessly frames the header, cards, and controls with zero empty voids */}
+      <div 
+        ref={containerRef}
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeaveOrUp}
+        onMouseUp={handleMouseLeaveOrUp}
+        onMouseMove={handleMouseMove}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        className={`sticky top-[60px] sm:top-[70px] w-full overflow-hidden flex flex-col justify-between py-2 sm:py-5 select-none group/timeline ${
+          isDragging ? 'cursor-grabbing' : 'cursor-grab'
+        }`}
+        style={{ height: 'calc(100vh - 68px)' }}
+      >
+        {/* Integrated Header & Filter Pills */}
+        <div className="w-full">
+          <div className="flex items-center justify-between gap-3 mb-2 px-1">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-mono font-semibold text-[var(--color-primary)] uppercase tracking-wider">
+                <Sparkles className="w-3 h-3" />
+                <span>// CHRONOLOGICAL MILESTONES</span>
+              </div>
+              <h3 className="text-base sm:text-2xl font-serif font-bold text-[var(--color-text-main)] leading-tight mt-0.5">
+                Academic &amp; Leadership Journey
+              </h3>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="font-mono text-xs font-bold text-[var(--color-primary)] bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 px-2.5 py-1 rounded-lg">
+                {String(currentCardIndex + 1).padStart(2, '0')} / {String(filteredMilestones.length).padStart(2, '0')}
+              </span>
+              {/* Desktop quick arrow buttons */}
+              <div className="hidden sm:flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={scrollLeft}
+                  disabled={currentCardIndex === 0}
+                  aria-label="Previous milestone"
+                  className="w-7 h-7 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-card)] hover:border-[var(--color-primary)] text-[var(--color-text-main)] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={scrollRight}
+                  disabled={currentCardIndex === filteredMilestones.length - 1}
+                  aria-label="Next milestone"
+                  className="w-7 h-7 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-card)] hover:border-[var(--color-primary)] text-[var(--color-text-main)] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
           </div>
-          <h3 className="text-xl sm:text-3xl font-serif font-bold text-[var(--color-text-main)] leading-tight">
-            Academic &amp; Leadership Journey
-          </h3>
-          <p className="text-xs sm:text-sm text-[var(--color-text-muted)] mt-1 leading-relaxed">
-            Track of academic degrees, government scholarships, teaching fellowships, and honors from 2013 to 2026.
-          </p>
+
+          {/* Filter Category Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1.5 -mx-1 px-1">
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => {
+                  setFilter(cat.id)
+                  setCurrentCardIndex(0)
+                }}
+                className={`px-2.5 py-1 rounded-lg font-mono text-[10px] sm:text-xs flex items-center gap-1.5 shrink-0 transition-all cursor-pointer border ${
+                  filter === cat.id
+                    ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold border-[var(--color-primary)] shadow-xs'
+                    : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:text-[var(--color-text-main)]'
+                }`}
+              >
+                <span>{cat.label}</span>
+                <span className="opacity-60 text-[9px]">({cat.count})</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Track Navigation Buttons */}
-        <div className="hidden md:flex items-center gap-2 shrink-0">
+        {/* Animated Horizontal Cards Row: Organic, Editorial Design */}
+        <motion.div 
+          ref={contentRef}
+          style={{ x }}
+          className="flex items-stretch gap-3 sm:gap-5 px-2 sm:px-6 my-auto py-2"
+        >
+          {filteredMilestones.map((item, index) => (
+            <div 
+              key={item.id}
+              className="w-[82vw] max-w-[310px] sm:w-[330px] shrink-0 bg-gradient-to-b from-[#0f2038] to-[#0a192f] border border-white/[0.08] hover:border-[var(--color-primary)]/40 rounded-2xl p-4 sm:p-5 shadow-[0_12px_32px_-12px_rgba(0,0,0,0.5)] flex flex-col justify-between relative overflow-hidden transition-all group"
+            >
+              {/* Delicate top gradient accent hairline */}
+              <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[var(--color-primary)]/40 to-transparent" />
+
+              <div>
+                {/* Organic Meta Header: Year + Step & Category */}
+                <div className="flex items-center justify-between gap-2 mb-2.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-mono text-sm font-bold text-[var(--color-primary)] shrink-0">
+                      {item.year}
+                    </span>
+                    <span className="text-[10px] font-mono text-[var(--color-text-subtle)] uppercase tracking-wider truncate">
+                      · {item.categoryLabel}
+                    </span>
+                  </div>
+
+                  <span className="font-mono text-[10px] font-medium text-[var(--color-text-subtle)] px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06] shrink-0">
+                    {String(index + 1).padStart(2, '0')}/{String(filteredMilestones.length).padStart(2, '0')}
+                  </span>
+                </div>
+
+                {/* Title & Affiliation */}
+                <div className="my-1.5">
+                  <h4 className="font-serif font-bold text-base sm:text-lg text-white leading-snug tracking-tight">
+                    {item.title}
+                  </h4>
+                  <p className="text-xs text-[var(--color-text-muted)] font-sans mt-1">
+                    {item.institution}
+                  </p>
+                </div>
+
+                {/* Organic Editorial Highlight Dispatch */}
+                <div className="border-l-2 border-[var(--color-primary)]/40 pl-3 my-3 text-xs sm:text-[13px] text-neutral-300 font-sans leading-relaxed">
+                  {item.highlight}
+                </div>
+              </div>
+
+              {/* Organic Footer: Period & Icon Accent */}
+              <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-[var(--color-text-muted)]">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)]/70" />
+                  <span>{item.period}</span>
+                </div>
+
+                <div 
+                  style={{ color: item.badgeColor }}
+                  className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center shrink-0"
+                >
+                  {item.icon}
+                </div>
+              </div>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Navigation Controls: Arrows & Progress Dots */}
+        <div className="flex items-center justify-between px-4 max-w-xs mx-auto w-full pt-1">
           <button
             type="button"
             onClick={scrollLeft}
             disabled={currentCardIndex === 0}
-            aria-label="Scroll left in journey timeline"
-            className="w-9 h-9 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-elevated)] hover:border-[var(--color-primary)] text-[var(--color-text-main)] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors shadow-xs cursor-pointer"
+            aria-label="Previous milestone"
+            className="w-8 h-8 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-main)] disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--color-primary)] cursor-pointer transition-colors shadow-xs"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
+
+          {/* Progress Dots */}
+          <div className="flex items-center gap-1.5">
+            {filteredMilestones.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => jumpToCard(i)}
+                aria-label={`Jump to milestone ${i + 1}`}
+                className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                  currentCardIndex === i 
+                    ? 'w-6 bg-[var(--color-primary)]' 
+                    : 'w-1.5 bg-white/20 hover:bg-white/40'
+                }`}
+              />
+            ))}
+          </div>
+
           <button
             type="button"
             onClick={scrollRight}
             disabled={currentCardIndex === filteredMilestones.length - 1}
-            aria-label="Scroll right in journey timeline"
-            className="w-9 h-9 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-elevated)] hover:border-[var(--color-primary)] text-[var(--color-text-main)] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors shadow-xs cursor-pointer"
+            aria-label="Next milestone"
+            className="w-8 h-8 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-main)] disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--color-primary)] cursor-pointer transition-colors shadow-xs"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
-
-      {/* Filter Category Pills & Counter */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1.5 -mx-1 px-1">
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => {
-                setFilter(cat.id)
-                setCurrentCardIndex(0)
-              }}
-              className={`px-3 py-1.5 rounded-xl font-mono text-[11px] sm:text-xs flex items-center gap-1.5 sm:gap-2 shrink-0 transition-all cursor-pointer border ${
-                filter === cat.id
-                  ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold border-[var(--color-primary)] shadow-sm'
-                  : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:text-[var(--color-text-main)] hover:bg-[var(--color-surface-elevated)]'
-              }`}
-            >
-              <span>{cat.label}</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${
-                filter === cat.id
-                  ? 'bg-black/20 text-[var(--color-primary-text)]'
-                  : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)]'
-              }`}>
-                {cat.count}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="font-mono text-xs font-bold text-[var(--color-primary)] bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 px-2.5 py-1 rounded-lg">
-            {String(currentCardIndex + 1).padStart(2, '0')} / {String(filteredMilestones.length).padStart(2, '0')}
-          </span>
-          <span className="hidden lg:inline-flex items-center gap-1.5 text-[11px] font-mono text-[var(--color-text-subtle)]">
-            <span>← Scroll to explore all milestones →</span>
-          </span>
-        </div>
-      </div>
-
-      {/* =========================================================================
-          HORIZONTAL SCROLL MILESTONES: Pinned scroll across all screen sizes
-          - Renders the exact requested card layout with watermark year, tags, and summary
-          - Locks under navbar and scrolls horizontally as the user scrolls vertically
-          - Also supports direct touch-swiping, mouse-drag, and quick arrow/dot navigation
-      ========================================================================= */}
-      <div 
-        ref={trackRef} 
-        className="relative w-full"
-        style={{ height: trackHeight }}
-      >
-        {/* Sticky stage: locked under header at top-[70px] */}
-        <div 
-          ref={containerRef}
-          onMouseDown={handleMouseDown}
-          onMouseLeave={handleMouseLeaveOrUp}
-          onMouseUp={handleMouseLeaveOrUp}
-          onMouseMove={handleMouseMove}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          className={`sticky top-[70px] w-full overflow-hidden flex flex-col justify-center select-none group/timeline ${
-            isDragging ? 'cursor-grabbing' : 'cursor-grab'
-          }`}
-          style={{ height: 'calc(100vh - 74px)' }}
-        >
-          {/* Animated Horizontal Cards Row */}
-          <motion.div 
-            ref={contentRef}
-            style={{ x }}
-            className="flex items-stretch gap-3.5 sm:gap-6 px-4 sm:px-12 py-3"
-          >
-            {filteredMilestones.map((item, index) => (
-              <div 
-                key={item.id}
-                className="w-[84vw] max-w-[320px] sm:w-[330px] shrink-0 bg-[var(--color-surface-card)] border-2 border-[var(--color-border)] hover:border-[var(--color-primary)]/50 rounded-2xl p-4 shadow-xl flex flex-col justify-between relative overflow-hidden transition-colors"
-              >
-                {/* Watermark Year Background Accent */}
-                <div className="absolute -right-2 -top-2 text-6xl font-black font-mono text-white/[0.04] select-none pointer-events-none">
-                  {item.year}
-                </div>
-
-                <div>
-                  {/* Top Row: Milestone 01 of 10, Category Pill */}
-                  <div className="flex items-center justify-between gap-2 mb-2 relative z-10">
-                    <span className="font-mono text-xs font-bold text-[var(--color-primary)] bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 px-2 py-0.5 rounded-md">
-                      {String(index + 1).padStart(2, '0')} of {String(filteredMilestones.length).padStart(2, '0')}
-                    </span>
-                    <span 
-                      style={{ color: item.badgeColor, backgroundColor: `${item.badgeColor}15`, borderColor: `${item.badgeColor}35` }}
-                      className="text-[10px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded border truncate"
-                    >
-                      {item.categoryLabel}
-                    </span>
-                  </div>
-
-                  {/* Icon & Title */}
-                  <div className="flex items-start gap-2.5 my-2.5">
-                    <div 
-                      style={{ borderColor: item.badgeColor }}
-                      className="w-9 h-9 rounded-xl bg-[var(--color-surface-base)] border flex items-center justify-center text-[var(--color-text-main)] shrink-0 shadow-sm"
-                    >
-                      <span style={{ color: item.badgeColor }}>
-                        {item.icon}
-                      </span>
-                    </div>
-                    <div className="min-w-0">
-                      <h4 className="font-serif font-bold text-sm sm:text-base text-[var(--color-text-main)] leading-snug">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-[var(--color-text-muted)] font-medium truncate mt-0.5">
-                        {item.institution}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Highlight Box */}
-                  <div className="p-3 rounded-xl bg-[var(--color-surface-base)] border border-[var(--color-border)] text-xs text-neutral-200 leading-relaxed font-sans mb-3">
-                    {item.highlight}
-                  </div>
-                </div>
-
-                {/* Period Footer */}
-                <div className="pt-2 border-t border-[var(--color-border)] text-[10px] font-mono text-[var(--color-text-muted)] flex items-center justify-between">
-                  <span>Timeline Period</span>
-                  <span className="text-[var(--color-primary)] font-bold">{item.period}</span>
-                </div>
-              </div>
-            ))}
-          </motion.div>
-
-          {/* Navigation Controls: Arrows & Progress Dots */}
-          <div className="flex items-center justify-between mt-4 px-4 max-w-xs mx-auto w-full">
-            <button
-              type="button"
-              onClick={scrollLeft}
-              disabled={currentCardIndex === 0}
-              aria-label="Previous milestone"
-              className="w-8 h-8 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-main)] disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--color-primary)] cursor-pointer transition-colors shadow-xs"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            {/* Progress Dots */}
-            <div className="flex items-center gap-1.5">
-              {filteredMilestones.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => jumpToCard(i)}
-                  aria-label={`Jump to milestone ${i + 1}`}
-                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                    currentCardIndex === i 
-                      ? 'w-6 bg-[var(--color-primary)]' 
-                      : 'w-1.5 bg-white/20 hover:bg-white/40'
-                  }`}
-                />
-              ))}
-            </div>
-
-            <button
-              type="button"
-              onClick={scrollRight}
-              disabled={currentCardIndex === filteredMilestones.length - 1}
-              aria-label="Next milestone"
-              className="w-8 h-8 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-main)] disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--color-primary)] cursor-pointer transition-colors shadow-xs"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
     </div>
   )
 }
