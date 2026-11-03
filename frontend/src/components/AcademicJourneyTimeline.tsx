@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { 
   GraduationCap, 
   Award, 
@@ -27,8 +28,6 @@ export interface MilestoneItem {
 
 export const AcademicJourneyTimeline: React.FC = () => {
   const [filter, setFilter] = useState<string>('all')
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const sectionRef = useRef<HTMLDivElement>(null)
 
   const milestones: MilestoneItem[] = [
     {
@@ -174,16 +173,50 @@ export const AcademicJourneyTimeline: React.FC = () => {
 
   const filteredMilestones = milestones.filter(m => filter === 'all' || m.category === filter)
 
-  // Drag-to-scroll state
+  const desktopTrackRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [maxScroll, setMaxScroll] = useState<number>(2200)
+
+  // Measure content scroll width vs container width dynamically
+  useEffect(() => {
+    const updateMaxScroll = () => {
+      if (contentRef.current && containerRef.current) {
+        const scrollDist = Math.max(0, contentRef.current.scrollWidth - containerRef.current.clientWidth)
+        setMaxScroll(scrollDist)
+      }
+    }
+    updateMaxScroll()
+    window.addEventListener('resize', updateMaxScroll)
+    return () => window.removeEventListener('resize', updateMaxScroll)
+  }, [filteredMilestones.length])
+
+  // Scroll progress through the desktop track (pinned once it reaches top-[70px] under navbar)
+  const { scrollYProgress } = useScroll({
+    target: desktopTrackRef as React.RefObject<HTMLElement>,
+    offset: ['start 70px', 'end end']
+  })
+
+  // Smooth transform: buffer at start (0.0 to 0.08) and end (0.92 to 1.0)
+  // so the section shows FULLY in place before horizontal scrolling begins,
+  // and stays in place before unpinning!
+  const x = useTransform(scrollYProgress, (progress) => {
+    if (progress <= 0.08) return 0
+    if (progress >= 0.92) return -maxScroll
+    const t = (progress - 0.08) / (0.92 - 0.08)
+    return -t * maxScroll
+  })
+
+  // Track height based on number of milestones: 280vh for full deck, 180vh for filtered subsets
+  const trackHeight = filteredMilestones.length <= 4 ? '180vh' : '280vh'
+
+  // Drag-to-scroll support that smoothly shifts page vertical scroll
   const [isDragging, setIsDragging] = useState(false)
-  const [startX, setStartX] = useState(0)
-  const [scrollLeftPos, setScrollLeftPos] = useState(0)
+  const dragStartX = useRef(0)
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (!scrollContainerRef.current) return
     setIsDragging(true)
-    setStartX(e.pageX - scrollContainerRef.current.offsetLeft)
-    setScrollLeftPos(scrollContainerRef.current.scrollLeft)
+    dragStartX.current = e.clientX
   }
 
   const handleMouseLeaveOrUp = () => {
@@ -191,80 +224,69 @@ export const AcademicJourneyTimeline: React.FC = () => {
   }
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !scrollContainerRef.current) return
-    e.preventDefault()
-    const x = e.pageX - scrollContainerRef.current.offsetLeft
-    const walk = (x - startX) * 1.5
-    scrollContainerRef.current.scrollLeft = scrollLeftPos - walk
+    if (!isDragging || !desktopTrackRef.current) return
+    const deltaX = dragStartX.current - e.clientX
+    const totalTravel = desktopTrackRef.current.offsetHeight - window.innerHeight + 70
+    if (totalTravel <= 0 || maxScroll <= 0) return
+
+    const scrollRatio = (totalTravel * 0.84) / maxScroll
+    window.scrollBy({ top: deltaX * scrollRatio })
+    dragStartX.current = e.clientX
   }
 
-  // Wheel horizontal scroll:
-  // Must show fully first before scrolling horizontally!
-  // Once the section has scrolled fully into position (rect.top <= 100),
-  // scrolling down scrolls the timeline horizontally until the end.
-  // Once it reaches the end, vertical page scroll seamlessly resumes down!
-  // When scrolling up, it scrolls the timeline backwards, and once at start resumes vertical scroll up.
-  React.useEffect(() => {
-    const sectionEl = sectionRef.current
-    const el = scrollContainerRef.current
-    if (!sectionEl || !el) return
+  // Trackpad horizontal swipe / shift-wheel translation
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
 
     const onWheel = (e: WheelEvent) => {
-      if (e.deltaY === 0 || e.shiftKey) return
-      const maxScroll = el.scrollWidth - el.clientWidth
-      if (maxScroll <= 0) return
-
-      const trackRect = el.getBoundingClientRect()
-
-      if (e.deltaY > 0) {
-        // Scrolling DOWN:
-        // Must show fully first: the card track itself must have scrolled up under the header (trackRect.top <= 85px).
-        // If trackRect.top > 85px (e.g. Screenshot 2 where header/filters take up space and bottom cards are cut off),
-        // do NOT intercept — let normal vertical page scroll continue until the track is fully in view (Screenshot 1)!
-        const isTrackFullyInView = trackRect.top <= 85 && trackRect.top >= 20 && trackRect.bottom >= window.innerHeight * 0.4
-        const canScrollRight = el.scrollLeft < maxScroll - 4
-
-        if (isTrackFullyInView && canScrollRight) {
-          e.preventDefault()
-          el.scrollLeft += e.deltaY * 1.15
-          return
+      const absX = Math.abs(e.deltaX)
+      const absY = Math.abs(e.deltaY)
+      // Only intercept if user is intentionally swiping horizontally with trackpad
+      if (absX > absY && absX > 2 && desktopTrackRef.current) {
+        e.preventDefault()
+        const totalTravel = desktopTrackRef.current.offsetHeight - window.innerHeight + 70
+        if (totalTravel > 0 && maxScroll > 0) {
+          const scrollRatio = (totalTravel * 0.84) / maxScroll
+          window.scrollBy({ top: e.deltaX * scrollRatio })
         }
-        // At the end or before showing fully, allow default vertical scroll down!
-      } else if (e.deltaY < 0) {
-        // Scrolling UP:
-        // When coming from below, trackRect.top starts negative (above viewport).
-        // Must wait until the track has scrolled down into full view (trackRect.top >= 82px && trackRect.top <= 135px)
-        // so the top cards and category badges are completely clear of the header before horizontal scrolling starts!
-        const isTrackFullyInView = trackRect.top >= 82 && trackRect.top <= 135 && trackRect.bottom >= window.innerHeight * 0.4
-        const canScrollLeft = el.scrollLeft > 4
-
-        if (isTrackFullyInView && canScrollLeft) {
-          e.preventDefault()
-          el.scrollLeft += e.deltaY * 1.15
-          return
-        }
-        // At the beginning (scrollLeft <= 4) or before showing fully, allow default vertical scroll up!
       }
     }
 
-    sectionEl.addEventListener('wheel', onWheel, { passive: false })
-    return () => sectionEl.removeEventListener('wheel', onWheel)
-  }, [filteredMilestones.length])
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [maxScroll])
 
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -360, behavior: 'smooth' })
+  const scrollStep = (direction: 'left' | 'right') => {
+    if (!desktopTrackRef.current) return
+    const rect = desktopTrackRef.current.getBoundingClientRect()
+    const pinTop = window.pageYOffset + rect.top - 70
+    const totalTravel = desktopTrackRef.current.offsetHeight - window.innerHeight + 70
+    if (totalTravel <= 0) return
+
+    const cardStep = (totalTravel * 0.84) / Math.max(1, filteredMilestones.length - 1)
+    const currentProgress = Math.max(0, Math.min(1, (window.pageYOffset - pinTop) / totalTravel))
+
+    if (direction === 'right') {
+      if (currentProgress < 0.08) {
+        window.scrollTo({ top: pinTop + totalTravel * 0.08 + cardStep, behavior: 'smooth' })
+      } else {
+        window.scrollTo({ top: Math.min(pinTop + totalTravel, window.pageYOffset + cardStep), behavior: 'smooth' })
+      }
+    } else {
+      if (currentProgress > 0.92) {
+        window.scrollTo({ top: pinTop + totalTravel * 0.92 - cardStep, behavior: 'smooth' })
+      } else {
+        window.scrollTo({ top: Math.max(pinTop, window.pageYOffset - cardStep), behavior: 'smooth' })
+      }
     }
   }
 
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 360, behavior: 'smooth' })
-    }
-  }
+  const scrollLeft = () => scrollStep('left')
+  const scrollRight = () => scrollStep('right')
 
   return (
-    <div ref={sectionRef} className="w-full my-16">
+    <div className="w-full my-16">
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-[var(--color-border)] gap-4">
         <div>
@@ -333,42 +355,50 @@ export const AcademicJourneyTimeline: React.FC = () => {
       </div>
 
       {/* =========================================================================
-          DESKTOP VIEW: Non-clashing Horizontal Alternating Milestone Cable
+          DESKTOP VIEW: Sticky-Pinned Horizontal Alternating Milestone Cable
       ========================================================================= */}
-      <div className="hidden md:block relative group/timeline">
-        {/* Left / Right floating quick buttons */}
-        <button
-          type="button"
-          onClick={scrollLeft}
-          aria-label="Scroll timeline left"
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-[var(--color-surface-card)]/90 backdrop-blur-md border border-[var(--color-border)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] shadow-xl flex items-center justify-center opacity-0 group-hover/timeline:opacity-100 transition-opacity cursor-pointer"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <button
-          type="button"
-          onClick={scrollRight}
-          aria-label="Scroll timeline right"
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-[var(--color-surface-card)]/90 backdrop-blur-md border border-[var(--color-border)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] shadow-xl flex items-center justify-center opacity-0 group-hover/timeline:opacity-100 transition-opacity cursor-pointer"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-
+      <div 
+        ref={desktopTrackRef} 
+        className="hidden md:block relative w-full"
+        style={{ height: trackHeight }}
+      >
+        {/* Sticky stage: locked under header at top-[70px], centering the 420px timeline */}
         <div 
-          ref={scrollContainerRef}
+          ref={containerRef}
           onMouseDown={handleMouseDown}
           onMouseLeave={handleMouseLeaveOrUp}
           onMouseUp={handleMouseLeaveOrUp}
           onMouseMove={handleMouseMove}
-          className={`overflow-x-auto py-4 select-none ${
+          className={`sticky top-[70px] w-full overflow-hidden flex flex-col justify-center select-none group/timeline ${
             isDragging ? 'cursor-grabbing' : 'cursor-grab'
           }`}
-          style={{
-            scrollbarWidth: 'thin',
-            scrollbarColor: 'var(--color-primary) transparent'
-          }}
+          style={{ height: 'calc(100vh - 74px)' }}
         >
-          <div className="relative min-w-max px-12" style={{ height: '420px' }}>
+          {/* Left / Right floating quick buttons */}
+          <button
+            type="button"
+            onClick={scrollLeft}
+            aria-label="Scroll timeline left"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-[var(--color-surface-card)]/90 backdrop-blur-md border border-[var(--color-border)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] shadow-xl flex items-center justify-center opacity-0 group-hover/timeline:opacity-100 transition-all cursor-pointer hover:scale-105"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={scrollRight}
+            aria-label="Scroll timeline right"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-[var(--color-surface-card)]/90 backdrop-blur-md border border-[var(--color-border)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] shadow-xl flex items-center justify-center opacity-0 group-hover/timeline:opacity-100 transition-all cursor-pointer hover:scale-105"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+
+          {/* Animated Horizontal Cable */}
+          <motion.div 
+            ref={contentRef}
+            style={{ x }}
+            className="relative min-w-max px-12 py-4"
+          >
+            <div className="relative min-w-max" style={{ height: '420px' }}>
             
             {/* Central Backbone Cable at Y=210px */}
             <div 
@@ -511,7 +541,8 @@ export const AcademicJourneyTimeline: React.FC = () => {
               })}
             </div>
 
-          </div>
+            </div>
+          </motion.div>
         </div>
       </div>
 
