@@ -283,14 +283,6 @@ export const NewsHero: React.FC = () => {
       >
         Latest updates on research appointments, publications, software releases, and academic honors.
       </motion.p>
-
-      <motion.div
-        {...rise(0.24)}
-        className="mt-6 inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-xs font-mono text-[var(--color-text-muted)] shadow-xs"
-      >
-        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-        <span>Official dispatches · Ibadan, Nigeria</span>
-      </motion.div>
     </header>
   )
 }

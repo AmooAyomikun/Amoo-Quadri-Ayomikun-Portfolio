@@ -366,7 +366,7 @@ export const QuestionsSection: React.FC = () => {
                       </>
                     ) : (
                       <>
-                        <span>Sent</span>
+                        <span>Send</span>
                         <Send className="w-3.5 h-3.5" />
                       </>
                     )}
@@ -383,10 +383,20 @@ export const QuestionsSection: React.FC = () => {
                     exit={{ opacity: 0, y: 10 }}
                     className="mt-5 p-4 rounded-2xl bg-[var(--color-surface-elevated)] border border-[var(--color-border)] text-left w-full text-xs text-[var(--color-text-main)] leading-relaxed shadow-sm relative"
                   >
-                    <div className="flex items-center gap-1.5 text-[var(--color-primary)] font-mono text-[10px] uppercase tracking-wider font-semibold mb-1">
-                      <Sparkles className="w-3 h-3" /> Response to &ldquo;{lastAskedQuestion}&rdquo;
+                    <div className="flex items-center justify-between gap-1.5 text-[var(--color-primary)] font-mono text-[10px] uppercase tracking-wider font-semibold mb-1.5">
+                      <span className="flex items-center gap-1.5 truncate">
+                        <Sparkles className="w-3 h-3 shrink-0" /> Answer to &ldquo;{lastAskedQuestion}&rdquo;
+                      </span>
+                      <button 
+                        type="button" 
+                        onClick={() => setAiAnswer(null)} 
+                        className="p-1 text-[var(--color-text-subtle)] hover:text-[var(--color-text-main)] transition-colors cursor-pointer shrink-0"
+                        title="Dismiss answer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                    <p className="whitespace-pre-line text-[var(--color-text-muted)]">
+                    <p className="whitespace-pre-line text-[var(--color-text-muted)] leading-relaxed">
                       {aiAnswer}
                     </p>
                   </motion.div>

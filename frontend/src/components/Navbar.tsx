@@ -28,7 +28,7 @@ export const Navbar: React.FC = () => {
     return saved === 'system' || saved === 'light' || saved === 'dark' ? saved : (theme as ThemeMode)
   })
 
-  // Mobile navigation drawer sheet state
+  // Mobile menu open state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
@@ -44,35 +44,7 @@ export const Navbar: React.FC = () => {
     return () => mq.removeEventListener('change', apply)
   }, [mode, setTheme])
 
-  // Sticky hide-on-scroll header logic
-  const [isVisible, setIsVisible] = useState(true)
-  const [isScrolled, setIsScrolled] = useState(false)
-
   useEffect(() => {
-    let lastScrollY = window.scrollY
-
-    const onScroll = () => {
-      const currentScrollY = window.scrollY
-      setIsScrolled(currentScrollY > 40)
-
-      if (currentScrollY <= 50) {
-        setIsVisible(true)
-      } else if (currentScrollY > lastScrollY + 8) {
-        setIsVisible(false)
-      } else if (currentScrollY < lastScrollY - 8) {
-        setIsVisible(true)
-      }
-
-      lastScrollY = Math.max(0, currentScrollY)
-    }
-
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    setIsVisible(true)
     setMobileMenuOpen(false)
   }, [location.pathname, location.hash])
 
@@ -180,56 +152,24 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Top sticky banner */}
-      <header
-        className={`sticky top-0 z-50 w-full border-b-2 border-[var(--color-text-main)] transition-all duration-300 ease-in-out ${
-          isVisible || mobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
-        } ${
-          isScrolled ? 'bg-[var(--color-surface-base)]/85 backdrop-blur-md shadow-sm' : 'bg-[var(--color-surface-base)]'
-        }`}
-      >
-        <div
-          className={`flex items-center justify-between gap-2 sm:gap-6 px-3 sm:px-8 transition-[padding] duration-500 ease-[cubic-bezier(.7,0,.2,1)] ${
-            isScrolled ? 'py-1.5 sm:py-2' : 'py-2 sm:py-3'
-          }`}
-        >
+      {/* Top static banner */}
+      <header className="relative w-full border-b-2 border-[var(--color-text-main)] bg-[var(--color-surface-base)] z-40">
+        <div className="flex items-center justify-between gap-2 sm:gap-6 px-3 sm:px-8 py-2.5 sm:py-3.5">
           <Link
             to="/"
             aria-label="Home - Quadri Ayomikun Amoo"
-            className={`name-banner group flex flex-1 items-center min-w-0 focus:outline-none ${
-              isScrolled ? 'justify-start gap-1 sm:gap-2' : 'justify-between gap-1.5 sm:gap-4'
-            }`}
+            className="name-banner group flex flex-1 items-center justify-between gap-1.5 sm:gap-4 min-w-0 focus:outline-none"
           >
-            {['Quadri', 'Ayomikun', 'Amoo'].map((word, i) => (
+            {['Quadri', 'Ayomikun', 'Amoo'].map((word) => (
               <span
                 key={word}
-                className="name-word font-black uppercase leading-none tracking-tight inline-flex shrink-0 transition-[font-size] duration-500 ease-[cubic-bezier(.7,0,.2,1)]"
+                className="name-word font-black uppercase leading-none tracking-tight inline-flex shrink-0"
                 style={{
                   fontFamily: "'Archivo Black', 'Inter', system-ui, sans-serif",
-                  fontSize: isScrolled
-                    ? 'clamp(0.95rem, 2.6vw, 1.75rem)'
-                    : 'clamp(0.88rem, 4.2vw, 4rem)',
-                  transitionDelay: `${i * 90}ms`
+                  fontSize: 'clamp(1.15rem, 4vw, 3.5rem)'
                 }}
               >
-                <span className="name-fill" style={{ transitionDelay: `${i * 110}ms` }}>
-                  {word[0]}
-                </span>
-                <span
-                  className="name-fill overflow-hidden whitespace-nowrap"
-                  style={{
-                    maxWidth: isScrolled ? '0' : '12ch',
-                    opacity: isScrolled ? 0 : 1,
-                    transitionDelay: `${i * 110}ms`
-                  }}
-                >
-                  {word.slice(1)}
-                </span>
-                {isScrolled && i < 2 && (
-                  <span className="ml-1 sm:ml-2 text-[var(--color-primary)] font-bold" aria-hidden>
-                    ·
-                  </span>
-                )}
+                <span className="name-fill">{word}</span>
               </span>
             ))}
           </Link>

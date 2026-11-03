@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react'
-import { motion } from 'framer-motion'
 import { 
   GraduationCap, 
   Award, 
@@ -9,8 +8,7 @@ import {
   Users, 
   ChevronLeft, 
   ChevronRight, 
-  Sparkles,
-  ExternalLink
+  Sparkles
 } from 'lucide-react'
 
 export interface MilestoneItem {
@@ -175,15 +173,53 @@ export const AcademicJourneyTimeline: React.FC = () => {
 
   const filteredMilestones = milestones.filter(m => filter === 'all' || m.category === filter)
 
+  // Drag-to-scroll state
+  const [isDragging, setIsDragging] = useState(false)
+  const [startX, setStartX] = useState(0)
+  const [scrollLeftPos, setScrollLeftPos] = useState(0)
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return
+    setIsDragging(true)
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft)
+    setScrollLeftPos(scrollContainerRef.current.scrollLeft)
+  }
+
+  const handleMouseLeaveOrUp = () => {
+    setIsDragging(false)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollContainerRef.current) return
+    e.preventDefault()
+    const x = e.pageX - scrollContainerRef.current.offsetLeft
+    const walk = (x - startX) * 1.5
+    scrollContainerRef.current.scrollLeft = scrollLeftPos - walk
+  }
+
+  // Wheel horizontal scroll: scrolling mouse wheel over timeline scrolls horizontally
+  React.useEffect(() => {
+    const el = scrollContainerRef.current
+    if (!el) return
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY !== 0 && !e.shiftKey) {
+        e.preventDefault()
+        el.scrollLeft += e.deltaY * 1.2
+      }
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [])
+
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -340, behavior: 'smooth' })
+      scrollContainerRef.current.scrollBy({ left: -360, behavior: 'smooth' })
     }
   }
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 340, behavior: 'smooth' })
+      scrollContainerRef.current.scrollBy({ left: 360, behavior: 'smooth' })
     }
   }
 
@@ -225,142 +261,209 @@ export const AcademicJourneyTimeline: React.FC = () => {
         </div>
       </div>
 
-      {/* Filter Category Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-4 mb-6">
-        {categories.map(cat => (
-          <button
-            key={cat.id}
-            type="button"
-            onClick={() => setFilter(cat.id)}
-            className={`px-3.5 py-1.5 rounded-xl font-mono text-xs flex items-center gap-2 shrink-0 transition-all cursor-pointer border ${
-              filter === cat.id
-                ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold border-[var(--color-primary)] shadow-sm'
-                : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:text-[var(--color-text-main)] hover:bg-[var(--color-surface-elevated)]'
-            }`}
-          >
-            <span>{cat.label}</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${
-              filter === cat.id
-                ? 'bg-black/20 text-[var(--color-primary-text)]'
-                : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)]'
-            }`}>
-              {cat.count}
-            </span>
-          </button>
-        ))}
+      {/* Filter Category Pills & Horizontal Scroll Hint */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          {categories.map(cat => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setFilter(cat.id)}
+              className={`px-3.5 py-1.5 rounded-xl font-mono text-xs flex items-center gap-2 shrink-0 transition-all cursor-pointer border ${
+                filter === cat.id
+                  ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold border-[var(--color-primary)] shadow-sm'
+                  : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:text-[var(--color-text-main)] hover:bg-[var(--color-surface-elevated)]'
+              }`}
+            >
+              <span>{cat.label}</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${
+                filter === cat.id
+                  ? 'bg-black/20 text-[var(--color-primary-text)]'
+                  : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)]'
+              }`}>
+                {cat.count}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-mono text-[var(--color-text-subtle)] shrink-0">
+          <span>← Scroll or drag to explore all {filteredMilestones.length} milestones →</span>
+        </span>
       </div>
 
       {/* =========================================================================
-          DESKTOP VIEW: Bespoke Horizontal Alternating Milestone Cable
+          DESKTOP VIEW: Non-clashing Horizontal Alternating Milestone Cable
       ========================================================================= */}
-      <div className="hidden md:block relative">
+      <div className="hidden md:block relative group/timeline">
+        {/* Left / Right floating quick buttons */}
+        <button
+          type="button"
+          onClick={scrollLeft}
+          aria-label="Scroll timeline left"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-[var(--color-surface-card)]/90 backdrop-blur-md border border-[var(--color-border)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] shadow-xl flex items-center justify-center opacity-0 group-hover/timeline:opacity-100 transition-opacity cursor-pointer"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <button
+          type="button"
+          onClick={scrollRight}
+          aria-label="Scroll timeline right"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-[var(--color-surface-card)]/90 backdrop-blur-md border border-[var(--color-border)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] shadow-xl flex items-center justify-center opacity-0 group-hover/timeline:opacity-100 transition-opacity cursor-pointer"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+
         <div 
           ref={scrollContainerRef}
-          className="overflow-x-auto no-scrollbar py-6 cursor-grab active:cursor-grabbing select-none"
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeaveOrUp}
+          onMouseUp={handleMouseLeaveOrUp}
+          onMouseMove={handleMouseMove}
+          className={`overflow-x-auto py-4 select-none ${
+            isDragging ? 'cursor-grabbing' : 'cursor-grab'
+          }`}
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'var(--color-primary) transparent'
+          }}
         >
-          <div className="relative min-w-max px-8" style={{ height: '460px' }}>
+          <div className="relative min-w-max px-12" style={{ height: '560px' }}>
             
-            {/* Glowing Central Backbone Cable */}
+            {/* Central Backbone Cable at Y=280px */}
             <div 
               className="absolute left-0 right-0 h-1 bg-gradient-to-r from-[var(--color-primary)]/20 via-[var(--color-primary)] to-[var(--color-primary)]/20 z-0"
-              style={{ top: '230px' }}
+              style={{ top: '280px' }}
             >
-              {/* Subtle dashed accent track */}
               <div className="absolute inset-0 border-b border-dashed border-white/20" />
             </div>
 
             {/* Alternating Milestone Nodes Along the Cable */}
-            <div className="flex items-center gap-12 relative z-10">
+            <div className="flex items-center gap-14 relative z-10">
               {filteredMilestones.map((item, index) => {
                 const isTop = index % 2 === 0
 
                 return (
                   <div 
                     key={item.id} 
-                    className="relative flex flex-col items-center w-[270px] shrink-0"
-                    style={{ height: '460px' }}
+                    className="relative flex flex-col items-center w-[285px] shrink-0"
+                    style={{ height: '560px' }}
                   >
-                    {/* TOP CARD (if isTop) */}
+                    {/* TOP CARD (if isTop): Placed in upper half (top: 20px - 215px) */}
                     {isTop ? (
-                      <div className="absolute top-0 w-full flex flex-col items-center">
-                        <div className="w-full bg-[var(--color-surface-card)] border-2 border-[var(--color-border)] hover:border-[var(--color-primary)]/60 rounded-2xl p-4 shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-                          <div className="flex items-center justify-between gap-2 mb-1.5">
-                            <span 
-                              style={{ color: item.badgeColor, borderColor: `${item.badgeColor}40`, backgroundColor: `${item.badgeColor}15` }}
-                              className="text-[10px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded border truncate"
-                            >
-                              {item.categoryLabel}
-                            </span>
-                            <span className="text-[11px] font-mono text-[var(--color-primary)] font-bold">
-                              {item.period}
-                            </span>
-                          </div>
+                      <>
+                        <div 
+                          className="absolute w-full flex flex-col items-center"
+                          style={{ top: '20px' }}
+                        >
+                          <div className="w-full bg-[var(--color-surface-card)] border-2 border-[var(--color-border)] hover:border-[var(--color-primary)]/70 rounded-2xl p-4 shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+                            <div className="flex items-center justify-between gap-2 mb-1.5">
+                              <span 
+                                style={{ color: item.badgeColor, borderColor: `${item.badgeColor}40`, backgroundColor: `${item.badgeColor}15` }}
+                                className="text-[10px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded border truncate"
+                              >
+                                {item.categoryLabel}
+                              </span>
+                              <span className="text-[11px] font-mono text-[var(--color-primary)] font-bold">
+                                {item.period}
+                              </span>
+                            </div>
 
-                          <h4 className="font-serif font-bold text-sm text-[var(--color-text-main)] mb-1 line-clamp-2">
-                            {item.title}
-                          </h4>
+                            <h4 className="font-serif font-bold text-sm text-[var(--color-text-main)] mb-1 leading-snug line-clamp-2">
+                              {item.title}
+                            </h4>
 
-                          <p className="text-xs text-[var(--color-text-muted)] font-medium mb-2 truncate">
-                            {item.institution}
-                          </p>
+                            <p className="text-xs text-[var(--color-text-muted)] font-medium mb-2 truncate">
+                              {item.institution}
+                            </p>
 
-                          <div className="pt-2 border-t border-[var(--color-border)] text-[11px] font-sans text-neutral-300 leading-snug">
-                            {item.highlight}
+                            <div className="pt-2 border-t border-[var(--color-border)] text-[11px] font-sans text-neutral-300 leading-snug">
+                              {item.highlight}
+                            </div>
                           </div>
                         </div>
 
-                        {/* Connector Stem pointing DOWN to central node */}
-                        <div className="w-0.5 h-10 border-r-2 border-dashed border-[var(--color-primary)]/50 mt-1" />
-                      </div>
+                        {/* Top Connector Stem pointing down to central node */}
+                        <div 
+                          className="absolute w-0.5 border-r-2 border-dashed border-[var(--color-primary)]/60 z-10"
+                          style={{ top: '220px', height: '42px' }}
+                        />
+                      </>
                     ) : null}
 
-                    {/* CENTRAL NODE on the timeline cable */}
+                    {/* CENTRAL CIRCULAR NODE on the timeline cable (Y=262px, height=36px) */}
                     <div 
                       className="absolute z-20 flex flex-col items-center"
-                      style={{ top: '215px' }}
+                      style={{ top: '262px' }}
                     >
-                      <div className="relative group cursor-pointer">
-                        <div className="w-8 h-8 rounded-full bg-[var(--color-surface-base)] border-2 border-[var(--color-primary)] flex items-center justify-center text-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/20 transition-transform group-hover:scale-125">
-                          {item.icon}
-                        </div>
-                        <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-mono font-bold text-[var(--color-text-muted)] whitespace-nowrap">
-                          {item.year}
-                        </span>
+                      <div className="w-9 h-9 rounded-full bg-[var(--color-surface-base)] border-2 border-[var(--color-primary)] flex items-center justify-center text-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/20 transition-transform hover:scale-110">
+                        {item.icon}
                       </div>
                     </div>
 
-                    {/* BOTTOM CARD (if !isTop) */}
+                    {/* YEAR BADGE: Positioned on the OPPOSITE side so it NEVER touches connector lines */}
+                    {isTop ? (
+                      /* Top card -> Year badge is safely BELOW the node */
+                      <div 
+                        className="absolute z-20 flex flex-col items-center"
+                        style={{ top: '308px' }}
+                      >
+                        <span className="px-2.5 py-0.5 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[10px] font-mono font-bold text-[var(--color-text-muted)] shadow-xs">
+                          {item.year}
+                        </span>
+                      </div>
+                    ) : (
+                      /* Bottom card -> Year badge is safely ABOVE the node */
+                      <div 
+                        className="absolute z-20 flex flex-col items-center"
+                        style={{ top: '232px' }}
+                      >
+                        <span className="px-2.5 py-0.5 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[10px] font-mono font-bold text-[var(--color-text-muted)] shadow-xs">
+                          {item.year}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* BOTTOM CARD (if !isTop): Placed in lower half (top: 340px) */}
                     {!isTop ? (
-                      <div className="absolute bottom-0 w-full flex flex-col items-center">
-                        {/* Connector Stem pointing UP from central node */}
-                        <div className="w-0.5 h-10 border-r-2 border-dashed border-[var(--color-primary)]/50 mb-1" />
+                      <>
+                        {/* Bottom Connector Stem pointing up to central node */}
+                        <div 
+                          className="absolute w-0.5 border-r-2 border-dashed border-[var(--color-primary)]/60 z-10"
+                          style={{ top: '298px', height: '42px' }}
+                        />
 
-                        <div className="w-full bg-[var(--color-surface-card)] border-2 border-[var(--color-border)] hover:border-[var(--color-primary)]/60 rounded-2xl p-4 shadow-xl transition-all duration-300 hover:translate-y-1 group">
-                          <div className="flex items-center justify-between gap-2 mb-1.5">
-                            <span 
-                              style={{ color: item.badgeColor, borderColor: `${item.badgeColor}40`, backgroundColor: `${item.badgeColor}15` }}
-                              className="text-[10px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded border truncate"
-                            >
-                              {item.categoryLabel}
-                            </span>
-                            <span className="text-[11px] font-mono text-[var(--color-primary)] font-bold">
-                              {item.period}
-                            </span>
-                          </div>
+                        <div 
+                          className="absolute w-full flex flex-col items-center"
+                          style={{ top: '340px' }}
+                        >
+                          <div className="w-full bg-[var(--color-surface-card)] border-2 border-[var(--color-border)] hover:border-[var(--color-primary)]/70 rounded-2xl p-4 shadow-xl transition-all duration-300 hover:translate-y-1 group">
+                            <div className="flex items-center justify-between gap-2 mb-1.5">
+                              <span 
+                                style={{ color: item.badgeColor, borderColor: `${item.badgeColor}40`, backgroundColor: `${item.badgeColor}15` }}
+                                className="text-[10px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded border truncate"
+                              >
+                                {item.categoryLabel}
+                              </span>
+                              <span className="text-[11px] font-mono text-[var(--color-primary)] font-bold">
+                                {item.period}
+                              </span>
+                            </div>
 
-                          <h4 className="font-serif font-bold text-sm text-[var(--color-text-main)] mb-1 line-clamp-2">
-                            {item.title}
-                          </h4>
+                            <h4 className="font-serif font-bold text-sm text-[var(--color-text-main)] mb-1 leading-snug line-clamp-2">
+                              {item.title}
+                            </h4>
 
-                          <p className="text-xs text-[var(--color-text-muted)] font-medium mb-2 truncate">
-                            {item.institution}
-                          </p>
+                            <p className="text-xs text-[var(--color-text-muted)] font-medium mb-2 truncate">
+                              {item.institution}
+                            </p>
 
-                          <div className="pt-2 border-t border-[var(--color-border)] text-[11px] font-sans text-neutral-300 leading-snug">
-                            {item.highlight}
+                            <div className="pt-2 border-t border-[var(--color-border)] text-[11px] font-sans text-neutral-300 leading-snug">
+                              {item.highlight}
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </>
                     ) : null}
 
                   </div>
