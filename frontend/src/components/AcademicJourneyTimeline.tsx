@@ -218,10 +218,10 @@ export const AcademicJourneyTimeline: React.FC = () => {
 
       if (e.deltaY > 0) {
         // Scrolling DOWN:
-        // Must show fully first: the card track itself must have scrolled up under the header (trackRect.top <= 80px).
-        // If trackRect.top > 80px (e.g. Screenshot 2 where header/filters take up space and bottom cards are cut off),
+        // Must show fully first: the card track itself must have scrolled up under the header (trackRect.top <= 85px).
+        // If trackRect.top > 85px (e.g. Screenshot 2 where header/filters take up space and bottom cards are cut off),
         // do NOT intercept — let normal vertical page scroll continue until the track is fully in view (Screenshot 1)!
-        const isTrackFullyInView = trackRect.top <= 80 && trackRect.bottom >= window.innerHeight * 0.4
+        const isTrackFullyInView = trackRect.top <= 85 && trackRect.top >= 20 && trackRect.bottom >= window.innerHeight * 0.4
         const canScrollRight = el.scrollLeft < maxScroll - 4
 
         if (isTrackFullyInView && canScrollRight) {
@@ -229,18 +229,21 @@ export const AcademicJourneyTimeline: React.FC = () => {
           el.scrollLeft += e.deltaY * 1.15
           return
         }
-        // At the end or before showing fully, allow default vertical scroll!
+        // At the end or before showing fully, allow default vertical scroll down!
       } else if (e.deltaY < 0) {
         // Scrolling UP:
-        const isTrackInView = trackRect.top <= 90 && trackRect.bottom >= window.innerHeight * 0.4
+        // When coming from below, trackRect.top starts negative (above viewport).
+        // Must wait until the track has scrolled down into full view (trackRect.top >= 45px && trackRect.top <= 125px)
+        // so the top cards are NOT cut off at the top before horizontal scrolling starts!
+        const isTrackFullyInView = trackRect.top >= 45 && trackRect.top <= 125 && trackRect.bottom >= window.innerHeight * 0.4
         const canScrollLeft = el.scrollLeft > 4
 
-        if (isTrackInView && canScrollLeft) {
+        if (isTrackFullyInView && canScrollLeft) {
           e.preventDefault()
           el.scrollLeft += e.deltaY * 1.15
           return
         }
-        // At the beginning or out of view, allow default vertical scroll!
+        // At the beginning (scrollLeft <= 4) or before showing fully, allow default vertical scroll up!
       }
     }
 
