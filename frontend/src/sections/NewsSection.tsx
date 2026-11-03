@@ -45,7 +45,9 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
       const data = await res.json()
       if (res.ok && data.success && Array.isArray(data.data)) {
         // Merge server articles with initial flagship articles so that real articles are never missing
-        const combined = [...data.data, ...initialNewsData]
+        const combined = [...data.data, ...initialNewsData].filter(
+          (item: NewsItem) => !(item.title || '').toLowerCase().includes('new research paper published')
+        )
         const seen = new Set<string>()
         const unique = combined.filter((item: NewsItem) => {
           const key = (item.title || '').trim().toLowerCase()
@@ -175,7 +177,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
           }}
-          className={`grid grid-cols-1 sm:grid-cols-2 ${displayList.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-5 sm:gap-6`}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {displayList.map((item) => (
             <motion.div 
@@ -183,11 +185,25 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
                 hidden: { opacity: 0, y: 30 },
                 visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
               }}
-              whileHover={{ y: -5, scale: 1.02 }}
+              whileHover={{ y: -5, scale: 1.01 }}
               key={item.id} 
-              className="card-elevated p-6 bg-[var(--color-surface-card)] flex flex-col justify-between h-full rounded-2xl border border-[var(--color-border)] shadow-sm hover:shadow-xl hover:border-[var(--color-primary)] transition-all duration-300 group"
+              className="card-elevated p-5 sm:p-6 bg-[var(--color-surface-card)] flex flex-col justify-between h-full rounded-2xl border border-[var(--color-border)] shadow-sm hover:shadow-xl hover:border-[var(--color-primary)] transition-all duration-300 group"
             >
               <div>
+                {item.imageUrl && (
+                  <Link 
+                    to={`/news/${item.id}`} 
+                    className="block overflow-hidden rounded-xl mb-4 aspect-[16/10] bg-[var(--color-surface-base)] border border-[var(--color-border)]/60 group/thumb"
+                  >
+                    <img 
+                      src={item.imageUrl} 
+                      alt={item.title} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover/thumb:scale-105"
+                      loading="lazy"
+                    />
+                  </Link>
+                )}
+
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <Badge variant="primary" size="sm">{item.category}</Badge>
                   <span className="text-xs font-mono text-[var(--color-text-subtle)] flex items-center gap-1">
@@ -197,12 +213,12 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
 
                 <Link 
                   to={`/news/${item.id}`}
-                  className="text-lg font-serif font-bold text-[var(--color-text-main)] mb-2 leading-snug hover:text-[var(--color-primary)] transition-colors block"
+                  className="text-base sm:text-lg font-serif font-bold text-[var(--color-text-main)] mb-2 leading-snug hover:text-[var(--color-primary)] transition-colors block line-clamp-2"
                 >
                   {item.title}
                 </Link>
 
-                <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mb-4">
+                <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mb-4 line-clamp-3">
                   {item.summary}
                 </p>
               </div>

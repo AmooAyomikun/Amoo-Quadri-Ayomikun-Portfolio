@@ -62,8 +62,10 @@ export class NewsRepository {
     if (!this.localStore) {
       this.localStore = this.readFromFile()
     }
-    // Chronological descending sort on ISO strings
-    return [...this.localStore].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    // Filter out dummy test items and sort chronologically
+    return this.localStore
+      .filter(item => !item.title.toLowerCase().includes('new research paper published'))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   }
 
   async save(article: NewsItem): Promise<void> {

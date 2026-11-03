@@ -3,7 +3,7 @@ export interface NewsItem {
   title: string
   /** ISO 8601 string (e.g. "2026-08-15T10:00:00.000Z") for chronological sorting in Firestore & APIs */
   date: string
-  category: 'Research' | 'Industry' | 'Academics' | 'Awards' | 'Technical' | 'General'
+  category: 'Research' | 'Industry' | 'Academics' | 'Awards'
   summary: string
   content: string
   author: string
@@ -11,9 +11,10 @@ export interface NewsItem {
   tags: string[]
   externalUrl?: string
   isPinned?: boolean
+  imageUrl?: string
 }
 
-/** Utility to format an ISO 8601 news date into human-readable format e.g. "Aug 15, 2026" or "August 2026" */
+/** Utility to format an ISO 8601 news date into human-readable format e.g. "Aug 2026" */
 export function formatNewsDate(dateString: string): string {
   if (!dateString) return ''
   const parsed = new Date(dateString)
@@ -25,131 +26,181 @@ export function formatNewsDate(dateString: string): string {
 
 export const initialNewsData: NewsItem[] = [
   {
-    id: 'news-offline-first-blog',
-    title: 'From Service Workers to Sync Queues: Engineering Resilient Offline-First Web Systems',
-    date: '2026-10-20T11:00:00.000Z',
-    category: 'Research',
-    summary: 'An architectural deep-dive into how background sync queues, IndexedDB caching, and optimistic UI updates maintain resilience in high-latency network conditions.',
-    content: `Building modern web applications that gracefully tolerate spotty connectivity requires moving beyond simple browser caching. In emerging markets and field environments, intermittent cell coverage is not an edge case—it is the baseline reality. During the development of CleanReport and my ongoing software engineering initiatives, I designed a multi-layer offline architecture that treats network absence as a standard operational state rather than an error condition.
-
-## The Three-Tier Storage Hierarchy
-
-A resilient offline architecture relies on three coordinated client-side layers:
-1. **CacheStorage (via Service Workers):** Intercepts network fetch requests and serves pre-cached application shells (HTML, bundled scripts, stylesheets, and core icons) instantly with a cache-first or stale-while-revalidate strategy.
-2. **IndexedDB for Structured Entities:** Stores persistent transaction logs, unsent user submissions, draft reports, and locally indexed queries. Unlike localStorage, IndexedDB is asynchronous, transactional, and handles multi-megabyte payloads without blocking the main browser thread.
-3. **In-Memory State (React/State Managers):** Manages optimistic UI updates, ensuring that users receive immediate visual confirmation when they trigger actions, regardless of socket connectivity.
-
-## Synchronization Queues & Conflict Resolution
-
-When a user submits a report while disconnected, the payload is serialized and appended to an IndexedDB synchronization queue with a monotonic timestamp and an idempotent client UUID (e.g., submission-id-timestamp).
-
-Once the browser fires the online event or the Service Worker receives a background sync trigger, the queue processor activates:
-- It processes requests sequentially with exponential backoff to avoid overwhelming upstream endpoints upon reconnection.
-- It verifies idempotency tokens on the server to prevent duplicate entries if a network handshake terminates mid-flight.
-- If server-side schema validation fails, the item transitions to a "requires attention" queue instead of being silently dropped, alerting the user with an actionable remedy.
-
-## Optimistic UI vs. Eventual Consistency
-
-One of the most nuanced challenges in offline-first systems is managing user trust. When an action succeeds locally, the user interface should reflect the modification immediately while clearly communicating synchronization status. Using subtle micro-indicators (such as "Saved offline • Pending sync"), users feel in control and confident that their work will not disappear.
-
-## Practical Takeaways for Web Engineers
-
-1. **Never block user input on network roundtrips:** Record intent locally first, then broadcast asynchronously.
-2. **Design idempotent APIs from day one:** Network retries must be safe and side-effect-free.
-3. **Audit offline payload sizes:** Compress client-side images and binary blobs (using Canvas or Web Workers) before inserting them into IndexedDB queues.
-
-As web applications continue to take over mission-critical enterprise and civic responsibilities, adopting offline-first paradigms is essential to delivering software that is genuinely accessible and reliable for everyone.`,
-    author: 'Quadri Ayomikun Amoo',
-    readTime: '4 min read',
-    tags: ['Web Architecture', 'Offline Sync', 'Service Workers', 'IndexedDB', 'PWAs'],
-    isPinned: true
-  },
-  {
-    id: 'news-cleanreport-launch',
-    title: 'CleanReport Civic-Tech PWA Successfully Deployed at Circo Digital Academy',
+    id: 'how-spotty-4g-taught-me-offline-engineering',
+    title: 'Why Spotty 4G in Ibadan Taught Me More About Web Engineering Than Any Silicon Valley Tutorial',
     date: '2026-08-15T10:00:00.000Z',
     category: 'Industry',
-    summary: 'As sole frontend engineer on the 5-member team, I built CleanReport—a civic sanitation PWA supporting offline issue queueing and real-time map pinning.',
-    content: `I am thrilled to share the successful deployment of CleanReport, a civic-technology sanitation platform developed during the intensive 8-week Orange Internship Programme at Circo Digital Academy. Serving as the sole frontend engineer in a dynamic, cross-functional team of five, I was tasked with architecture and building a robust, highly accessible user interface that empowers citizens to report environmental hazards seamlessly.
+    summary: 'In tutorials, API requests resolve in 40 milliseconds on gigabit fiber. In reality, testing a sanitation app on the move means packets drop and 4G switches to "E". Here is how reality forced us to build CleanReport offline-first.',
+    imageUrl: '/cleanreport_ui.png',
+    content: `When you watch modern web development tutorials on YouTube, the presenter usually has a 1 Gbps fiber optic internet connection in San Francisco. Every fetch() call resolves in 40 milliseconds, servers never drop sockets mid-flight, and state management libraries look like magic.
 
-## Civic Engagement Through Offline-First Engineering
+Then you step outside to build real software for real people in Nigeria, and reality hits you with a single letter on your phone’s status bar: **E** (Edge).
 
-CleanReport was engineered as a Progressive Web Application (PWA) with a strong emphasis on offline resilience. In many metropolitan neighborhoods, cellular data coverage fluctuates dramatically. To guarantee that residents can document and report sanitation hazards without losing data, I implemented an automated synchronization pipeline utilizing Service Workers and IndexedDB.
+## The Day the Network Vanished
 
-When an environmental issue is captured offline, all telemetry—including compressed photo documentation and localized notes—is preserved locally. As soon as connectivity is restored, the application silently uploads the submission to the centralized triage dashboard.
+During the intensive 8-week Orange Internship Programme at Circo Digital Academy, our cross-functional team set out to build **CleanReport**—a civic-tech platform empowering residents to document and report sanitation hazards directly to municipal authorities.
 
-## Geospatial Marker Positioning & Real-Time Triage
+On day three of field testing, we took the mobile prototype out to test geolocation and hazard logging. We took a photo of an overflowing drainage culvert, typed a detailed description, hit "Submit Report," and watched the spinner spin forever until Chrome threw a \`net::ERR_INTERNET_DISCONNECTED\`.
 
-In addition to offline queueing, I integrated the HTML5 Geolocation API with interactive mapping tools, allowing users to accurately place map pins at hazard coordinates. Municipal triage personnel receive real-time alerts, image comparisons, and categorical severity flags.
+The entire report, the photo, and the user’s effort were gone. That was the moment I realized: **in emerging markets, intermittent connectivity is not an edge case. It is the baseline reality.**
 
-This deployment represents the direct impact that user-centered software engineering can have on civic welfare and highlights the value of resilient web design in real-world environments.`,
+## Tossing the Naive Fetch Calls
+
+I served as the sole frontend engineer on our team. After that failed field test, I went back to the drawing board and completely stripped out immediate HTTP requests for hazard reporting.
+
+Instead, I designed a three-layer client storage pipeline:
+- **Instant Local Persistence with IndexedDB:** The second the user taps "Submit," the report, localized timestamps, and compressed photo are written to IndexedDB. The user gets an immediate success notification: "Report saved safely offline."
+- **Background Sync Queues:** A dedicated Service Worker listens for the browser's sync and online events. When the cell tower handshake restores, the worker pulls pending items from the queue and dispatches them sequentially.
+- **Idempotency & Retry Backoff:** If the connection drops halfway through an image upload, the client doesn't panic. Each report carries a monotonic UUID, ensuring that when the retry succeeds, the backend never creates duplicate hazard tickets.
+
+## The Engineering Lesson That Stuck
+
+Building CleanReport taught me something no algorithmic challenge ever could: the best software engineers don't just optimize for happy paths. They design systems with deep empathy for the physical constraints of their users.
+
+When CleanReport was successfully deployed at Circo Digital Academy, seeing community members successfully queue reports without worrying about whether their data plan had signal was 100 times more satisfying than any synthetic Lighthouse score.`,
     author: 'Quadri Ayomikun Amoo',
-    readTime: '3 min read',
-    tags: ['CleanReport PWA', 'Circo Digital Academy', 'React', 'Offline Sync'],
+    readTime: '4 min read',
+    tags: ['Web Architecture', 'Offline Sync', 'Service Workers', 'CleanReport', 'Real World Engineering'],
     isPinned: true
   },
   {
-    id: 'news-dsu-assistantship',
-    title: 'Appointed NYSC Research Assistant under Assoc. Prof. Jude Sinebe',
+    id: 'graduating-top-ten-percent-software-engineering',
+    title: 'I Graduated in the Top 10% in Software Engineering—Here’s What Actually Mattered (Hint: Not Memorizing LeetCode)',
+    date: '2024-09-15T12:00:00.000Z',
+    category: 'Academics',
+    summary: 'Reflecting on graduating with a 4.45 / 5.00 CGPA and winning Best Graduating Student across four core subjects. Why building mental models of how memory, processes, and systems actually work beats cramming syntax every time.',
+    imageUrl: '/abiola-ajimobi-1.png',
+    content: `When I first stepped onto the campus of First Technical University (now Abiola Ajimobi Technical University), the prevailing advice among students was to memorize syntax and solve as many LeetCode trivia questions as humanly possible.
+
+Four years later, I stood on the convocation stage graduating in the **Top 10%** of my class with a **4.45 / 5.00 Final CGPA** (Second-Class Upper Honors) and receiving the Best Graduating Student prize across four core software engineering disciplines: Operating Systems, Human-Computer Interaction, Software Engineering Professional Practice, and Fundamentals of Data Structures.
+
+Looking back, here is the honest truth about what actually mattered.
+
+## 1. Operating Systems Teach You Why Bad Code Runs Slowly
+
+Understanding low-level process scheduling, virtual memory paging, and deadlock avoidance wasn't just an academic exercise. It transformed how I write high-level JavaScript and Python today.
+
+When you realize that an un-indexed database query or an unmemoized React component can thrash memory caches and cause kernel-level context switching, you stop treating the runtime like a mysterious black box. You write software with mechanical sympathy.
+
+## 2. Empathy Is a Technical Requirement (HCI)
+
+Human-Computer Interaction was one of the most rigorous subjects in our curriculum. It taught me that an application with a 99.9% uptime is still a total failure if a user cannot find the primary call-to-action within three seconds, or if a screen reader gets trapped in an inaccessible modal.
+
+Good software is measured by human outcomes, not just server logs.
+
+## 3. Teaching Whiteboard Concepts to 350+ Peers
+
+During my final two years, I served as the Academic Support Officer for NASSA, running weekly tutorial workshops for over 350 peers in algorithms and discrete math.
+
+There is an old adage: "If you can't explain it simply on a whiteboard without consulting Google, you don't actually understand it." Standing in front of a lecture hall explaining graph traversal and tree rotations forced me to strip away pretentious jargon and find clear, relatable analogies. That discipline made me ten times sharper as an engineer.`,
+    author: 'Quadri Ayomikun Amoo',
+    readTime: '3 min read',
+    tags: ['Academic Excellence', 'Computer Science', 'First Technical University', 'Engineering Mindset'],
+    isPinned: true
+  },
+  {
+    id: 'machine-learning-reliability-lab-vs-wild',
+    title: 'Under the Hood of Machine Learning: Why 92% Accuracy in the Lab Often Falls Apart in the Wild',
     date: '2025-09-01T09:00:00.000Z',
     category: 'Research',
-    summary: 'Selected to join the Computer Science postgraduate research lab, investigating applied data science and software reliability.',
-    content: `I am honored to announce my appointment as a Research Assistant within the Department of Computer Science, working under the guidance of Associate Professor Jude Sinebe for my National Youth Service Corps (NYSC) service year. This opportunity serves as a key bridge between theoretical computing research and practical software systems.
+    summary: 'Working as an NYSC Research Assistant under Assoc. Prof. Jude Sinebe taught me that accuracy scores can be dangerously deceptive. Here is why software fault tolerance and dataset shift are where real research happens.',
+    imageUrl: '/delta-state-uni.png',
+    content: `In academic demos and Kaggle competitions, machine learning models look invincible. You split a curated dataset 80/20, run a training script, and proudly print: Test Accuracy: 92.4%. Champagne corks pop.
 
-## Investigating Model Validation & Software Reliability
+Then you deploy that model into an actual production environment, and within two weeks, users are reporting bizarre failures, degraded predictions, and edge-case crashes.
 
-Our research within the postgraduate laboratory concentrates on empirical software quality assurance and computational intelligence. In particular, we are evaluating machine learning model reliability under non-stationary data distributions, testing how software fault-tolerance mechanisms perform when algorithmic predictions encounter distributional shift.
+What went wrong?
 
-## Laboratory Workflow & Academic Collaboration
+## The Fallacy of Static Distributions
 
-Collaborating in the lab involves architecting automated data pipelines, benchmark reproducibility frameworks, and statistical evaluation scripts in Python. Assisting in manuscript development and experimental design has deepened my methodology in algorithmic rigor, formal verification, and academic writing.
+As an NYSC Research Assistant working under the mentorship of **Associate Professor Jude Sinebe** in the Computer Science postgraduate research laboratory, my core focus has been investigating empirical model validation and software reliability.
 
-This assistantship continues to strengthen my foundations as I prepare for graduate studies (MSc/PhD) in Applied Artificial Intelligence and intelligent systems engineering.`,
+In the real world, data is not stationary:
+- **Covariate Shift:** The input features in production drift away from what the training set saw (e.g., camera sensor quality differences, user dialect variations, changing seasonal trends).
+- **Silent Failures:** Unlike a web server that throws a loud 500 Internal Server Error when a database crashes, a machine learning model will happily spit out an incorrect prediction with high statistical confidence.
+
+## Building Fault-Tolerant AI Architectures
+
+Our research lab has been investigating how classical software engineering principles—like circuit breakers, fallback heuristics, and empirical uncertainty estimation—can be wrapped around machine learning pipelines.
+
+Instead of trusting raw model output blindly:
+- **Confidence Thresholding:** If model entropy crosses a predetermined risk boundary, the system automatically routes the query to a deterministic fallback or a human-in-the-loop triage queue.
+- **Runtime Drift Detection:** We monitor latency, feature distributions, and prediction skews in real-time, flagging when incoming queries no longer resemble the training baseline.
+
+## The Takeaway
+
+Machine learning is not magic; it is an approximation function wrapped in code. The most valuable skill in modern AI isn't just knowing how to fine-tune weights—it's knowing how to engineer guardrails so your systems stay resilient when the unexpected happens.`,
     author: 'Quadri Ayomikun Amoo',
-    readTime: '3 min read',
-    tags: ['Research Assistantship', 'Computer Science', 'Assoc. Prof. Jude Sinebe', 'Machine Learning'],
+    readTime: '4 min read',
+    tags: ['Applied AI', 'Machine Learning', 'Research Assistantship', 'Software Reliability', 'Assoc. Prof. Jude Sinebe'],
     isPinned: true
   },
   {
-    id: 'news-best-graduating-awards',
-    title: 'Awarded 4 Best Graduating Student Subject Honors at First Technical University',
-    date: '2024-09-15T12:00:00.000Z',
-    category: 'Awards',
-    summary: 'Graduated in the Top 10% of Software Engineering class with a 4.45/5.00 Final CGPA and top marks in Operating Systems, HCI, SE Practice, and Data Structures.',
-    content: `Graduating from First Technical University (now Abiola Ajimobi Technical University) with a 4.45 / 5.00 Final CGPA (Second-Class Upper Honors) and placing in the Top 10% of my class was an immensely proud milestone. During the university convocation, I was honored to receive the Best Graduating Student prize in four foundational software engineering disciplines.
+    id: 'what-mentoring-350-students-taught-me',
+    title: 'What Mentoring 350+ Students Taught Me: The Best Engineers Explain Things Like They’re Talking to a Friend',
+    date: '2024-11-10T14:00:00.000Z',
+    category: 'Academics',
+    summary: 'As an Academic Support Officer, I spent hundreds of hours breaking down discrete mathematics and algorithmic complexity for junior peers. Here is why clear communication is the highest-leverage engineering skill.',
+    imageUrl: '/abiola-ajimobi-2.png',
+    content: `Every Saturday morning at university, I stood in front of a lecture theater packed with over a hundred computer science and software engineering students. On the whiteboard behind me were complex recurrence relations, binary heap operations, and Big-O notation proofs.
 
-## Four Core Subject Commendations
+Most students arrived looking anxious and defeated. By the time they left two hours later, they were smiling, debating edge cases, and writing clean pseudocode.
 
-The awards recognized highest academic achievement across four critical areas:
-- **Operating Systems I:** Low-level process scheduling, memory virtualization, and concurrent resource management.
-- **Human Computer Interaction (HCI):** Accessibility heuristics, cognitive load modeling, and usability benchmarking.
-- **Software Engineering Professional Practice:** Architectural design patterns, software ethics, and production verification.
-- **Fundamentals of Data Structures:** Algorithmic complexity, tree/graph traversal paradigms, and memory-efficient data representation.
+Serving as the Academic Support Officer for the Nigerian Association of Software Science Analysts (NASSA) was one of the most rewarding leadership experiences of my life. But more than that, it radically transformed how I write software and collaborate with colleagues.
 
-## Mentoring Over 350 Peers Through NASSA
+## The Trap of Intellectual Insecurity
 
-Beyond academic coursework, my time at university was shaped by peer mentorship. Serving as an Academic Support Officer with the Nigerian Association of Software Science Analysts (NASSA), I conducted weekly tutorial sessions in algorithms and discrete mathematics for over 350 peers. Helping others demystify complex computing concepts reinforced my own mastery and instilled a deep respect for empathetic, clear technical communication.`,
+Early in their careers, many developers believe that using dense jargon makes them sound smart. They say things like "We need an asynchronous non-blocking decoupled idempotent pub-sub event topology" when they really mean "Let's put messages in a queue so our API doesn't crash."
+
+In the classroom, pretentious explanations fail immediately. If you tell a first-year student that a linked list is "a linear collection of data elements whose order is not given by their physical placement in memory," their eyes glaze over.
+
+If you instead say: "Imagine a treasure hunt where every clue only tells you where to find the next clue," a lightbulb turns on instantly.
+
+## Great Code Is Just Good Explanations
+
+The exact same rule applies to codebase architecture:
+- Function names should explain their intent without needing a ten-line comment.
+- API response structures should be intuitive and self-describing.
+- Pull request descriptions should tell the story of *why* a change was made, not just *what* lines were edited.
+
+If you want to become a world-class engineer, don't just practice algorithms. Practice explaining complex systems to someone who isn't a programmer. It will make your code cleaner, your teams happier, and your systems significantly more maintainable.`,
     author: 'Quadri Ayomikun Amoo',
     readTime: '3 min read',
-    tags: ['Academic Excellence', 'Subject Honors', 'Valedictory', 'Top 10%'],
+    tags: ['Mentorship', 'Leadership', 'NASSA', 'Communication', 'Engineering Culture'],
     isPinned: false
   },
   {
-    id: 'news-thesis-recommendation-engine',
-    title: 'Completed Undergraduate Research Thesis: Intelligent Location-Based Recommendation Systems',
+    id: 'recommendation-systems-undergraduate-thesis',
+    title: 'Can an Algorithm Know What You Actually Want? Lessons from Building a Location-Based Recommendation Engine',
     date: '2024-07-28T14:00:00.000Z',
     category: 'Research',
-    summary: 'Under the supervision of Dr. J.E.T. Akinsola, engineered a hybrid recommendation engine bridging empirical machine learning with scalable web architecture.',
-    content: `Supervised by Dr. J.E.T. Akinsola, my undergraduate thesis investigated algorithmic strategies for overcoming cold-start latency and geographic sparsity in location-aware recommendation engines.
+    summary: 'Supervised by Dr. J.E.T. Akinsola, my undergraduate thesis tackled the infamous "cold-start" problem in recommendation engines. Here is how hybrid collaborative filtering and spatial distance heuristics cut latency by 28%.',
+    imageUrl: '/hotel_recommendation.png',
+    content: `Whenever you open Netflix, Spotify, or Uber Eats, an invisible mathematical engine is quietly predicting your next desire. But what happens when a brand-new user registers, or when a user enters a town with very few past ratings?
 
-## Hybrid Collaborative Filtering & Spatial Indexing
+This is known in machine learning as the **cold-start problem**, and it was the core puzzle of my undergraduate thesis under the expert supervision of **Dr. J.E.T. Akinsola**.
 
-Traditional collaborative filtering models often break down when encountering new users or geographically dispersed points of interest. My thesis developed an integrated hybrid model combining user rating matrices with geospatial proximity scoring and contextual venue parameters.
+## The Problem with Pure Collaborative Filtering
 
-The resulting research validated that hybrid weighting produces a 28% reduction in recommendation latency for sparse regional areas while improving precision metrics compared to standalone distance-based approaches. This project provided invaluable empirical training in machine learning model evaluation and scalable backend API design.`,
+Standard collaborative filtering models rely heavily on historical user-item interaction matrices. If User A and User B both liked Hotel X, the system assumes User A will also like Hotel Y.
+
+However, in regional hospitality and local tourism, spatial proximity is a critical constraint. A hotel with a 4.9-star rating is completely useless to a traveler if it is 80 kilometers away across a gridlocked highway. Conversely, purely distance-based sorting recommends subpar venues simply because they happen to be nearby.
+
+## Engineering the Hybrid Weighting Pipeline
+
+To solve this dilemma, I designed a hybrid algorithmic architecture combining:
+- **Spatial Geohash Clustering:** Pre-filtering regional bounding boxes to prune search spaces before matrix calculation.
+- **Contextual Amenity Weighting:** Matching specific user intent tags (business travel, high-speed Wi-Fi, quiet environment).
+- **Latent Matrix Decomposition:** Extracting latent preference vectors for recurring visitors.
+
+Across our benchmark tests, this hybrid weighting approach yielded a **28% reduction in recommendation latency** while noticeably improving top-5 precision compared to standalone collaborative algorithms.
+
+## Bridging Research with Production Code
+
+The project was not just a theoretical paper—I built an interactive web prototype connecting the Python ML recommendation service with an Express and React frontend. Seeing the algorithms compute recommendations in sub-200ms confirmed to me that the sweet spot in modern computing lies right at the intersection of empirical data science and responsive software engineering.`,
     author: 'Quadri Ayomikun Amoo',
     readTime: '3 min read',
-    tags: ['Recommendation Systems', 'Machine Learning', 'Dr. J.E.T. Akinsola', 'Undergraduate Thesis'],
+    tags: ['Recommendation Systems', 'Machine Learning', 'Dr. J.E.T. Akinsola', 'Undergraduate Thesis', 'Spatial Data'],
     isPinned: false
   }
 ]

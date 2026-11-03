@@ -19,12 +19,21 @@ import {
   Check, 
   ArrowRight,
   Sparkles,
-  BookOpen
+  BookOpen,
+  MessageSquare,
+  Send
 } from 'lucide-react'
 import { initialNewsData, formatNewsDate, type NewsItem } from '../content/newsData'
 import { apiUrl } from '../lib/api'
 import { SEO } from '../components/SEO'
 import { PageContainer } from '../components/PageContainer'
+
+interface CommentItem {
+  id: string
+  name: string
+  content: string
+  timestamp: string
+}
 
 export default function NewsArticlePage() {
   const { id } = useParams<{ id: string }>()
@@ -34,6 +43,12 @@ export default function NewsArticlePage() {
   const [news, setNews] = useState<NewsItem | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+
+  // Discussion / Comments state
+  const [comments, setComments] = useState<CommentItem[]>([])
+  const [commentName, setCommentName] = useState('')
+  const [commentBody, setCommentBody] = useState('')
+  const [commentSubmitted, setCommentSubmitted] = useState(false)
   
   // Audio Narrator State
   const [isPlaying, setIsPlaying] = useState(false)
@@ -66,7 +81,22 @@ export default function NewsArticlePage() {
     return 12 + Math.abs(hash % 24)
   }, [id])
 
-  // Fetch all articles and locate active article
+  // Load comments from localStorage for this specific article
+  useEffect(() => {
+    if (!id) return
+    try {
+      const stored = localStorage.getItem(`news_comments_${id}`)
+      if (stored) {
+        setComments(JSON.parse(stored))
+      } else {
+        setComments([])
+      }
+    } catch {
+      setComments([])
+    }
+  }, [id])
+
+  // Fetch all articles and locate active article (filtering out dummy test items)
   useEffect(() => {
     window.scrollTo(0, 0)
     
@@ -83,8 +113,10 @@ export default function NewsArticlePage() {
         const res = await fetch(apiUrl('/api/news'))
         const data = await res.json()
         if (res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
-          // Merge API items with initial items to guarantee full coverage
-          const combined = [...data.data, ...initialNewsData]
+          // Merge API items with initial items, filtering out dummy placeholders
+          const combined = [...data.data, ...initialNewsData].filter(
+            (item: NewsItem) => !(item.title || '').toLowerCase().includes('new research paper published')
+          )
           const seen = new Set<string>()
           const unique = combined.filter((item: NewsItem) => {
             const key = item.id || (item.title || '').trim().toLowerCase()
@@ -118,7 +150,6 @@ export default function NewsArticlePage() {
       const updateVoices = () => {
         const voices = window.speechSynthesis.getVoices()
         if (voices.length > 0) {
-          // Prioritize English voices
           const englishVoices = voices.filter(v => v.lang.startsWith('en'))
           setAvailableVoices(englishVoices.length > 0 ? englishVoices : voices)
         }
@@ -266,9 +297,34 @@ export default function NewsArticlePage() {
     }
   }
 
-  // Sidebar articles (exclude the current article)
+  // Handle Comment Submission
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!commentBody.trim() || !id) return
+
+    const newComment: CommentItem = {
+      id: `comment-${Date.now()}`,
+      name: commentName.trim() || 'Anonymous Reader',
+      content: commentBody.trim(),
+      timestamp: 'Just now'
+    }
+
+    const updated = [newComment, ...comments]
+    setComments(updated)
+    try {
+      localStorage.setItem(`news_comments_${id}`, JSON.stringify(updated))
+    } catch {
+      // ignore
+    }
+
+    setCommentBody('')
+    setCommentSubmitted(true)
+    setTimeout(() => setCommentSubmitted(false), 3000)
+  }
+
+  // Sidebar articles (exclude current article and dummy test placeholders)
   const sidebarArticles = useMemo(() => {
-    return allNews.filter((n) => n.id !== id).slice(0, 4)
+    return allNews.filter((n) => n.id !== id && !n.title.toLowerCase().includes('new research paper published')).slice(0, 4)
   }, [allNews, id])
 
   if (loading) {
@@ -292,7 +348,7 @@ export default function NewsArticlePage() {
         </p>
         <button 
           onClick={() => navigate('/news')} 
-          className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] text-xs font-mono font-semibold text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-all"
+          className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] text-xs font-mono font-semibold text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-all cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" /> Return to News Timeline
         </button>
@@ -330,7 +386,7 @@ export default function NewsArticlePage() {
             
             {/* Editorial Title */}
             <div>
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif font-bold text-[var(--color-text-main)] leading-[1.18] tracking-tight">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif font-bold text-[var(--color-text-main)] leading-[1.2] tracking-tight">
                 {news.title}
               </h1>
             </div>
@@ -367,7 +423,7 @@ export default function NewsArticlePage() {
                 SHARE:
               </span>
 
-              {/* Native / General Share Button */}
+              {/* Native Share Button */}
               <button
                 onClick={handleNativeShare}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-elevated)] border border-[var(--color-border)] hover:border-[var(--color-primary)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] transition-all cursor-pointer shadow-xs active:scale-95"
@@ -428,12 +484,23 @@ export default function NewsArticlePage() {
               </button>
             </div>
 
+            {/* Real Article Featured Image (if present) */}
+            {news.imageUrl && (
+              <div className="rounded-2xl overflow-hidden border border-[var(--color-border)] aspect-video sm:aspect-[21/10] bg-[var(--color-surface-card)] shadow-sm">
+                <img
+                  src={news.imageUrl}
+                  alt={news.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
             {/* Audio Narrator Player Card ("Listen to this update") */}
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6 shadow-sm hover:border-[var(--color-primary)]/40 transition-colors">
+            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6 shadow-sm">
               {/* Header Row */}
               <div className="flex items-center justify-between gap-3 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 via-cyan-500/20 to-teal-500/20 border border-[var(--color-primary)]/30 flex items-center justify-center text-[var(--color-primary)] shadow-xs">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--color-surface-base)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-primary)] shadow-xs">
                     <Headphones className="w-5 h-5" />
                   </div>
                   <div>
@@ -478,7 +545,7 @@ export default function NewsArticlePage() {
               <div className="space-y-1.5 mb-4">
                 <div className="w-full bg-[var(--color-surface-base)] h-2 rounded-full overflow-hidden border border-[var(--color-border)] relative">
                   <div 
-                    className="h-full bg-gradient-to-r from-indigo-500 via-[var(--color-primary)] to-cyan-400 transition-all duration-300"
+                    className="h-full bg-[var(--color-primary)] transition-all duration-300"
                     style={{ width: `${playbackProgress}%` }}
                   />
                 </div>
@@ -531,7 +598,7 @@ export default function NewsArticlePage() {
             </div>
 
             {/* Lead Summary Callout Block */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-[var(--color-surface-card)]/60 border-l-4 border-l-[var(--color-primary)] border border-[var(--color-border)] text-sm sm:text-base leading-relaxed text-[var(--color-text-main)] font-medium">
+            <div className="p-5 sm:p-6 rounded-2xl bg-[var(--color-surface-card)] border-l-4 border-l-[var(--color-primary)] border border-[var(--color-border)] text-sm sm:text-base leading-relaxed text-[var(--color-text-main)] font-medium">
               <span className="block text-xs font-mono text-[var(--color-primary)] uppercase tracking-widest font-semibold mb-1.5 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5" /> Executive Summary
               </span>
@@ -627,18 +694,103 @@ export default function NewsArticlePage() {
               <div className="flex items-center gap-2.5 w-full sm:w-auto">
                 <Link
                   to="/contact"
-                  className="flex-1 sm:flex-none text-center px-4 py-2 rounded-xl text-xs font-mono font-semibold bg-[var(--color-surface-base)] border border-[var(--color-border)] hover:border-[var(--color-primary)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] transition-all"
+                  className="flex-1 sm:flex-none text-center px-4 py-2 rounded-xl text-xs font-mono font-semibold bg-[var(--color-surface-base)] border border-[var(--color-border)] hover:border-[var(--color-primary)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] transition-all cursor-pointer"
                 >
                   Contact Author
                 </Link>
                 <Link
                   to="/research"
-                  className="flex-1 sm:flex-none text-center px-4 py-2 rounded-xl text-xs font-mono font-semibold bg-[var(--color-surface-base)] border border-[var(--color-border)] hover:border-[var(--color-primary)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] transition-all"
+                  className="flex-1 sm:flex-none text-center px-4 py-2 rounded-xl text-xs font-mono font-semibold bg-[var(--color-surface-base)] border border-[var(--color-border)] hover:border-[var(--color-primary)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] transition-all cursor-pointer"
                 >
                   View Research
                 </Link>
               </div>
             </div>
+
+            {/* Discussion & Comments Section */}
+            <section className="mt-12 pt-8 border-t border-[var(--color-border)] space-y-6">
+              <div className="flex items-center gap-2.5">
+                <MessageSquare className="w-5 h-5 text-[var(--color-primary)]" />
+                <h3 className="text-xl sm:text-2xl font-serif font-bold text-[var(--color-text-main)]">
+                  Discussion ({comments.length})
+                </h3>
+              </div>
+
+              {/* Comments list or empty notice */}
+              {comments.length === 0 ? (
+                <p className="text-xs sm:text-sm text-[var(--color-text-muted)] italic font-mono">
+                  No comments yet. Be the first to start the conversation!
+                </p>
+              ) : (
+                <div className="space-y-3.5">
+                  {comments.map((c) => (
+                    <div 
+                      key={c.id} 
+                      className="p-4 sm:p-5 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] space-y-2"
+                    >
+                      <div className="flex items-center justify-between text-xs font-mono">
+                        <span className="font-bold text-[var(--color-text-main)]">{c.name}</span>
+                        <span className="text-[var(--color-text-subtle)]">{c.timestamp}</span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-[var(--color-text-muted)] leading-relaxed whitespace-pre-wrap">
+                        {c.content}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Leave a Comment Form */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] space-y-4">
+                <h4 className="text-sm sm:text-base font-serif font-bold text-[var(--color-text-main)]">
+                  Leave a comment
+                </h4>
+                
+                {commentSubmitted && (
+                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono flex items-center gap-2">
+                    <Check className="w-4 h-4" />
+                    <span>Your comment has been posted successfully!</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleCommentSubmit} className="space-y-3.5">
+                  <div>
+                    <label className="block text-xs font-mono text-[var(--color-text-muted)] mb-1">
+                      Your name (optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={commentName}
+                      onChange={(e) => setCommentName(e.target.value)}
+                      placeholder="Your name or handle"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-surface-base)] border border-[var(--color-border)] text-xs sm:text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] font-sans"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-mono text-[var(--color-text-muted)] mb-1">
+                      What are your thoughts?
+                    </label>
+                    <textarea
+                      rows={3}
+                      required
+                      value={commentBody}
+                      onChange={(e) => setCommentBody(e.target.value)}
+                      placeholder="Share your perspective or feedback..."
+                      className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface-base)] border border-[var(--color-border)] text-xs sm:text-sm text-[var(--color-text-main)] focus:outline-none focus:border-[var(--color-primary)] font-sans resize-y"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-primary)] text-slate-950 font-mono text-xs font-bold hover:brightness-110 active:scale-95 transition-all shadow-sm cursor-pointer"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Post Comment</span>
+                  </button>
+                </form>
+              </div>
+            </section>
 
           </div>
 
@@ -667,6 +819,17 @@ export default function NewsArticlePage() {
                   to={`/news/${other.id}`}
                   className="group block p-4 sm:p-5 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all duration-300 shadow-xs hover:shadow-md hover:-translate-y-0.5"
                 >
+                  {other.imageUrl && (
+                    <div className="rounded-xl overflow-hidden mb-3 aspect-[16/9] bg-[var(--color-surface-base)] border border-[var(--color-border)]/50">
+                      <img
+                        src={other.imageUrl}
+                        alt={other.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <Badge variant="subtle" size="sm">
                       {other.category}
@@ -697,8 +860,8 @@ export default function NewsArticlePage() {
               ))}
             </div>
 
-            {/* Newsletter / Keep In Touch Callout in Sidebar */}
-            <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-cyan-500/10 to-transparent border border-[var(--color-border)] space-y-3">
+            {/* Newsletter / Keep In Touch Callout in Sidebar (Solid card, NO gradient) */}
+            <div className="p-5 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] space-y-3 shadow-xs">
               <span className="text-xs font-mono text-[var(--color-primary)] uppercase tracking-wider font-semibold">
                 // STAY CONNECTED
               </span>
