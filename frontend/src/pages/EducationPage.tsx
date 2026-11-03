@@ -42,30 +42,30 @@ export default function EducationPage() {
         <EducationHero />
 
         {/* Overview Stats Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-8">
-          <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] p-3.5 rounded-xl text-center shadow-xs">
-            <span className="text-lg sm:text-xl font-bold font-serif text-[var(--color-primary)] block">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 my-4 sm:my-8">
+          <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] p-2.5 sm:p-3.5 rounded-xl text-center shadow-xs">
+            <span className="text-base sm:text-xl font-bold font-serif text-[var(--color-primary)] block">
               <AnimatedCounter value={5.0} decimals={1} duration={1.2} /> / 5.0
             </span>
-            <span className="text-[10px] font-mono text-[var(--color-text-muted)]">Peak Term GPA</span>
+            <span className="text-[10px] sm:text-[11px] font-mono text-[var(--color-text-muted)]">Peak Term GPA</span>
           </div>
-          <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] p-3.5 rounded-xl text-center shadow-xs">
-            <span className="text-lg sm:text-xl font-bold font-serif text-[var(--color-primary)] block">
+          <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] p-2.5 sm:p-3.5 rounded-xl text-center shadow-xs">
+            <span className="text-base sm:text-xl font-bold font-serif text-[var(--color-primary)] block">
               <AnimatedCounter value={4.45} decimals={2} duration={1.2} /> / 5.0
             </span>
-            <span className="text-[10px] font-mono text-[var(--color-text-muted)]">Final CGPA (Top 10%)</span>
+            <span className="text-[10px] sm:text-[11px] font-mono text-[var(--color-text-muted)]">Final CGPA (Top 10%)</span>
           </div>
-          <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] p-3.5 rounded-xl text-center shadow-xs">
-            <span className="text-lg sm:text-xl font-bold font-serif text-[var(--color-primary)] block">
+          <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] p-2.5 sm:p-3.5 rounded-xl text-center shadow-xs">
+            <span className="text-base sm:text-xl font-bold font-serif text-[var(--color-primary)] block">
               Top <AnimatedCounter value={10} duration={1.2} suffix="%" />
             </span>
-            <span className="text-[10px] font-mono text-[var(--color-text-muted)]">Graduating Honor</span>
+            <span className="text-[10px] sm:text-[11px] font-mono text-[var(--color-text-muted)]">Graduating Honor</span>
           </div>
-          <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] p-3.5 rounded-xl text-center shadow-xs">
-            <span className="text-lg sm:text-xl font-bold font-serif text-[var(--color-primary)] block">
+          <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] p-2.5 sm:p-3.5 rounded-xl text-center shadow-xs">
+            <span className="text-base sm:text-xl font-bold font-serif text-[var(--color-primary)] block">
               <AnimatedCounter value={4} duration={1.2} suffix=" Awards" />
             </span>
-            <span className="text-[10px] font-mono text-[var(--color-text-muted)]">Subject Excellence</span>
+            <span className="text-[10px] sm:text-[11px] font-mono text-[var(--color-text-muted)]">Subject Excellence</span>
           </div>
         </div>
 
@@ -194,9 +194,9 @@ export default function EducationPage() {
                 key={i}
                 className="bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[#64ffda]/40 rounded-xl p-3.5 transition-colors"
               >
-                <div className="flex items-center gap-1.5 mb-1">
-                  <Code2 className="w-3 h-3 text-[#64ffda] shrink-0" />
-                  <span className="text-xs font-mono font-bold text-[var(--color-text-main)] truncate">
+                <div className="flex items-start gap-1.5 mb-1">
+                  <Code2 className="w-3.5 h-3.5 text-[#64ffda] shrink-0 mt-0.5" />
+                  <span className="text-xs font-mono font-bold text-[var(--color-text-main)] leading-snug">
                     {mod.name}
                   </span>
                 </div>

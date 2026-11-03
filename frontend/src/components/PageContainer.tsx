@@ -20,7 +20,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
   return (
     <Component
       id={id}
-      className={`max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20 w-full ${className}`}
+      className={`max-w-6xl mx-auto px-4 sm:px-8 md:px-16 lg:px-20 w-full ${className}`}
     >
       {children}
     </Component>

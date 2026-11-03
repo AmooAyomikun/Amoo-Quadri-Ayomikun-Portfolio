@@ -286,18 +286,18 @@ export const AcademicJourneyTimeline: React.FC = () => {
   const scrollRight = () => scrollStep('right')
 
   return (
-    <div className="w-full my-16">
+    <div className="w-full my-8 sm:my-16">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-[var(--color-border)] gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-[var(--color-border)] gap-3 sm:gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/25 text-[var(--color-primary)] text-xs font-mono font-semibold uppercase mb-2 select-none">
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/25 text-[var(--color-primary)] text-[10px] sm:text-xs font-mono font-semibold uppercase mb-2 select-none">
+            <Sparkles className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
             <span>// CHRONOLOGICAL MILESTONES &amp; HONORS</span>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[var(--color-text-main)]">
+          <h3 className="text-xl sm:text-3xl font-serif font-bold text-[var(--color-text-main)] leading-tight">
             Academic &amp; Leadership Journey
           </h3>
-          <p className="text-xs sm:text-sm text-[var(--color-text-muted)] mt-1">
+          <p className="text-xs sm:text-sm text-[var(--color-text-muted)] mt-1 leading-relaxed">
             Track of academic degrees, government scholarships, teaching fellowships, and honors from 2013 to 2026.
           </p>
         </div>
@@ -325,13 +325,13 @@ export const AcademicJourneyTimeline: React.FC = () => {
 
       {/* Filter Category Pills & Horizontal Scroll Hint */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1.5 -mx-1 px-1">
           {categories.map(cat => (
             <button
               key={cat.id}
               type="button"
               onClick={() => setFilter(cat.id)}
-              className={`px-3.5 py-1.5 rounded-xl font-mono text-xs flex items-center gap-2 shrink-0 transition-all cursor-pointer border ${
+              className={`px-3 py-1.5 rounded-xl font-mono text-[11px] sm:text-xs flex items-center gap-1.5 sm:gap-2 shrink-0 transition-all cursor-pointer border ${
                 filter === cat.id
                   ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold border-[var(--color-primary)] shadow-sm'
                   : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:text-[var(--color-text-main)] hover:bg-[var(--color-surface-elevated)]'
@@ -547,44 +547,81 @@ export const AcademicJourneyTimeline: React.FC = () => {
       </div>
 
       {/* =========================================================================
-          MOBILE VIEW: Vertical Clean Tree Timeline (Optimized for 375px+ screens)
+          MOBILE VIEW: Sequential Card Stream with Curved Dashed Connectors
+          (Optimized for 375px+ screens, inspired by editorial research portfolios)
       ========================================================================= */}
-      <div className="block md:hidden relative pl-6 border-l-2 border-[var(--color-primary)]/40 ml-4 space-y-6">
-        {filteredMilestones.map((item) => (
-          <div key={item.id} className="relative group">
-            {/* Glowing Node Dot on the left spine */}
-            <div className="absolute -left-[31px] top-3.5 w-6 h-6 rounded-full bg-[var(--color-surface-base)] border-2 border-[var(--color-primary)] flex items-center justify-center text-[var(--color-primary)] shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]" />
-            </div>
+      <div className="block md:hidden space-y-0 mt-6">
+        {filteredMilestones.map((item, index) => {
+          const isLast = index === filteredMilestones.length - 1
 
-            {/* Mobile Card */}
-            <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 rounded-xl p-4 shadow-md transition-colors">
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <span 
-                  style={{ color: item.badgeColor, backgroundColor: `${item.badgeColor}15`, borderColor: `${item.badgeColor}35` }}
-                  className="text-[10px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded border"
-                >
-                  {item.categoryLabel}
-                </span>
-                <span className="text-[10px] font-mono font-bold text-[var(--color-primary)]">
-                  {item.period}
-                </span>
+          return (
+            <React.Fragment key={item.id}>
+              {/* Milestone Card */}
+              <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 rounded-2xl p-4 shadow-sm transition-all relative overflow-hidden">
+                {/* Top Row: 01 badge, category pill & year */}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-black text-[var(--color-primary)] bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/25 px-2 py-0.5 rounded-md shadow-xs">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span 
+                      style={{ color: item.badgeColor, backgroundColor: `${item.badgeColor}15`, borderColor: `${item.badgeColor}35` }}
+                      className="text-[10px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded border truncate"
+                    >
+                      {item.categoryLabel}
+                    </span>
+                  </div>
+
+                  <span className="text-[11px] font-mono font-bold text-[var(--color-primary)] shrink-0">
+                    {item.year}
+                  </span>
+                </div>
+
+                {/* Title */}
+                <h4 className="font-serif font-bold text-sm sm:text-base text-[var(--color-text-main)] mb-1 leading-snug">
+                  {item.title}
+                </h4>
+
+                {/* Institution & Period */}
+                <div className="flex items-center justify-between text-xs text-[var(--color-text-muted)] font-medium mb-2.5">
+                  <span className="truncate">{item.institution}</span>
+                  <span className="text-[10px] font-mono text-[var(--color-text-subtle)] shrink-0 ml-2">{item.period}</span>
+                </div>
+
+                {/* Highlight */}
+                <p className="text-xs text-neutral-200 pt-2 border-t border-[var(--color-border)] leading-relaxed font-sans">
+                  {item.highlight}
+                </p>
               </div>
 
-              <h4 className="font-serif font-bold text-sm sm:text-base text-[var(--color-text-main)] mb-1 leading-snug">
-                {item.title}
-              </h4>
-
-              <p className="text-xs text-[var(--color-text-muted)] font-medium mb-2">
-                {item.institution}
-              </p>
-
-              <p className="text-xs text-neutral-200 pt-2 border-t border-[var(--color-border)] leading-relaxed">
-                {item.highlight}
-              </p>
-            </div>
-          </div>
-        ))}
+              {/* Curved Dashed Connector Arrow between cards */}
+              {!isLast && (
+                <div className="flex justify-center my-2 select-none pointer-events-none">
+                  <svg
+                    className={`w-12 h-10 text-[var(--color-primary)]/40 ${index % 2 === 1 ? '-scale-x-100' : ''}`}
+                    viewBox="0 0 56 44"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M 16 0 V 14 C 16 28, 40 18, 40 34"
+                      stroke="currentColor"
+                      strokeWidth="1.75"
+                      strokeDasharray="3 3"
+                    />
+                    <path
+                      d="M 35 29 L 40 36 L 45 29"
+                      stroke="currentColor"
+                      strokeWidth="1.75"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+              )}
+            </React.Fragment>
+          )
+        })}
       </div>
 
     </div>

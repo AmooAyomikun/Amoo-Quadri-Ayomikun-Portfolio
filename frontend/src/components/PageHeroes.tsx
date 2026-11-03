@@ -25,7 +25,7 @@ interface EyebrowProps {
 
 const Eyebrow: React.FC<EyebrowProps> = ({ children }) => (
   <motion.div {...rise(0)} className="flex items-center justify-center mb-3">
-    <span className="font-mono text-xs sm:text-sm font-semibold tracking-wider text-[var(--color-primary)] uppercase inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/25 select-none shadow-xs">
+    <span className="font-mono text-[10px] sm:text-xs font-semibold tracking-wider text-[var(--color-primary)] uppercase inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/25 select-none shadow-xs">
       {children}
     </span>
   </motion.div>
@@ -237,21 +237,21 @@ export const ExperienceHero: React.FC = () => {
 
 export const EducationHero: React.FC = () => {
   return (
-    <header className="pt-10 sm:pt-14 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
+    <header className="pt-6 sm:pt-14 pb-4 sm:pb-8 px-2 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
         <span>🎓</span> // ACADEMIC FOUNDATIONS &amp; CREDENTIALS
       </Eyebrow>
 
       <motion.h1
         {...rise(0.08)}
-        className="font-sans font-extrabold text-3xl sm:text-5xl md:text-6xl text-[var(--color-text-main)] tracking-tight leading-tight"
+        className="font-sans font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-[var(--color-text-main)] tracking-tight leading-snug sm:leading-tight"
       >
         Academic Degrees &amp; Credentials
       </motion.h1>
 
       <motion.p
         {...rise(0.16)}
-        className="mt-4 text-sm sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed"
+        className="mt-2.5 sm:mt-4 text-xs sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed"
       >
         Software engineering degree, professional diplomas, departmental subject honors, and core coursework foundations.
       </motion.p>
