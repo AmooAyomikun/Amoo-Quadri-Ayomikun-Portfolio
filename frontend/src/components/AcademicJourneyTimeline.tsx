@@ -197,19 +197,28 @@ export const AcademicJourneyTimeline: React.FC = () => {
     scrollContainerRef.current.scrollLeft = scrollLeftPos - walk
   }
 
-  // Wheel horizontal scroll: scrolling mouse wheel over timeline scrolls horizontally
+  // Wheel horizontal scroll: scrolling mouse wheel over timeline scrolls horizontally,
+  // but seamlessly returns back to normal vertical page scroll once reaching the boundary!
   React.useEffect(() => {
     const el = scrollContainerRef.current
     if (!el) return
     const onWheel = (e: WheelEvent) => {
-      if (e.deltaY !== 0 && !e.shiftKey) {
+      if (e.deltaY === 0 || e.shiftKey) return
+      const maxScroll = el.scrollWidth - el.clientWidth
+      if (maxScroll <= 0) return
+
+      const canScrollRight = e.deltaY > 0 && el.scrollLeft < maxScroll - 4
+      const canScrollLeft = e.deltaY < 0 && el.scrollLeft > 4
+
+      if (canScrollRight || canScrollLeft) {
         e.preventDefault()
-        el.scrollLeft += e.deltaY * 1.2
+        el.scrollLeft += e.deltaY * 1.15
       }
+      // When at start or end, default vertical page scrolling continues smoothly!
     }
     el.addEventListener('wheel', onWheel, { passive: false })
     return () => el.removeEventListener('wheel', onWheel)
-  }, [])
+  }, [filteredMilestones.length])
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -328,35 +337,35 @@ export const AcademicJourneyTimeline: React.FC = () => {
             scrollbarColor: 'var(--color-primary) transparent'
           }}
         >
-          <div className="relative min-w-max px-12" style={{ height: '560px' }}>
+          <div className="relative min-w-max px-12" style={{ height: '420px' }}>
             
-            {/* Central Backbone Cable at Y=280px */}
+            {/* Central Backbone Cable at Y=210px */}
             <div 
               className="absolute left-0 right-0 h-1 bg-gradient-to-r from-[var(--color-primary)]/20 via-[var(--color-primary)] to-[var(--color-primary)]/20 z-0"
-              style={{ top: '280px' }}
+              style={{ top: '210px' }}
             >
               <div className="absolute inset-0 border-b border-dashed border-white/20" />
             </div>
 
             {/* Alternating Milestone Nodes Along the Cable */}
-            <div className="flex items-center gap-14 relative z-10">
+            <div className="flex items-center gap-12 relative z-10">
               {filteredMilestones.map((item, index) => {
                 const isTop = index % 2 === 0
 
                 return (
                   <div 
                     key={item.id} 
-                    className="relative flex flex-col items-center w-[285px] shrink-0"
-                    style={{ height: '560px' }}
+                    className="relative flex flex-col items-center w-[275px] shrink-0"
+                    style={{ height: '420px' }}
                   >
-                    {/* TOP CARD (if isTop): Placed in upper half (top: 20px - 215px) */}
+                    {/* TOP CARD (if isTop): Placed in upper half (top: 12px) */}
                     {isTop ? (
                       <>
                         <div 
                           className="absolute w-full flex flex-col items-center"
-                          style={{ top: '20px' }}
+                          style={{ top: '12px' }}
                         >
-                          <div className="w-full bg-[var(--color-surface-card)] border-2 border-[var(--color-border)] hover:border-[var(--color-primary)]/70 rounded-2xl p-4 shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+                          <div className="w-full bg-[var(--color-surface-card)] border-2 border-[var(--color-border)] hover:border-[var(--color-primary)]/70 rounded-2xl p-3.5 shadow-xl transition-all duration-300 hover:-translate-y-1 group">
                             <div className="flex items-center justify-between gap-2 mb-1.5">
                               <span 
                                 style={{ color: item.badgeColor, borderColor: `${item.badgeColor}40`, backgroundColor: `${item.badgeColor}15` }}
@@ -373,11 +382,11 @@ export const AcademicJourneyTimeline: React.FC = () => {
                               {item.title}
                             </h4>
 
-                            <p className="text-xs text-[var(--color-text-muted)] font-medium mb-2 truncate">
+                            <p className="text-xs text-[var(--color-text-muted)] font-medium mb-1.5 truncate">
                               {item.institution}
                             </p>
 
-                            <div className="pt-2 border-t border-[var(--color-border)] text-[11px] font-sans text-neutral-300 leading-snug">
+                            <div className="pt-1.5 border-t border-[var(--color-border)] text-[11px] font-sans text-neutral-300 leading-snug line-clamp-2">
                               {item.highlight}
                             </div>
                           </div>
@@ -386,15 +395,15 @@ export const AcademicJourneyTimeline: React.FC = () => {
                         {/* Top Connector Stem pointing down to central node */}
                         <div 
                           className="absolute w-0.5 border-r-2 border-dashed border-[var(--color-primary)]/60 z-10"
-                          style={{ top: '220px', height: '42px' }}
+                          style={{ top: '168px', height: '24px' }}
                         />
                       </>
                     ) : null}
 
-                    {/* CENTRAL CIRCULAR NODE on the timeline cable (Y=262px, height=36px) */}
+                    {/* CENTRAL CIRCULAR NODE on the timeline cable (Y=192px, height=36px) */}
                     <div 
                       className="absolute z-20 flex flex-col items-center"
-                      style={{ top: '262px' }}
+                      style={{ top: '192px' }}
                     >
                       <div className="w-9 h-9 rounded-full bg-[var(--color-surface-base)] border-2 border-[var(--color-primary)] flex items-center justify-center text-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/20 transition-transform hover:scale-110">
                         {item.icon}
@@ -406,7 +415,7 @@ export const AcademicJourneyTimeline: React.FC = () => {
                       /* Top card -> Year badge is safely BELOW the node */
                       <div 
                         className="absolute z-20 flex flex-col items-center"
-                        style={{ top: '308px' }}
+                        style={{ top: '232px' }}
                       >
                         <span className="px-2.5 py-0.5 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[10px] font-mono font-bold text-[var(--color-text-muted)] shadow-xs">
                           {item.year}
@@ -416,7 +425,7 @@ export const AcademicJourneyTimeline: React.FC = () => {
                       /* Bottom card -> Year badge is safely ABOVE the node */
                       <div 
                         className="absolute z-20 flex flex-col items-center"
-                        style={{ top: '232px' }}
+                        style={{ top: '160px' }}
                       >
                         <span className="px-2.5 py-0.5 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[10px] font-mono font-bold text-[var(--color-text-muted)] shadow-xs">
                           {item.year}
@@ -424,20 +433,20 @@ export const AcademicJourneyTimeline: React.FC = () => {
                       </div>
                     )}
 
-                    {/* BOTTOM CARD (if !isTop): Placed in lower half (top: 340px) */}
+                    {/* BOTTOM CARD (if !isTop): Placed in lower half (top: 252px) */}
                     {!isTop ? (
                       <>
                         {/* Bottom Connector Stem pointing up to central node */}
                         <div 
                           className="absolute w-0.5 border-r-2 border-dashed border-[var(--color-primary)]/60 z-10"
-                          style={{ top: '298px', height: '42px' }}
+                          style={{ top: '228px', height: '24px' }}
                         />
 
                         <div 
                           className="absolute w-full flex flex-col items-center"
-                          style={{ top: '340px' }}
+                          style={{ top: '252px' }}
                         >
-                          <div className="w-full bg-[var(--color-surface-card)] border-2 border-[var(--color-border)] hover:border-[var(--color-primary)]/70 rounded-2xl p-4 shadow-xl transition-all duration-300 hover:translate-y-1 group">
+                          <div className="w-full bg-[var(--color-surface-card)] border-2 border-[var(--color-border)] hover:border-[var(--color-primary)]/70 rounded-2xl p-3.5 shadow-xl transition-all duration-300 hover:translate-y-1 group">
                             <div className="flex items-center justify-between gap-2 mb-1.5">
                               <span 
                                 style={{ color: item.badgeColor, borderColor: `${item.badgeColor}40`, backgroundColor: `${item.badgeColor}15` }}
@@ -454,11 +463,11 @@ export const AcademicJourneyTimeline: React.FC = () => {
                               {item.title}
                             </h4>
 
-                            <p className="text-xs text-[var(--color-text-muted)] font-medium mb-2 truncate">
+                            <p className="text-xs text-[var(--color-text-muted)] font-medium mb-1.5 truncate">
                               {item.institution}
                             </p>
 
-                            <div className="pt-2 border-t border-[var(--color-border)] text-[11px] font-sans text-neutral-300 leading-snug">
+                            <div className="pt-1.5 border-t border-[var(--color-border)] text-[11px] font-sans text-neutral-300 leading-snug line-clamp-2">
                               {item.highlight}
                             </div>
                           </div>

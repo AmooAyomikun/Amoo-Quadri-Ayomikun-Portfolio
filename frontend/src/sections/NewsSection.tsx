@@ -218,25 +218,11 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
         </div>
 
         {/* News Items Grid: Exactly 3 in a row, compact card layout */}
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-          }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayList.map((item) => (
-            <motion.div 
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
-              }}
-              whileHover={{ y: -4 }}
+            <div 
               key={item.id} 
-              className="card-elevated p-4 sm:p-5 bg-[var(--color-surface-card)] flex flex-col justify-between h-full rounded-2xl border border-[var(--color-border)] shadow-sm hover:shadow-lg hover:border-[var(--color-primary)]/70 transition-all duration-300 group"
+              className="card-elevated p-4 sm:p-5 bg-[var(--color-surface-card)] flex flex-col justify-between h-full rounded-2xl border border-[var(--color-border)] shadow-sm hover:shadow-lg hover:border-[var(--color-primary)]/70 transition-all duration-300 hover:-translate-y-1 group"
             >
               <div>
                 {item.imageUrl && (
@@ -289,9 +275,9 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         {showViewAll && (
           <div className="mt-10 sm:mt-12 flex justify-center">

@@ -152,8 +152,8 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Top static banner */}
-      <header className="relative w-full border-b-2 border-[var(--color-text-main)] bg-[var(--color-surface-base)] z-40">
+      {/* Top static banner - locked permanently at the top of the viewport */}
+      <header className="sticky top-0 z-40 w-full border-b-2 border-[var(--color-text-main)] bg-[var(--color-surface-base)]/95 backdrop-blur-md shadow-xs">
         <div className="flex items-center justify-between gap-2 sm:gap-6 px-3 sm:px-8 py-2.5 sm:py-3.5">
           <Link
             to="/"

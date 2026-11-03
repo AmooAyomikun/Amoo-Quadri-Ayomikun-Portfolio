@@ -18,6 +18,7 @@ export interface ProjectItem {
   githubUrl?: string
   caseStudyPath?: string
   previewType?: 'iframe' | 'image'
+  status?: 'completed' | 'in-progress' | 'live'
   featured: boolean
 }
 
@@ -388,14 +389,15 @@ export const portfolioData = {
     {
       id: 'kynda-ai-assistant',
       title: 'Kynda AI Learning Platform',
-      subtitle: 'Intelligent Academic Learning & AI Tutoring Assistant',
+      subtitle: 'Intelligent Academic Tutoring & Study Assistant (In Progress)',
       category: 'ai-data',
       lens: 'both',
-      period: '2026',
-      role: 'Full Stack Engineer',
-      organization: 'Personal Research Project',
-      summary: 'An intelligent learning platform leveraging generative AI to generate quiz modules, study notes, and explanations.',
-      description: 'Designed to assist university students and parents with course comprehension. Features automated flashcard generation, parent dashboards, wallet systems, and conversational academic explanations using LLM APIs.',
+      period: '2026 · In Progress',
+      role: 'Full Stack Engineer & Founder',
+      organization: 'Personal Project (In Active Development)',
+      status: 'in-progress',
+      summary: 'An intelligent academic tutoring platform currently in active development, leveraging generative AI to generate quiz modules, study notes, and explanations.',
+      description: 'Currently in active development: designed to assist university students and parents with course comprehension. Features automated flashcard generation, parent dashboards, wallet systems, and conversational academic explanations using LLM APIs.',
       keyFeatures: [
         'Parent Dashboard, Learnings, and Approvals',
         'AI Quiz & flashcard generation',
@@ -404,8 +406,8 @@ export const portfolioData = {
       ],
       technologies: ['React', 'TypeScript', 'Node.js', 'OpenAI API', 'Tailwind CSS'],
       metrics: [
-        { label: 'Focus', value: 'AI Education' },
-        { label: 'NLP Engine', value: 'LLM Integration' }
+        { label: 'Status', value: 'In Progress' },
+        { label: 'Domain', value: 'AI EdTech' }
       ],
       imageUrl: '/kynda.png',
       demoUrl: 'https://kynda-ai-assistant-learning-platfor.vercel.app/',

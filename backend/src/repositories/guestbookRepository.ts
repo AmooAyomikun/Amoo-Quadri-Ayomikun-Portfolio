@@ -45,6 +45,12 @@ export class GuestbookRepository {
     }
   }
 
+  private isMockOrTestEntry(entry: GuestbookEntry): boolean {
+    const name = (entry.name || '').trim().toLowerCase()
+    const msg = (entry.message || '').trim().toLowerCase()
+    return name.includes('adeleke') || msg.includes('inspiring academic trajectory')
+  }
+
   /**
    * Paginates signatures to prevent unbounded memory and 500KB payload issues (Issue 3.3).
    * Firestore is single source of truth when configured (Issue 3.1).
@@ -65,17 +71,17 @@ export class GuestbookRepository {
           }
         }
 
-        const snapshot = await query.limit(limit + 1).get()
+        const snapshot = await query.limit(limit + 5).get()
         const docs = snapshot.docs
-        const hasMore = docs.length > limit
-        const resultDocs = hasMore ? docs.slice(0, limit) : docs
-
-        const entries = resultDocs.map((doc: any) => ({
+        const rawEntries = docs.map((doc: any) => ({
           id: doc.id,
           ...doc.data()
         })) as GuestbookEntry[]
 
-        const nextCursor = hasMore && resultDocs.length > 0 ? resultDocs[resultDocs.length - 1].id : null
+        const filtered = rawEntries.filter(e => !this.isMockOrTestEntry(e))
+        const hasMore = filtered.length > limit
+        const entries = hasMore ? filtered.slice(0, limit) : filtered
+        const nextCursor = hasMore && entries.length > 0 ? entries[entries.length - 1].id : null
 
         return {
           entries,
@@ -92,7 +98,9 @@ export class GuestbookRepository {
       this.localStore = this.readFromFile()
     }
 
-    const all = [...this.localStore].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    const all = [...this.localStore]
+      .filter(e => !this.isMockOrTestEntry(e))
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     let startIndex = 0
     if (cursor) {
       const idx = all.findIndex(e => e.id === cursor)
@@ -112,6 +120,14 @@ export class GuestbookRepository {
   }
 
   async save(entry: GuestbookEntry): Promise<void> {
+    if (process.env.NODE_ENV === 'test') {
+      if (!this.localStore) {
+        this.localStore = this.readFromFile()
+      }
+      this.localStore.unshift(entry)
+      return
+    }
+
     if (db) {
       try {
         await db.collection('guestbook').doc(entry.id).set(entry)

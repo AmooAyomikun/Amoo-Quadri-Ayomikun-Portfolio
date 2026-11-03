@@ -24,6 +24,7 @@ interface InteractiveAppPreviewProps {
   showInteractiveBadge?: boolean
   defaultDeviceMode?: 'desktop' | 'mobile'
   autoPlayTourDefault?: boolean
+  status?: 'completed' | 'in-progress' | 'live'
 }
 
 export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
@@ -38,6 +39,7 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
   showInteractiveBadge = true,
   defaultDeviceMode = 'desktop',
   autoPlayTourDefault = false,
+  status,
 }) => {
   const [isInteractive, setIsInteractive] = useState(initialInteractive)
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>(defaultDeviceMode)
@@ -255,9 +257,11 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
 
         {/* Tour Mode Indicator Badge */}
         {isTourActive && !isInteractive && (
-          <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/85 backdrop-blur-md border border-emerald-500/40 text-emerald-400 font-mono text-[9px] font-bold shadow-lg">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>TOUR ACTIVE</span>
+          <div className={`absolute top-2 right-2 z-10 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/85 backdrop-blur-md border ${
+            status === 'in-progress' ? 'border-amber-500/40 text-amber-400' : 'border-emerald-500/40 text-emerald-400'
+          } font-mono text-[9px] font-bold shadow-lg`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${status === 'in-progress' ? 'bg-amber-400' : 'bg-emerald-400'} animate-pulse`} />
+            <span>{status === 'in-progress' ? 'IN PROGRESS PREVIEW' : 'TOUR ACTIVE'}</span>
           </div>
         )}
 
@@ -296,12 +300,17 @@ export const InteractiveAppPreview: React.FC<InteractiveAppPreviewProps> = ({
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
-            {hasLiveDemo && (
+            {status === 'in-progress' ? (
+              <span className="ml-1 px-1.5 py-0.2 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono text-[9px] font-bold flex items-center gap-1 shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                <span className="hidden sm:inline">IN PROGRESS</span>
+              </span>
+            ) : hasLiveDemo ? (
               <span className="ml-1 px-1.5 py-0.2 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[9px] font-bold flex items-center gap-1 shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="hidden sm:inline">LIVE</span>
               </span>
-            )}
+            ) : null}
           </div>
 
           {/* Center Address Pill */}

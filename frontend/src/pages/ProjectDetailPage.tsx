@@ -65,6 +65,12 @@ export default function ProjectDetailPage() {
               <div>
                 <div className="flex flex-wrap items-center gap-2.5 mb-4">
                   <Badge variant="primary" size="sm">{project.category.replace('-', ' ').toUpperCase()}</Badge>
+                  {project.status === 'in-progress' && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-[11px] font-semibold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                      In Active Development
+                    </span>
+                  )}
                   <span className="text-xs font-mono text-[var(--color-text-muted)]">
                     {project.period}
                   </span>
@@ -250,6 +256,7 @@ export default function ProjectDetailPage() {
                 initialInteractive={true}
                 scaleMode="full"
                 showInteractiveBadge={false}
+                status={project.status}
               />
               {/* Interactive Status Callout */}
               <div className="mt-2.5 px-3 py-2 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] flex items-center justify-between gap-2 font-mono text-xs shadow-xs">

@@ -20,14 +20,19 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           aspectRatio="aspect-[4/3]"
           autoPlayTourDefault={true}
           tourRoutes={project.tourRoutes}
+          status={project.status}
         />
 
-        {/* Case study tag overlay */}
-        {project.caseStudyPath && (
+        {/* Status or case study tag overlay */}
+        {project.status === 'in-progress' ? (
+          <div className="absolute top-12 right-3 z-30 bg-black/85 backdrop-blur-xs text-amber-400 border border-amber-500/40 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold flex items-center gap-1.5 shadow-lg pointer-events-none">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" /> In Development
+          </div>
+        ) : project.caseStudyPath ? (
           <div className="absolute top-12 right-3 z-30 bg-black/80 backdrop-blur-xs text-[var(--color-primary)] border border-[var(--color-primary)]/40 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold flex items-center gap-1.5 shadow-lg pointer-events-none">
             <BookOpen className="w-3 h-3" /> Case Study
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Minimalist Text Block Below Mockup Frame */}
@@ -51,7 +56,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
               {project.category.replace('-', ' ').toUpperCase()} · {project.technologies.slice(0, 2).join(' / ')}
             </p>
             <span className="text-xs font-mono text-[var(--color-primary)] group-hover/link:underline flex items-center gap-1 font-semibold">
-              Read Study ↗
+              {project.status === 'in-progress' ? 'In Progress ↗' : project.caseStudyPath ? 'Read Study ↗' : 'View Architecture ↗'}
             </span>
           </div>
         </Link>
