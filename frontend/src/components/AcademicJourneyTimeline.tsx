@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { 
   GraduationCap, 
   Award, 
@@ -9,6 +9,10 @@ import {
   Users, 
   ChevronLeft, 
   ChevronRight, 
+  ChevronDown,
+  ChevronUp,
+  GitCommit,
+  Layers,
   Sparkles
 } from 'lucide-react'
 
@@ -177,6 +181,47 @@ export const AcademicJourneyTimeline: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const [maxScroll, setMaxScroll] = useState<number>(2200)
+
+  // Mobile 3-in-1 hybrid state:
+  const [mobileViewMode, setMobileViewMode] = useState<'roadmap' | 'carousel'>('roadmap')
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({
+    m1: true,
+    m3: true
+  })
+  const [activeCarouselIdx, setActiveCarouselIdx] = useState(0)
+  const carouselContainerRef = useRef<HTMLDivElement>(null)
+
+  const toggleExpand = (id: string) => {
+    setExpandedItems(prev => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  const toggleAll = (expand: boolean) => {
+    const next: Record<string, boolean> = {}
+    filteredMilestones.forEach(m => { next[m.id] = expand })
+    setExpandedItems(next)
+  }
+
+  const allExpanded = filteredMilestones.every(m => expandedItems[m.id])
+
+  const scrollCarousel = (index: number) => {
+    const safeIdx = Math.max(0, Math.min(filteredMilestones.length - 1, index))
+    setActiveCarouselIdx(safeIdx)
+    if (carouselContainerRef.current) {
+      const card = carouselContainerRef.current.children[safeIdx] as HTMLElement
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+      }
+    }
+  }
+
+  const onCarouselScroll = () => {
+    if (!carouselContainerRef.current) return
+    const el = carouselContainerRef.current
+    const cardWidth = el.firstElementChild ? (el.firstElementChild as HTMLElement).offsetWidth + 12 : 300
+    const scrollPos = el.scrollLeft
+    const idx = Math.round(scrollPos / cardWidth)
+    setActiveCarouselIdx(Math.max(0, Math.min(filteredMilestones.length - 1, idx)))
+  }
 
   // Measure content scroll width vs container width dynamically
   useEffect(() => {
@@ -547,113 +592,293 @@ export const AcademicJourneyTimeline: React.FC = () => {
       </div>
 
       {/* =========================================================================
-          MOBILE VIEW: Sequential Card Stream with Curved Dashed Connectors
-          (Optimized for 375px+ screens, inspired by editorial research portfolios)
+          MOBILE VIEW: Combined 3-in-1 Hybrid Milestone Experience
+          1. Quick Year Scrubber Ribbon (Touch-jump to any milestone)
+          2. Luminous Vertical Timeline Spine with Category Icon Nodes & Floating Badges
+          3. Interactive Minimalist Tap-to-Expand Accordion Details
+          4. Touch-Swipe Story Card Carousel with Progress Bar
       ========================================================================= */}
-      <div className="block md:hidden space-y-0 mt-6">
-        {filteredMilestones.map((item, index) => {
-          const isLast = index === filteredMilestones.length - 1
+      <div className="block md:hidden mt-6">
+        {/* Top Controls: View Switcher (Roadmap vs Carousel) & Expand/Collapse Toggle */}
+        <div className="flex items-center justify-between gap-2 mb-3.5">
+          <div className="inline-flex p-1 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] text-xs font-mono">
+            <button
+              type="button"
+              onClick={() => setMobileViewMode('roadmap')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                mobileViewMode === 'roadmap'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold shadow-xs'
+                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-main)]'
+              }`}
+            >
+              <GitCommit className="w-3.5 h-3.5" />
+              <span>Roadmap</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileViewMode('carousel')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                mobileViewMode === 'carousel'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] font-bold shadow-xs'
+                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-main)]'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Cards</span>
+            </button>
+          </div>
 
-          return (
-            <React.Fragment key={item.id}>
-              {/* Milestone Card */}
-              <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 rounded-2xl p-4 shadow-sm transition-all relative overflow-hidden">
-                {/* Top Row: 01 badge, category pill & year */}
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-black text-[var(--color-primary)] bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/25 px-2 py-0.5 rounded-md shadow-xs">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <span 
-                      style={{ color: item.badgeColor, backgroundColor: `${item.badgeColor}15`, borderColor: `${item.badgeColor}35` }}
-                      className="text-[10px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded border truncate"
-                    >
-                      {item.categoryLabel}
+          {mobileViewMode === 'roadmap' ? (
+            <button
+              type="button"
+              onClick={() => toggleAll(!allExpanded)}
+              className="text-[11px] font-mono text-[var(--color-primary)] hover:underline px-2 py-1 cursor-pointer font-semibold"
+            >
+              {allExpanded ? 'Collapse All' : 'Expand All'}
+            </button>
+          ) : (
+            <div className="text-[11px] font-mono font-bold text-[var(--color-primary)]">
+              {String(activeCarouselIdx + 1).padStart(2, '0')} / {String(filteredMilestones.length).padStart(2, '0')}
+            </div>
+          )}
+        </div>
+
+        {/* Quick Year Scrubber Ribbon (Always accessible on touch devices) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2 mb-4 -mx-1 px-1">
+          {filteredMilestones.map((item, idx) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => {
+                if (mobileViewMode === 'carousel') {
+                  scrollCarousel(idx)
+                } else {
+                  const el = document.getElementById(`mobile-milestone-${item.id}`)
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    setExpandedItems(prev => ({ ...prev, [item.id]: true }))
+                  }
+                }
+              }}
+              className={`shrink-0 px-2.5 py-1 rounded-lg font-mono text-[11px] flex items-center gap-1 border transition-all cursor-pointer ${
+                (mobileViewMode === 'carousel' ? activeCarouselIdx === idx : expandedItems[item.id])
+                  ? 'bg-[var(--color-primary)]/15 text-[var(--color-primary)] border-[var(--color-primary)]/40 font-bold shadow-xs'
+                  : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:text-[var(--color-text-main)]'
+              }`}
+            >
+              <span>{item.year}</span>
+              <span className="text-[9px] opacity-60">· 0{idx + 1}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* =================================================================== */}
+        {/* VIEW 1: ROADMAP SPINE WITH TAP-TO-EXPAND DETAILS                    */}
+        {/* =================================================================== */}
+        {mobileViewMode === 'roadmap' && (
+          <div className="relative pl-9 sm:pl-10 space-y-4">
+            {/* Continuous Luminous Gradient Spine */}
+            <div 
+              className="absolute left-[15px] sm:left-[17px] top-4 bottom-4 w-0.5 bg-gradient-to-b from-[#64ffda] via-[#38bdf8] via-[#a855f7] to-[#10b981] rounded-full shadow-[0_0_8px_rgba(100,255,218,0.4)]"
+            />
+
+            {filteredMilestones.map((item, index) => {
+              const isExpanded = !!expandedItems[item.id]
+
+              return (
+                <div 
+                  key={item.id} 
+                  id={`mobile-milestone-${item.id}`}
+                  className="relative group/mitem"
+                >
+                  {/* Glowing Category Icon Node directly on the spine */}
+                  <div 
+                    style={{ borderColor: item.badgeColor }}
+                    className="absolute -left-[31px] sm:-left-[33px] top-3.5 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[var(--color-surface-base)] border-2 flex items-center justify-center text-[var(--color-text-main)] shadow-md transition-transform group-hover/mitem:scale-110 z-10"
+                  >
+                    <span style={{ color: item.badgeColor }} className="scale-75 sm:scale-90">
+                      {item.icon}
                     </span>
                   </div>
 
-                  <span className="text-[11px] font-mono font-bold text-[var(--color-primary)] shrink-0">
+                  {/* Minimalist Interactive Card */}
+                  <div 
+                    onClick={() => toggleExpand(item.id)}
+                    className="bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 rounded-2xl p-3.5 sm:p-4 shadow-sm transition-all cursor-pointer relative overflow-hidden"
+                  >
+                    {/* Header Row: 01, Category Pill, Year, Expand Chevron */}
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                        <span className="font-mono text-[10px] font-bold text-[var(--color-primary)] bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 px-1.5 py-0.2 rounded shrink-0">
+                          0{index + 1}
+                        </span>
+                        <span 
+                          style={{ color: item.badgeColor, backgroundColor: `${item.badgeColor}15`, borderColor: `${item.badgeColor}35` }}
+                          className="text-[9px] sm:text-[10px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded border truncate"
+                        >
+                          {item.categoryLabel}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[10px] sm:text-[11px] font-mono font-bold text-[var(--color-text-main)] bg-[var(--color-surface-elevated)] border border-[var(--color-border)] px-2 py-0.5 rounded-full shadow-xs">
+                          {item.year}
+                        </span>
+                        <button
+                          type="button"
+                          aria-label={isExpanded ? 'Collapse milestone details' : 'Expand milestone details'}
+                          className="w-5 h-5 rounded-md flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors"
+                        >
+                          {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Title */}
+                    <h4 className="font-serif font-bold text-sm sm:text-base text-[var(--color-text-main)] mb-1 leading-snug">
+                      {item.title}
+                    </h4>
+
+                    {/* Institution & Period Subtitle */}
+                    <div className="flex items-center justify-between text-xs text-[var(--color-text-muted)] font-medium">
+                      <span className="truncate">{item.institution}</span>
+                      <span className="text-[10px] font-mono text-[var(--color-text-subtle)] shrink-0 ml-2">{item.period}</span>
+                    </div>
+
+                    {/* Expandable Highlight Details Drawer */}
+                    <AnimatePresence initial={false}>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="pt-2.5 mt-2.5 border-t border-[var(--color-border)] text-xs text-neutral-200 leading-relaxed font-sans flex items-start gap-2">
+                            <span className="text-[var(--color-primary)] font-bold text-sm shrink-0 leading-none mt-0.5">↳</span>
+                            <span>{item.highlight}</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* =================================================================== */}
+        {/* VIEW 2: HORIZONTAL TOUCH-SNAP CAROUSEL WITH PROGRESS TRACKER       */}
+        {/* =================================================================== */}
+        {mobileViewMode === 'carousel' && (
+          <div>
+            <div 
+              ref={carouselContainerRef}
+              onScroll={onCarouselScroll}
+              className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-3 pb-3 pt-1 -mx-2 px-2"
+            >
+              {filteredMilestones.map((item, index) => (
+                <div 
+                  key={item.id}
+                  className="w-[85vw] max-w-[330px] shrink-0 snap-center bg-[var(--color-surface-card)] border-2 border-[var(--color-border)] hover:border-[var(--color-primary)]/50 rounded-2xl p-4 shadow-xl flex flex-col justify-between relative overflow-hidden"
+                >
+                  {/* Watermark Year Background Accent */}
+                  <div className="absolute -right-2 -top-2 text-6xl font-black font-mono text-white/[0.04] select-none pointer-events-none">
                     {item.year}
-                  </span>
+                  </div>
+
+                  <div>
+                    {/* Top Row: Milestone 01, Category Pill, Year */}
+                    <div className="flex items-center justify-between gap-2 mb-2 relative z-10">
+                      <span className="font-mono text-xs font-bold text-[var(--color-primary)] bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 px-2 py-0.5 rounded-md">
+                        0{index + 1} of {filteredMilestones.length}
+                      </span>
+                      <span 
+                        style={{ color: item.badgeColor, backgroundColor: `${item.badgeColor}15`, borderColor: `${item.badgeColor}35` }}
+                        className="text-[10px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded border truncate"
+                      >
+                        {item.categoryLabel}
+                      </span>
+                    </div>
+
+                    {/* Icon & Title */}
+                    <div className="flex items-start gap-2.5 my-2.5">
+                      <div 
+                        style={{ borderColor: item.badgeColor }}
+                        className="w-9 h-9 rounded-xl bg-[var(--color-surface-base)] border flex items-center justify-center text-[var(--color-text-main)] shrink-0 shadow-sm"
+                      >
+                        <span style={{ color: item.badgeColor }}>
+                          {item.icon}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-serif font-bold text-sm sm:text-base text-[var(--color-text-main)] leading-snug">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs text-[var(--color-text-muted)] font-medium truncate mt-0.5">
+                          {item.institution}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Highlight Box */}
+                    <div className="p-3 rounded-xl bg-[var(--color-surface-base)] border border-[var(--color-border)] text-xs text-neutral-200 leading-relaxed font-sans mb-3">
+                      {item.highlight}
+                    </div>
+                  </div>
+
+                  {/* Period Footer */}
+                  <div className="pt-2 border-t border-[var(--color-border)] text-[10px] font-mono text-[var(--color-text-muted)] flex items-center justify-between">
+                    <span>Timeline Period</span>
+                    <span className="text-[var(--color-primary)] font-bold">{item.period}</span>
+                  </div>
                 </div>
+              ))}
+            </div>
 
-                {/* Title */}
-                <h4 className="font-serif font-bold text-sm sm:text-base text-[var(--color-text-main)] mb-1 leading-snug">
-                  {item.title}
-                </h4>
+            {/* Carousel Navigation Footer (Arrows & Touch Dots) */}
+            <div className="flex items-center justify-between mt-3 px-1">
+              <button
+                type="button"
+                onClick={() => scrollCarousel(activeCarouselIdx - 1)}
+                disabled={activeCarouselIdx === 0}
+                aria-label="Previous milestone"
+                className="w-8 h-8 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-main)] disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--color-primary)] cursor-pointer"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
 
-                {/* Institution & Period */}
-                <div className="flex items-center justify-between text-xs text-[var(--color-text-muted)] font-medium mb-2.5">
-                  <span className="truncate">{item.institution}</span>
-                  <span className="text-[10px] font-mono text-[var(--color-text-subtle)] shrink-0 ml-2">{item.period}</span>
-                </div>
-
-                {/* Highlight */}
-                <p className="text-xs text-neutral-200 pt-2 border-t border-[var(--color-border)] leading-relaxed font-sans">
-                  {item.highlight}
-                </p>
+              {/* Progress Dots */}
+              <div className="flex items-center gap-1">
+                {filteredMilestones.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => scrollCarousel(i)}
+                    aria-label={`Jump to milestone ${i + 1}`}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                      activeCarouselIdx === i 
+                        ? 'w-5 bg-[var(--color-primary)]' 
+                        : 'w-1.5 bg-white/20 hover:bg-white/40'
+                    }`}
+                  />
+                ))}
               </div>
 
-              {/* Stylish Curved Dashed Connector Arrow between cards */}
-              {!isLast && (
-                <div className="flex justify-center my-3.5 select-none pointer-events-none">
-                  <svg
-                    className="w-20 h-14 text-[var(--color-primary)] drop-shadow-[0_2px_8px_rgba(100,255,218,0.2)]"
-                    viewBox="0 0 100 56"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <defs>
-                      <linearGradient id={`milestone-grad-${item.id}`} x1="36%" y1="0%" x2="64%" y2="100%">
-                        <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="0.35" />
-                        <stop offset="60%" stopColor="var(--color-primary)" stopOpacity="0.85" />
-                        <stop offset="100%" stopColor="var(--color-primary)" stopOpacity="1" />
-                      </linearGradient>
-                    </defs>
-
-                    {/* Subtle background glow path */}
-                    <path
-                      d="M 36 2 C 36 26, 64 26, 64 48"
-                      stroke="var(--color-primary)"
-                      strokeWidth="3.5"
-                      strokeOpacity="0.15"
-                      strokeLinecap="round"
-                      fill="none"
-                    />
-
-                    {/* Top origin glowing anchor dot */}
-                    <circle 
-                      cx="36" 
-                      cy="3" 
-                      r="2.5" 
-                      fill="var(--color-primary)" 
-                    />
-
-                    {/* Main smooth S-curve with rounded dashed strokes */}
-                    <path
-                      d="M 36 2 C 36 26, 64 26, 64 48"
-                      stroke={`url(#milestone-grad-${item.id})`}
-                      strokeWidth="2"
-                      strokeDasharray="4 4"
-                      strokeLinecap="round"
-                      fill="none"
-                    />
-
-                    {/* Downward pointing arrowhead entering bottom card */}
-                    <path
-                      d="M 58 43 L 64 52 L 70 43"
-                      stroke="var(--color-primary)"
-                      strokeWidth="2.25"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      fill="none"
-                    />
-                  </svg>
-                </div>
-              )}
-            </React.Fragment>
-          )
-        })}
+              <button
+                type="button"
+                onClick={() => scrollCarousel(activeCarouselIdx + 1)}
+                disabled={activeCarouselIdx === filteredMilestones.length - 1}
+                aria-label="Next milestone"
+                className="w-8 h-8 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-main)] disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--color-primary)] cursor-pointer"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
     </div>
