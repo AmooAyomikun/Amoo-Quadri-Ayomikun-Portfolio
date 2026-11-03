@@ -27,6 +27,9 @@ export class NewsRepository {
   }
 
   private saveToFile(articles: NewsItem[]): void {
+    if (process.env.NODE_ENV === 'test') {
+      return // Do not pollute news.json file during CI and automated test runs
+    }
     try {
       fs.writeFileSync(newsFilePath, JSON.stringify(articles, null, 2), 'utf8')
     } catch (err) {

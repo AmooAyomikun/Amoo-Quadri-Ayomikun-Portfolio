@@ -24,7 +24,6 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
   showViewAll = false
 }) => {
   const [newsList, setNewsList] = useState<NewsItem[]>([])
-  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null)
   const [publishModalOpen, setPublishModalOpen] = useState(false)
 
   // Publish Form state
@@ -196,12 +195,12 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
                   </span>
                 </div>
 
-                <h3 
-                  onClick={() => setSelectedNews(item)}
-                  className="text-lg font-serif font-bold text-[var(--color-text-main)] mb-2 leading-snug cursor-pointer group-hover:text-[var(--color-primary)] transition-colors"
+                <Link 
+                  to={`/news/${item.id}`}
+                  className="text-lg font-serif font-bold text-[var(--color-text-main)] mb-2 leading-snug hover:text-[var(--color-primary)] transition-colors block"
                 >
                   {item.title}
-                </h3>
+                </Link>
 
                 <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mb-4">
                   {item.summary}
@@ -213,15 +212,13 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
                   <Clock className="w-3 h-3" /> {item.readTime}
                 </span>
                 
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setSelectedNews(item)}
-                    className="text-xs font-mono text-[var(--color-primary)] font-semibold hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>Read Article</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
+                <Link
+                  to={`/news/${item.id}`}
+                  className="text-xs font-mono text-[var(--color-primary)] font-semibold hover:underline flex items-center gap-1"
+                >
+                  <span>Read Article</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
               </div>
             </motion.div>
           ))}
@@ -241,60 +238,6 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
         </div>
       </div>
 
-      {/* Article Reader Modal */}
-      <AnimatePresence>
-        {selectedNews && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl relative"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <Badge variant="primary" size="md" className="mb-2">{selectedNews.category}</Badge>
-                  <h3 className="text-2xl font-serif font-bold text-[var(--color-text-main)]">
-                    {selectedNews.title}
-                  </h3>
-                  <div className="flex items-center gap-4 text-xs font-mono text-[var(--color-text-subtle)] mt-1">
-                    <span>By {selectedNews.author}</span>
-                    <span>• {formatNewsDate(selectedNews.date)}</span>
-                    <span>• {selectedNews.readTime}</span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedNews(null)}
-                  aria-label="Close reader"
-                  className="p-2 rounded-lg border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] hover:bg-white/5 transition-colors cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="text-sm text-[var(--color-text-muted)] leading-relaxed border-t border-[var(--color-border)] pt-4 whitespace-pre-line font-sans">
-                {selectedNews.content.replace(/\\n/g, '\n')}
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[var(--color-border)]">
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedNews.tags.map((t, i) => (
-                    <Badge key={i} variant="subtle" size="sm">{t}</Badge>
-                  ))}
-                </div>
-                
-                <Link
-                  to={`/news/${selectedNews.id}`}
-                  className="text-xs font-mono text-[var(--color-primary)] hover:underline flex items-center gap-1"
-                >
-                  <span>Open Dedicated Page</span>
-                  <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
       {/* Quick Article Publish Modal (Admin) */}
       <AnimatePresence>
