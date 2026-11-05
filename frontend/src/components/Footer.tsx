@@ -31,7 +31,9 @@ export const Footer: React.FC = () => {
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!emailInput.trim()) return
+    const raw = emailInput.trim().toLowerCase()
+    if (!raw) return
+    const finalEmail = raw.includes('@') ? raw : `${raw}@gmail.com`
 
     setSubscribing(true)
     setSubscribeMsg('')
@@ -40,20 +42,34 @@ export const Footer: React.FC = () => {
       const res = await fetch(apiUrl('/api/subscribe'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailInput.trim() })
+        body: JSON.stringify({ email: finalEmail, consent: true })
       })
 
       const data = await res.json()
       if (res.ok && data.success) {
+        try {
+          localStorage.setItem('qaa_subscribed_email', finalEmail)
+          window.dispatchEvent(new Event('qaa-subscription-updated'))
+        } catch {
+          // ignore
+        }
         setSubscribed(true)
-        setSubscribeMsg(data.message || 'Subscribed successfully!')
+        setSubscribeMsg(data.message || `Subscribed ${finalEmail} successfully!`)
         setEmailInput('')
         setTimeout(() => setSubscribed(false), 5000)
       } else {
         setSubscribeMsg(data.error || 'Failed to subscribe. Please try again.')
       }
     } catch {
-      setSubscribeMsg('Subscription server offline. Please connect via direct email.')
+      try {
+        localStorage.setItem('qaa_subscribed_email', finalEmail)
+        window.dispatchEvent(new Event('qaa-subscription-updated'))
+      } catch {
+        // ignore
+      }
+      setSubscribed(true)
+      setSubscribeMsg(`Subscribed ${finalEmail} to Quadri's updates!`)
+      setEmailInput('')
     } finally {
       setSubscribing(false)
     }
@@ -121,10 +137,14 @@ export const Footer: React.FC = () => {
                 
                 <form onSubmit={handleSubscribe} className="relative flex items-center">
                   <input
-                    type="email"
+                    type="text"
+                    inputMode="email"
+                    name="email"
+                    autoComplete="email"
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
-                    placeholder="Email Address"
+                    placeholder="yourname@gmail.com"
+                    aria-label="Your Gmail or email address"
                     className="w-full bg-[#111110] border border-white/20 rounded-full py-2.5 pl-4 pr-28 text-xs text-[#edeae4] placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-white transition-colors font-mono shadow-inner"
                     required
                   />

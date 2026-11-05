@@ -5,6 +5,7 @@ import { Newspaper, BookOpen, Sparkles, PlusCircle, X, CheckCircle2, ArrowRight,
 import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { AnimatedWords } from '../components/AnimatedWords'
+import { NewsletterSubscribeCard } from '../components/NewsletterSubscribeCard'
 import { apiUrl, getAdminToken, setAdminToken } from '../lib/api'
 import { initialNewsData, formatFullNewsDate, type NewsItem } from '../content/newsData'
 
@@ -291,6 +292,8 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
             </Link>
           </div>
         )}
+
+        <NewsletterSubscribeCard variant="banner" />
         </div>
       </div>
 

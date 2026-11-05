@@ -1,5 +1,7 @@
 import { Request, Response } from 'express'
 import { newsService } from '../services/newsService.js'
+import { subscriberService } from '../services/subscriberService.js'
+import { emailService } from '../services/emailService.js'
 
 export const getNews = async (_req: Request, res: Response): Promise<void> => {
   try {
@@ -26,6 +28,11 @@ export const publishNews = async (req: Request, res: Response): Promise<void> =>
       tags,
       externalUrl
     })
+
+    // Asynchronously email all active subscribers about the new dispatch
+    subscriberService.getAll()
+      .then((subs) => emailService.notifySubscribersNewArticle(newArticle, subs))
+      .catch((err) => console.warn('[NewsController] Subscriber broadcast error:', err))
 
     console.log('[NewsController] News published:', newArticle.id)
     res.status(201).json({

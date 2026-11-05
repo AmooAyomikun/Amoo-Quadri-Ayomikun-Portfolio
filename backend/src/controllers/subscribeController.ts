@@ -1,10 +1,17 @@
 import { Request, Response } from 'express'
 import { subscriberService } from '../services/subscriberService.js'
+import { emailService } from '../services/emailService.js'
 
 export const subscribeNewsletter = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, consent } = req.body ?? {}
     const result = await subscriberService.subscribe(email, consent !== false)
+
+    if (result.subscriber) {
+      emailService.sendSubscriptionWelcomeEmail(result.subscriber).catch((err) => {
+        console.warn('[SubscribeController] Welcome email dispatch error:', err)
+      })
+    }
 
     res.status(201).json({
       success: true,

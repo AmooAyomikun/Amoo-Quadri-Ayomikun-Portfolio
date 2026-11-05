@@ -1,15 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LogOut, Newspaper, ShieldCheck, Mail, MessageSquare, Loader2, RefreshCw, Menu, X } from 'lucide-react'
+import { LogOut, Newspaper, ShieldCheck, Mail, MessageSquare, Users, Loader2, RefreshCw, Menu, X } from 'lucide-react'
 import { apiUrl, getAdminToken, clearAdminToken } from '../lib/api'
 import { SEO } from '../components/SEO'
 import { AdminNewsTab, type NewsItem } from '../components/admin/AdminNewsTab'
 import { AdminMessagesTab, type ContactMessage } from '../components/admin/AdminMessagesTab'
 import { AdminGuestbookTab, type GuestbookEntry } from '../components/admin/AdminGuestbookTab'
+import { AdminSubscribersTab, type SubscriberItem } from '../components/admin/AdminSubscribersTab'
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<'news' | 'messages' | 'guestbook'>('news')
+  const [activeTab, setActiveTab] = useState<'news' | 'messages' | 'guestbook' | 'subscribers'>('news')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [adminToken, setAdminTokenState] = useState<string | null>(null)
   const [loadingVerify, setLoadingVerify] = useState(true)
@@ -18,6 +19,7 @@ export default function AdminDashboard() {
   const [newsArticles, setNewsArticles] = useState<NewsItem[]>([])
   const [messages, setMessages] = useState<ContactMessage[]>([])
   const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>([])
+  const [subscribers, setSubscribers] = useState<SubscriberItem[]>([])
   const [loadingData, setLoadingData] = useState(false)
 
   // Verify Admin Session on mount
@@ -75,6 +77,16 @@ export default function AdminDashboard() {
       if (gbRes.ok) {
         const json = await gbRes.json()
         if (Array.isArray(json)) setGuestbookEntries(json)
+        else if (Array.isArray(json.entries)) setGuestbookEntries(json.entries)
+      }
+
+      // 4. Fetch Subscribers
+      const subRes = await fetch(apiUrl('/api/admin/subscribers'), {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      })
+      if (subRes.ok) {
+        const json = await subRes.json()
+        if (Array.isArray(json.data)) setSubscribers(json.data)
       }
     } catch (err) {
       console.warn('Error loading dashboard data:', err)
@@ -190,6 +202,25 @@ export default function AdminDashboard() {
                 {guestbookEntries.length}
               </span>
             </button>
+
+            <button
+              onClick={() => {
+                setActiveTab('subscribers')
+                setMobileMenuOpen(false)
+              }}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-mono text-sm transition-colors cursor-pointer ${
+                activeTab === 'subscribers'
+                  ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]/30 font-bold'
+                  : 'text-[var(--color-text-muted)] hover:bg-white/5'
+              }`}
+            >
+              <span className="flex items-center gap-3">
+                <Users className="w-4 h-4" /> Gmail Subscribers
+              </span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-300">
+                {subscribers.filter(s => s.status === 'active').length}
+              </span>
+            </button>
           </nav>
 
           <div className="p-4 border-t border-[var(--color-border)]">
@@ -228,6 +259,10 @@ export default function AdminDashboard() {
             guestbookEntries={guestbookEntries}
             setGuestbookEntries={setGuestbookEntries}
           />
+        )}
+
+        {activeTab === 'subscribers' && (
+          <AdminSubscribersTab subscribers={subscribers} />
         )}
       </main>
     </div>

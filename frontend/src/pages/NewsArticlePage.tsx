@@ -26,6 +26,7 @@ import { initialNewsData, formatFullNewsDate, type NewsItem } from '../content/n
 import { apiUrl } from '../lib/api'
 import { SEO } from '../components/SEO'
 import { PageContainer } from '../components/PageContainer'
+import { NewsletterSubscribeCard } from '../components/NewsletterSubscribeCard'
 
 interface CommentItem {
   id: string
@@ -843,7 +844,10 @@ export default function NewsArticlePage() {
               ))}
             </div>
 
-            {/* Newsletter / Keep In Touch Callout in Sidebar (Solid card, NO gradient) */}
+            {/* Gmail / Newsletter Subscribe Callout in Sidebar */}
+            <NewsletterSubscribeCard variant="compact" />
+
+            {/* Keep In Touch Callout in Sidebar */}
             <div className="p-5 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] space-y-3 shadow-xs">
               <span className="text-xs font-mono text-[var(--color-primary)] uppercase tracking-wider font-semibold">
                 // STAY CONNECTED
