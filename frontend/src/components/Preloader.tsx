@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface PreloaderProps {
   onComplete?: () => void
@@ -8,23 +8,14 @@ interface PreloaderProps {
 export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   const [count, setCount] = useState(0)
   const [isPushing, setIsPushing] = useState(false)
-  const prefersReducedMotion = useReducedMotion()
   const onCompleteRef = useRef(onComplete)
 
   useEffect(() => {
     onCompleteRef.current = onComplete
   }, [onComplete])
 
-  // Reduced motion: immediate finish
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      onCompleteRef.current?.()
-    }
-  }, [prefersReducedMotion])
-
   // 1. Counter simulation interval
   useEffect(() => {
-    if (prefersReducedMotion) return
     const interval = setInterval(() => {
       setCount((prev) => {
         if (prev >= 100) {
@@ -38,12 +29,12 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     }, 35)
 
     return () => clearInterval(interval)
-  }, [prefersReducedMotion])
+  }, [])
 
   // 2. Trigger push wipe when counter reaches 100%
   const isFinishedCount = count >= 100
   useEffect(() => {
-    if (!isFinishedCount || prefersReducedMotion) return
+    if (!isFinishedCount) return
     setIsPushing(true)
 
     // Hold brand reveal and complete transition after 3.2s
@@ -52,14 +43,10 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     }, 3200)
 
     return () => clearTimeout(timer)
-  }, [isFinishedCount, prefersReducedMotion])
+  }, [isFinishedCount])
 
   const handleSkip = () => {
     onCompleteRef.current?.()
-  }
-
-  if (prefersReducedMotion) {
-    return null
   }
 
   return (
