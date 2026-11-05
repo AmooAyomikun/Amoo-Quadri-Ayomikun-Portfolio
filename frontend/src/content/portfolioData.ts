@@ -500,7 +500,7 @@ export const portfolioData = {
       ],
       imageUrl: '/hotel_recommendation.png',
       demoUrl: 'https://zenodo.org/records/22926326',
-      githubUrl: 'https://github.com/amooquadri/hotel-recommendation-system',
+      githubUrl: 'https://github.com/AmooAyomikun/Hotel_Management_System',
       caseStudyPath: '/case-study/hotel-recommendation',
       previewType: 'image',
       featured: true
@@ -529,6 +529,7 @@ export const portfolioData = {
       ],
       imageUrl: '/algorithmic_bias.png',
       demoUrl: 'https://zenodo.org/records/20269104',
+      previewType: 'image',
       featured: true
     }
   ] as ProjectItem[],

@@ -399,12 +399,6 @@ export default function NewsArticlePage() {
                 <span>{formatFullNewsDate(news.date)}</span>
               </span>
 
-              {/* Readers count */}
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-muted)]">
-                <Users className="w-3.5 h-3.5 text-[var(--color-primary)]" />
-                <span>{news.readersCount || readersCount} readers</span>
-              </span>
-
               {/* Reading time */}
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-muted)]">
                 <Clock className="w-3.5 h-3.5 text-[var(--color-primary)]" />

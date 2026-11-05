@@ -242,7 +242,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
                   </Link>
                 )}
 
-                {/* Relatable metadata format: October 6th, 2026 • 9 min read • 10 readers */}
+                {/* Relatable metadata format: October 6th, 2026 • 9 min read */}
                 <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-mono text-[var(--color-text-subtle)] mb-2">
                   <span className="font-semibold text-[var(--color-primary)] uppercase tracking-wider text-[10px]">
                     {item.type === 'blog' ? 'Blog Post' : 'News'}
@@ -251,8 +251,6 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
                   <span>{formatFullNewsDate(item.date)}</span>
                   <span>•</span>
                   <span>{item.readTime}</span>
-                  <span>•</span>
-                  <span>{item.readersCount || 15} readers</span>
                 </div>
 
                 <Link 

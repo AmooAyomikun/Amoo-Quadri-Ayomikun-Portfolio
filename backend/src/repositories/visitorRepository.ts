@@ -120,6 +120,10 @@ export class VisitorRepository {
   }
 
   async saveAggregatedStats(stats: CachedStats): Promise<void> {
+    if (process.env.NODE_ENV === 'test') {
+      return
+    }
+
     if (db) {
       try {
         await db.collection('analytics').doc('visitors_summary').set({
@@ -132,21 +136,36 @@ export class VisitorRepository {
     }
   }
 
-  async saveVisitors(visitors: VisitorRecord[]): Promise<void> {
+  async saveVisitors(visitors: VisitorRecord[], activeVisitor?: VisitorRecord): Promise<void> {
     const clean = visitors.filter(v => v && !v.id?.startsWith('vis-sample-'))
     this.localStore = clean
     this.saveToFile(clean)
 
+    // Guard: Do not write test visitor records to live Firestore during automated test runs
+    if (process.env.NODE_ENV === 'test') {
+      return
+    }
+
     if (db) {
       try {
-        const batch = db.batch()
-        for (const visitor of clean) {
-          const docRef = db.collection('visitors').doc(visitor.id)
-          batch.set(docRef, visitor, { merge: true })
+        if (activeVisitor && activeVisitor.id) {
+          // O(1) Scalable write: only persist the active or updated visitor record to Firestore
+          await db.collection('visitors').doc(activeVisitor.id).set(activeVisitor, { merge: true })
+        } else {
+          // Bulk write with safe batch chunking (max 400 operations per batch to stay under Firestore 500 limit)
+          const BATCH_SIZE = 400
+          for (let i = 0; i < clean.length; i += BATCH_SIZE) {
+            const chunk = clean.slice(i, i + BATCH_SIZE)
+            const batch = db.batch()
+            for (const visitor of chunk) {
+              const docRef = db.collection('visitors').doc(visitor.id)
+              batch.set(docRef, visitor, { merge: true })
+            }
+            await batch.commit()
+          }
         }
-        await batch.commit()
       } catch (err) {
-        console.warn('[VisitorRepository] Firestore batch write visitors error:', err)
+        console.warn('[VisitorRepository] Firestore write visitor error:', err)
       }
     }
   }

@@ -52,11 +52,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           </p>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 pt-2.5 border-t border-[var(--color-border)]">
-            <p className="text-[11px] sm:text-xs font-mono text-[var(--color-text-subtle)] truncate">
+            <p className="text-[11px] sm:text-xs font-mono text-[var(--color-text-subtle)] truncate max-w-full">
               {project.category.replace('-', ' ').toUpperCase()} · {project.technologies.slice(0, 2).join(' / ')}
             </p>
             <span className="text-xs font-mono text-[var(--color-primary)] group-hover/link:underline inline-flex items-center gap-1 font-semibold self-start sm:self-auto shrink-0">
-              {project.status === 'in-progress' ? 'In Progress ↗' : project.caseStudyPath ? 'Read Study ↗' : 'View Architecture ↗'}
+              {project.status === 'in-progress'
+                ? 'In Progress ↗'
+                : project.caseStudyPath
+                  ? 'Read Study ↗'
+                  : project.lens === 'research' || project.category === 'ai-data'
+                    ? 'View Publication ↗'
+                    : 'View Architecture ↗'}
             </span>
           </div>
         </Link>

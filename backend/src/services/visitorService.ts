@@ -188,6 +188,7 @@ export class VisitorService {
     const nowIso = new Date().toISOString()
     const SESSION_INACTIVITY_MS = 30 * 60 * 1000 // 30 minutes industry-standard session window
 
+    let activeVisitor: VisitorRecord
     if (existingIndex >= 0) {
       const existing = visitors[existingIndex]
       const lastSeenTime = new Date(existing.lastSeenAt || existing.timestamp).getTime()
@@ -209,8 +210,9 @@ export class VisitorService {
         existing.lat = lat
         existing.lon = lon
       }
+      activeVisitor = existing
     } else {
-      visitors.push({
+      const newVisitor: VisitorRecord = {
         id: vid || `vis-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
         visitorId: vid,
         ipHash: ipKey || (vid ? this.hashIp(vid) : this.hashIp('anon-fallback')),
@@ -222,10 +224,12 @@ export class VisitorService {
         timestamp: nowIso,
         lastSeenAt: nowIso,
         visitCount: 1
-      })
+      }
+      visitors.push(newVisitor)
+      activeVisitor = newVisitor
     }
 
-    await visitorRepository.saveVisitors(visitors)
+    await visitorRepository.saveVisitors(visitors, activeVisitor)
     const stats = this.computeStats(visitors)
     memoryStatsCache = { ...stats, cachedAt: Date.now() }
     visitorRepository.saveAggregatedStats(stats).catch(err => {
