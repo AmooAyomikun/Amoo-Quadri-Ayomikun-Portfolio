@@ -9,6 +9,7 @@ const visitorsFilePath = path.join(__dirname, '../data/visitors.json')
 
 export interface VisitorRecord {
   id: string
+  visitorId?: string
   ipHash: string
   country: string
   countryCode: string
@@ -31,12 +32,34 @@ export interface CachedStats {
 export class VisitorRepository {
   private localStore: VisitorRecord[] | null = null
 
+  private deduplicateVisitors(records: VisitorRecord[]): VisitorRecord[] {
+    const map = new Map<string, VisitorRecord>()
+    for (const r of records) {
+      if (!r || r.id?.startsWith('vis-sample-')) continue
+      const key = r.visitorId || r.ipHash || (r as any).ip || r.id
+      if (!map.has(key)) {
+        map.set(key, { ...r, visitCount: r.visitCount || 1 })
+      } else {
+        const existing = map.get(key)!
+        existing.visitCount = Math.max(existing.visitCount || 1, r.visitCount || 1)
+        if (r.country && r.country !== 'Unknown') {
+          existing.country = r.country
+          existing.countryCode = r.countryCode || existing.countryCode
+          existing.city = r.city || existing.city
+          existing.lat = r.lat ?? existing.lat
+          existing.lon = r.lon ?? existing.lon
+        }
+      }
+    }
+    return Array.from(map.values())
+  }
+
   private readFromFile(): VisitorRecord[] {
     try {
       if (fs.existsSync(visitorsFilePath)) {
         const raw = fs.readFileSync(visitorsFilePath, 'utf8')
         const parsed = JSON.parse(raw) as VisitorRecord[]
-        return parsed.filter(v => v && !v.id?.startsWith('vis-sample-'))
+        return this.deduplicateVisitors(parsed)
       }
     } catch (err) {
       console.warn('[VisitorRepository] Error reading local file fallback:', err)
@@ -46,7 +69,7 @@ export class VisitorRepository {
 
   private saveToFile(visitors: VisitorRecord[]): void {
     try {
-      const clean = visitors.filter(v => v && !v.id?.startsWith('vis-sample-'))
+      const clean = this.deduplicateVisitors(visitors)
       fs.writeFileSync(visitorsFilePath, JSON.stringify(clean, null, 2), 'utf8')
     } catch (err) {
       console.warn('[VisitorRepository] Error saving local file fallback:', err)
@@ -60,10 +83,10 @@ export class VisitorRepository {
         if (!snapshot.empty) {
           const docs = snapshot.docs
             .map(d => ({ id: d.id, ...d.data() }) as VisitorRecord)
-            .filter(v => v && !v.id?.startsWith('vis-sample-'))
-          if (docs.length > 0) {
-            this.localStore = docs
-            return docs
+          const deduplicated = this.deduplicateVisitors(docs)
+          if (deduplicated.length > 0) {
+            this.localStore = deduplicated
+            return deduplicated
           }
         }
       } catch (err) {

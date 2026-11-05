@@ -115,6 +115,7 @@ export const aiChatSchema = z.object({
 
 // 6. Visitor log client hint schema (Strict boundary and type validation)
 export const visitorLogSchema = z.object({
+  visitorId: z.string().trim().max(100).optional(),
   country: z.string().trim().max(60).optional(),
   countryCode: z.string().trim().toUpperCase().max(3).optional(),
   city: z.string().trim().max(60).optional(),

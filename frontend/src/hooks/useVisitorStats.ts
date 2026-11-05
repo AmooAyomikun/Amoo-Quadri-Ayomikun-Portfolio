@@ -92,6 +92,20 @@ export const findCountryCount = (geoName: string, stats: Record<string, number>)
 
 const CACHED_STATS_KEY = 'portfolio_visitor_stats_cache'
 
+const getOrCreateVisitorId = (): string => {
+  const STORAGE_KEY = 'portfolio_anonymous_uid'
+  try {
+    let id = localStorage.getItem(STORAGE_KEY)
+    if (!id) {
+      id = 'vid_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36)
+      localStorage.setItem(STORAGE_KEY, id)
+    }
+    return id
+  } catch {
+    return 'vid_' + Date.now().toString(36)
+  }
+}
+
 const INITIAL_REAL_DATA: VisitorResponse = {
   userCountry: '',
   userCountryCode: '',
@@ -238,9 +252,11 @@ export function useVisitorStats() {
             retryTimerRef.current = setTimeout(() => initStats(true), 3000)
           }
         } else {
-          const logPayload = clientGeo
-            ? { country, countryCode, city, lat, lon }
-            : {}
+          const visitorId = getOrCreateVisitorId()
+          const logPayload = {
+            visitorId,
+            ...(clientGeo ? { country, countryCode, city, lat, lon } : {})
+          }
 
           const res = await fetch(apiUrl('/api/visitors/log'), {
             method: 'POST',

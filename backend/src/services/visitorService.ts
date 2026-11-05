@@ -103,6 +103,7 @@ export class VisitorService {
   }
 
   async logVisitor(ipAddress: string, clientHint: {
+    visitorId?: string
     country?: string
     countryCode?: string
     city?: string
@@ -175,9 +176,15 @@ export class VisitorService {
       lon = null
     }
 
-    const ipKey = this.hashIp(resolvedIp || 'anonymous-' + Date.now())
+    const ipKey = rawIp ? this.hashIp(rawIp) : ''
+    const vid = clientHint.visitorId?.trim()
+
     const visitors = await visitorRepository.getAll()
-    const existingIndex = visitors.findIndex(v => v.ipHash === ipKey)
+    const existingIndex = visitors.findIndex(v =>
+      (vid && v.visitorId && v.visitorId === vid) ||
+      (vid && v.id === vid) ||
+      (ipKey && v.ipHash === ipKey)
+    )
     const nowIso = new Date().toISOString()
     const SESSION_INACTIVITY_MS = 30 * 60 * 1000 // 30 minutes industry-standard session window
 
@@ -191,6 +198,9 @@ export class VisitorService {
       }
       existing.lastSeenAt = nowIso
       existing.timestamp = nowIso
+      if (vid && !existing.visitorId) {
+        existing.visitorId = vid
+      }
 
       if (country !== 'Unknown') {
         existing.country = country
@@ -201,8 +211,9 @@ export class VisitorService {
       }
     } else {
       visitors.push({
-        id: `vis-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-        ipHash: ipKey,
+        id: vid || `vis-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        visitorId: vid,
+        ipHash: ipKey || (vid ? this.hashIp(vid) : this.hashIp('anon-fallback')),
         country,
         countryCode,
         city,

@@ -23,12 +23,33 @@ export const logVisitor = async (req: Request, res: Response): Promise<void> => 
       req.socket.remoteAddress ||
       ''
 
+    const isLocalhost = rawIp === '::1' ||
+      rawIp === '127.0.0.1' ||
+      req.hostname === 'localhost' ||
+      (typeof req.headers.host === 'string' && req.headers.host.includes('localhost'))
+
+    // Do not count local development refreshes as new visitors
+    if (isLocalhost && process.env.NODE_ENV !== 'production') {
+      const stats = await visitorService.getStats()
+      res.status(200).json({
+        success: true,
+        totalVisitors: stats.total,
+        userCountry: 'Nigeria',
+        userCountryCode: 'NG',
+        userCity: 'Local Development',
+        userCountryCount: stats.countryStats['Nigeria'] || 1,
+        ...stats
+      })
+      return
+    }
+
     const edgeCountryCode = (req.headers['x-vercel-ip-country'] || req.headers['cf-ipcountry'] || '') as string
     const edgeCity = (req.headers['x-vercel-ip-city'] || '') as string
     const edgeLatStr = req.headers['x-vercel-ip-latitude'] as string | undefined
     const edgeLonStr = req.headers['x-vercel-ip-longitude'] as string | undefined
 
     const clientHint = {
+      visitorId: typeof req.body?.visitorId === 'string' ? req.body.visitorId.trim().slice(0, 100) : undefined,
       country: req.body?.country || undefined,
       countryCode: req.body?.countryCode || (edgeCountryCode && edgeCountryCode !== 'XX' ? edgeCountryCode.toUpperCase() : undefined),
       city: req.body?.city || (edgeCity ? decodeURIComponent(edgeCity) : undefined),
