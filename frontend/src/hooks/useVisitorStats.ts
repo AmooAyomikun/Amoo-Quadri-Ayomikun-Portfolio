@@ -92,28 +92,15 @@ export const findCountryCount = (geoName: string, stats: Record<string, number>)
 
 const CACHED_STATS_KEY = 'portfolio_visitor_stats_cache'
 
-const BASELINE_DATA: VisitorResponse = {
-  userCountry: 'Nigeria',
-  userCountryCode: 'NG',
-  userCity: 'Lagos',
-  userCountryCount: 5,
-  totalVisitors: 8,
-  topCountries: [
-    { rank: 1, name: 'Nigeria', code: 'NG', count: 5 },
-    { rank: 2, name: 'United States', code: 'US', count: 1 },
-    { rank: 3, name: 'United Kingdom', code: 'GB', count: 1 }
-  ],
-  countryStats: {
-    'Nigeria': 5,
-    'United States': 1,
-    'United Kingdom': 1
-  },
-  locations: [
-    { lat: 6.4474, lon: 3.3903, city: 'Lagos', country: 'Nigeria', countryCode: 'NG' },
-    { lat: 40.7128, lon: -74.006, city: 'New York', country: 'United States', countryCode: 'US' },
-    { lat: 51.5074, lon: -0.1278, city: 'London', country: 'United Kingdom', countryCode: 'GB' },
-    { lat: 6.1715, lon: 7.0053, city: 'Enugu-Ukwu', country: 'Nigeria', countryCode: 'NG' }
-  ]
+const INITIAL_REAL_DATA: VisitorResponse = {
+  userCountry: '',
+  userCountryCode: '',
+  userCity: '',
+  userCountryCount: 0,
+  totalVisitors: 0,
+  topCountries: [],
+  countryStats: {},
+  locations: []
 }
 
 export function useVisitorStats() {
@@ -122,14 +109,16 @@ export function useVisitorStats() {
       const cached = localStorage.getItem(CACHED_STATS_KEY)
       if (cached) {
         const parsed = JSON.parse(cached)
-        if (parsed && typeof parsed.totalVisitors === 'number' && parsed.totalVisitors > 0) {
+        // Discard any legacy mock cache containing fake NY location
+        const hasLegacyMock = parsed?.locations?.some((l: any) => l.country === 'United States' && l.city === 'New York' && l.lat === 40.7128)
+        if (!hasLegacyMock && typeof parsed?.totalVisitors === 'number') {
           return parsed
         }
       }
     } catch {
       // fallback
     }
-    return BASELINE_DATA
+    return INITIAL_REAL_DATA
   })
 
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'offline'>('connecting')
@@ -191,34 +180,60 @@ export function useVisitorStats() {
       try {
         setConnectionStatus('connecting')
 
+        const updateDataWithJson = (json: any, userCountryHint?: string, userCityHint?: string, userCodeHint?: string) => {
+          const finalCountry = json.userCountry || userCountryHint || country || 'Unknown'
+          const finalCode = json.userCountryCode || userCodeHint || countryCode || 'UN'
+          const finalCity = json.userCity || userCityHint || city || 'Unknown'
+          const finalTotal = typeof json.totalVisitors === 'number'
+            ? json.totalVisitors
+            : typeof json.total === 'number'
+            ? json.total
+            : 0
+
+          const rawLocations = Array.isArray(json.locations) ? json.locations : []
+          const cleanLocations = rawLocations.filter(
+            (l: any) => !(l.country === 'United States' && l.city === 'New York' && l.lat === 40.7128)
+          )
+
+          const cleanStats = json.countryStats || {}
+          const finalCountryCount = typeof json.userCountryCount === 'number'
+            ? json.userCountryCount
+            : finalCountry
+            ? cleanStats[finalCountry] || findCountryCount(finalCountry, cleanStats) || 1
+            : 1
+
+          const cleanTopCountries = Array.isArray(json.topCountries)
+            ? json.topCountries.filter((c: any) => c.name?.toUpperCase() !== 'UNITED STATES' || cleanStats['United States'])
+            : []
+
+          setData((prev) => {
+            const next: VisitorResponse = {
+              ...prev,
+              userCountry: finalCountry,
+              userCountryCode: finalCode,
+              userCity: finalCity,
+              userCountryCount: finalCountryCount,
+              totalVisitors: finalTotal || prev.totalVisitors || 1,
+              topCountries: cleanTopCountries,
+              countryStats: cleanStats,
+              locations: cleanLocations
+            }
+            try {
+              localStorage.setItem(CACHED_STATS_KEY, JSON.stringify(next))
+            } catch {
+              // ignore
+            }
+            return next
+          })
+        }
+
         if (isAlreadyLogged) {
           const res = await fetch(apiUrl('/api/visitors'), { signal: controller.signal })
           if (res.ok) {
             const json = await res.json()
             if (!controller.signal.aborted) {
               setConnectionStatus('connected')
-              const countryCount = country
-                ? json.countryStats?.[country] || findCountryCount(country, json.countryStats) || 1
-                : 1
-              setData((prev) => {
-                const next = {
-                  ...prev,
-                  userCountry: country || prev.userCountry || 'UNKNOWN',
-                  userCountryCode: countryCode || prev.userCountryCode,
-                  userCity: city || prev.userCity,
-                  userCountryCount: countryCount,
-                  totalVisitors: typeof json.total === 'number' ? json.total : prev.totalVisitors,
-                  topCountries: Array.isArray(json.topCountries) ? json.topCountries : prev.topCountries,
-                  countryStats: json.countryStats || prev.countryStats,
-                  locations: Array.isArray(json.locations) ? json.locations : prev.locations
-                }
-                try {
-                  localStorage.setItem(CACHED_STATS_KEY, JSON.stringify(next))
-                } catch {
-                  // ignore
-                }
-                return next
-              })
+              updateDataWithJson(json, country, city, countryCode)
             }
           } else if (!isRetry && !controller.signal.aborted) {
             setConnectionStatus('offline')
@@ -239,27 +254,9 @@ export function useVisitorStats() {
           if (res.ok) {
             const json = await res.json()
             sessionStorage.setItem(SESSION_KEY, 'true')
-            if (!controller.signal.aborted && json.success) {
+            if (!controller.signal.aborted) {
               setConnectionStatus('connected')
-              setData((prev) => {
-                const next = {
-                  ...prev,
-                  userCountry: json.userCountry || country || 'UNKNOWN',
-                  userCountryCode: json.userCountryCode || countryCode,
-                  userCity: json.userCity || city,
-                  userCountryCount: json.userCountryCount || 1,
-                  totalVisitors: json.totalVisitors || 1,
-                  topCountries: Array.isArray(json.topCountries) ? json.topCountries : [],
-                  countryStats: json.countryStats || {},
-                  locations: Array.isArray(json.locations) ? json.locations : []
-                }
-                try {
-                  localStorage.setItem(CACHED_STATS_KEY, JSON.stringify(next))
-                } catch {
-                  // ignore
-                }
-                return next
-              })
+              updateDataWithJson(json, country, city, countryCode)
             }
           } else if (!isRetry && !controller.signal.aborted) {
             setConnectionStatus('offline')
@@ -280,8 +277,80 @@ export function useVisitorStats() {
 
     initStats()
 
+    // Keep visitor data always live: poll every 30s while page is visible
+    const livePollingInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        void fetch(apiUrl('/api/visitors'), { signal: controller.signal })
+          .then(async (res) => {
+            if (res.ok) {
+              const json = await res.json()
+              if (!controller.signal.aborted) {
+                setConnectionStatus('connected')
+                setData((prev) => {
+                  const finalTotal = typeof json.totalVisitors === 'number'
+                    ? json.totalVisitors
+                    : typeof json.total === 'number'
+                    ? json.total
+                    : prev.totalVisitors
+                  const rawLocations = Array.isArray(json.locations) ? json.locations : []
+                  const cleanLocations = rawLocations.filter(
+                    (l: any) => !(l.country === 'United States' && l.city === 'New York' && l.lat === 40.7128)
+                  )
+                  const cleanStats = json.countryStats || prev.countryStats
+                  const cleanTopCountries = Array.isArray(json.topCountries)
+                    ? json.topCountries.filter((c: any) => c.name?.toUpperCase() !== 'UNITED STATES' || cleanStats['United States'])
+                    : prev.topCountries
+                  const next: VisitorResponse = {
+                    ...prev,
+                    totalVisitors: finalTotal,
+                    topCountries: cleanTopCountries,
+                    countryStats: cleanStats,
+                    locations: cleanLocations
+                  }
+                  try {
+                    localStorage.setItem(CACHED_STATS_KEY, JSON.stringify(next))
+                  } catch {
+                    // ignore
+                  }
+                  return next
+                })
+              }
+            }
+          })
+          .catch(() => {})
+      }
+    }, 30000)
+
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === 'visible') {
+        void fetch(apiUrl('/api/visitors'), { signal: controller.signal })
+          .then(async (res) => {
+            if (res.ok) {
+              const json = await res.json()
+              if (!controller.signal.aborted) {
+                setConnectionStatus('connected')
+                setData((prev) => ({
+                  ...prev,
+                  totalVisitors: typeof json.totalVisitors === 'number' ? json.totalVisitors : (typeof json.total === 'number' ? json.total : prev.totalVisitors),
+                  topCountries: Array.isArray(json.topCountries) ? json.topCountries : prev.topCountries,
+                  countryStats: json.countryStats || prev.countryStats,
+                  locations: Array.isArray(json.locations) ? json.locations : prev.locations
+                }))
+              }
+            }
+          })
+          .catch(() => {})
+      }
+    }
+
+    window.addEventListener('visibilitychange', handleVisibilityOrFocus)
+    window.addEventListener('focus', handleVisibilityOrFocus)
+
     return () => {
       controller.abort()
+      clearInterval(livePollingInterval)
+      window.removeEventListener('visibilitychange', handleVisibilityOrFocus)
+      window.removeEventListener('focus', handleVisibilityOrFocus)
       if (retryTimerRef.current) clearTimeout(retryTimerRef.current)
     }
   }, [])

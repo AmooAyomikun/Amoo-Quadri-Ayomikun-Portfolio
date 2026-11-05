@@ -31,23 +31,12 @@ export class GithubService {
     let totalCount = 0
     const days: ContributionDay[] = []
 
-    // 1. Primary: GitHub GraphQL API (Issue 3.8)
+    // 1. Primary: GitHub GraphQL API
     const token = process.env.GITHUB_TOKEN
     if (token) {
       try {
-        const now = new Date()
-        let fromDate: string
-        let toDate: string
-
-        if (validYear === currentYear) {
-          const oneYearAgo = new Date()
-          oneYearAgo.setFullYear(now.getFullYear() - 1)
-          fromDate = oneYearAgo.toISOString()
-          toDate = now.toISOString()
-        } else {
-          fromDate = `${validYear}-01-01T00:00:00Z`
-          toDate = `${validYear}-12-31T23:59:59Z`
-        }
+        const fromDate = `${validYear}-01-01T00:00:00Z`
+        const toDate = `${validYear}-12-31T23:59:59Z`
 
         const query = `
           query($userName: String!, $from: DateTime, $to: DateTime) {
@@ -88,33 +77,33 @@ export class GithubService {
         if (graphqlRes.ok) {
           const gqlData = (await graphqlRes.json()) as any
           const calendar = gqlData?.data?.user?.contributionsCollection?.contributionCalendar
-          if (calendar) {
+          if (calendar && Array.isArray(calendar.weeks) && calendar.weeks.length > 0) {
             totalCount = calendar.totalContributions || 0
-            if (Array.isArray(calendar.weeks)) {
-              for (const week of calendar.weeks) {
-                if (Array.isArray(week.contributionDays)) {
-                  for (const day of week.contributionDays) {
-                    const count = day.contributionCount || 0
-                    const level = count > 8 ? 4 : count > 5 ? 3 : count > 2 ? 2 : count > 0 ? 1 : 0
-                    days.push({
-                      date: day.date,
-                      level,
-                      count,
-                      tooltip: `${count} contributions on ${day.date}`
-                    })
-                  }
+            for (const week of calendar.weeks) {
+              if (Array.isArray(week.contributionDays)) {
+                for (const day of week.contributionDays) {
+                  const count = day.contributionCount || 0
+                  const level = count > 8 ? 4 : count > 5 ? 3 : count > 2 ? 2 : count > 0 ? 1 : 0
+                  days.push({
+                    date: day.date,
+                    level,
+                    count,
+                    tooltip: `${count} contributions on ${day.date}`
+                  })
                 }
               }
             }
 
-            const result: ContributionResult = {
-              username,
-              year: parseInt(validYear, 10),
-              totalContributions: totalCount,
-              days
+            if (totalCount > 0 || days.length > 0) {
+              const result: ContributionResult = {
+                username,
+                year: parseInt(validYear, 10),
+                totalContributions: totalCount,
+                days
+              }
+              githubCache.set(cacheKey, result)
+              return result
             }
-            githubCache.set(cacheKey, result)
-            return result
           }
         }
       } catch (gqlErr) {
@@ -122,7 +111,40 @@ export class GithubService {
       }
     }
 
-    // 2. Reliable Fallback via GitHub REST API User Events (No brittle HTML scraping!) (Issue 3.8)
+    // 2. High-reliability Public Contributions API Fallback
+    try {
+      const publicApiRes = await fetch(`https://github-contributions-api.jogruber.de/v4/${username}?y=${validYear}`, {
+        headers: { 'User-Agent': 'Amoo-Quadri-Portfolio' },
+        signal: AbortSignal.timeout(5000)
+      })
+
+      if (publicApiRes.ok) {
+        const pubData = await publicApiRes.json() as any
+        const pubContributions = pubData?.contributions
+        if (Array.isArray(pubContributions) && pubContributions.length > 0) {
+          const pubTotal = pubData?.total?.[validYear] ?? pubContributions.reduce((acc: number, cur: any) => acc + (cur.count || 0), 0)
+          const pubDays: ContributionDay[] = pubContributions.map((c: any) => ({
+            date: c.date,
+            level: Math.min(4, Math.max(0, c.level || 0)),
+            count: c.count || 0,
+            tooltip: `${c.count || 0} contributions on ${c.date}`
+          }))
+
+          const result: ContributionResult = {
+            username,
+            year: parseInt(validYear, 10),
+            totalContributions: pubTotal,
+            days: pubDays
+          }
+          githubCache.set(cacheKey, result)
+          return result
+        }
+      }
+    } catch (pubErr) {
+      console.warn('[GithubService] Public contributions API error:', pubErr)
+    }
+
+    // 3. Fallback via GitHub REST API User Events
     try {
       const restRes = await fetch(`https://api.github.com/users/${username}/events/public`, {
         headers: {
@@ -140,7 +162,9 @@ export class GithubService {
           for (const ev of events) {
             if (ev.created_at) {
               const d = ev.created_at.split('T')[0]
-              dateCounts[d] = (dateCounts[d] || 0) + 1
+              if (d.startsWith(validYear)) {
+                dateCounts[d] = (dateCounts[d] || 0) + 1
+              }
             }
           }
         }
@@ -155,6 +179,17 @@ export class GithubService {
             tooltip: `${count} contributions on ${date}`
           })
         }
+
+        if (totalCount > 0) {
+          const result: ContributionResult = {
+            username,
+            year: parseInt(validYear, 10),
+            totalContributions: totalCount,
+            days
+          }
+          githubCache.set(cacheKey, result)
+          return result
+        }
       }
     } catch (restErr) {
       console.warn('[GithubService] GitHub REST events fallback error:', restErr)
@@ -166,7 +201,8 @@ export class GithubService {
       totalContributions: totalCount,
       days
     }
-    githubCache.set(cacheKey, fallbackResult)
+    // Only cache successful results, or cache empty failures for at most 15 seconds
+    githubCache.set(cacheKey, fallbackResult, 15)
     return fallbackResult
   }
 }

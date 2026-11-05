@@ -45,6 +45,42 @@ export function useGithubContributions() {
     const controller = new AbortController()
     abortRef.current = controller
 
+    const fetchDirectPublicContributions = async (): Promise<boolean> => {
+      try {
+        const publicRes = await fetch(`https://github-contributions-api.jogruber.de/v4/${username}?y=${selectedYear}`, {
+          signal: controller.signal
+        })
+        if (publicRes.ok) {
+          const pubData = await publicRes.json()
+          if (!controller.signal.aborted && Array.isArray(pubData?.contributions) && pubData.contributions.length > 0) {
+            const map: Record<string, { level: 0 | 1 | 2 | 3 | 4; count: number }> = {}
+            pubData.contributions.forEach((d: { date: string; count?: number; level?: number }) => {
+              if (d.date) {
+                map[d.date] = {
+                  level: Math.min(4, Math.max(0, d.level || 0)) as 0 | 1 | 2 | 3 | 4,
+                  count: d.count || 0
+                }
+              }
+            })
+            const total = typeof pubData.total?.[selectedYear] === 'number'
+              ? pubData.total[selectedYear]
+              : Object.values(map).reduce((a, b) => a + b.count, 0)
+
+            setRealContributions({
+              totalContributions: total,
+              daysMap: map
+            })
+            return true
+          }
+        }
+      } catch (e) {
+        if (!(e instanceof DOMException && e.name === 'AbortError')) {
+          console.debug('Direct public GitHub contributions fallback note:', e)
+        }
+      }
+      return false
+    }
+
     const fetchRealContributions = async (isRetry = false) => {
       try {
         const res = await fetch(apiUrl(`/api/github-contributions?year=${selectedYear}`), {
@@ -57,8 +93,8 @@ export function useGithubContributions() {
             if (data.username) {
               setUsername(data.username)
             }
-            const map: Record<string, { level: 0 | 1 | 2 | 3 | 4; count: number }> = {}
-            if (Array.isArray(data.days)) {
+            if (Array.isArray(data.days) && data.days.length > 0 && (data.totalContributions ?? 0) > 0) {
+              const map: Record<string, { level: 0 | 1 | 2 | 3 | 4; count: number }> = {}
               data.days.forEach((d: GithubDayItem) => {
                 if (d.date) {
                   map[d.date] = {
@@ -67,18 +103,34 @@ export function useGithubContributions() {
                   }
                 }
               })
+              setRealContributions({
+                totalContributions: data.totalContributions ?? 0,
+                daysMap: map
+              })
+              return
+            } else {
+              // If backend returned 0 contributions, verify with direct public API
+              const recovered = await fetchDirectPublicContributions()
+              if (recovered) return
+
+              setRealContributions({
+                totalContributions: data.totalContributions ?? 0,
+                daysMap: {}
+              })
             }
-            setRealContributions({
-              totalContributions: data.totalContributions ?? 0,
-              daysMap: map
-            })
           }
-        } else if (!isRetry && !controller.signal.aborted) {
-          retryTimerRef.current = setTimeout(() => fetchRealContributions(true), 2500)
+        } else {
+          const recovered = await fetchDirectPublicContributions()
+          if (recovered) return
+          if (!isRetry && !controller.signal.aborted) {
+            retryTimerRef.current = setTimeout(() => fetchRealContributions(true), 2500)
+          }
         }
       } catch (err: unknown) {
         if (err instanceof DOMException && err.name === 'AbortError') return
-        console.warn('GitHub contributions fallback active:', err)
+        console.warn('Backend GitHub contributions unreachable, checking public fallback:', err)
+        const recovered = await fetchDirectPublicContributions()
+        if (recovered) return
         if (!isRetry && !controller.signal.aborted) {
           retryTimerRef.current = setTimeout(() => fetchRealContributions(true), 2500)
         }

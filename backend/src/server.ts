@@ -47,7 +47,11 @@ const allowedOriginsSet = new Set([...defaultAllowedOrigins, ...envOrigins])
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true)
-    if (allowedOriginsSet.has(origin)) {
+    if (
+      allowedOriginsSet.has(origin) ||
+      origin.endsWith('.vercel.app') ||
+      origin.endsWith('.amooquadri.dev')
+    ) {
       return callback(null, true)
     }
     return callback(null, false)

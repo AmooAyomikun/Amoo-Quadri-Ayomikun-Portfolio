@@ -4,7 +4,11 @@ import { visitorService } from '../services/visitorService.js'
 export const getVisitors = async (_req: Request, res: Response): Promise<void> => {
   try {
     const stats = await visitorService.getStats()
-    res.status(200).json(stats)
+    res.status(200).json({
+      success: true,
+      totalVisitors: stats.total,
+      ...stats
+    })
   } catch (error) {
     console.error('[VisitorsController] Error fetching visitor stats:', error)
     res.status(500).json({ error: 'Failed to retrieve visitor statistics' })
@@ -14,8 +18,19 @@ export const getVisitors = async (_req: Request, res: Response): Promise<void> =
 export const logVisitor = async (req: Request, res: Response): Promise<void> => {
   try {
     const rawIp = req.ip || req.socket.remoteAddress || ''
-    const stats = await visitorService.logVisitor(rawIp, req.body ?? {})
-    res.status(200).json(stats)
+    const clientHint = req.body ?? {}
+    const stats = await visitorService.logVisitor(rawIp, clientHint)
+    const userCountry = clientHint.country || ''
+    const userCountryCount = userCountry ? (stats.countryStats[userCountry] || 1) : 1
+    res.status(200).json({
+      success: true,
+      totalVisitors: stats.total,
+      userCountry,
+      userCountryCode: clientHint.countryCode || '',
+      userCity: clientHint.city || '',
+      userCountryCount,
+      ...stats
+    })
   } catch (error) {
     console.error('[VisitorsController] Error logging visitor:', error)
     res.status(500).json({ error: 'Failed to record visitor location' })

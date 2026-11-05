@@ -33,7 +33,8 @@ export class VisitorRepository {
     try {
       if (fs.existsSync(visitorsFilePath)) {
         const raw = fs.readFileSync(visitorsFilePath, 'utf8')
-        return JSON.parse(raw) as VisitorRecord[]
+        const parsed = JSON.parse(raw) as VisitorRecord[]
+        return parsed.filter(v => v && !v.id?.startsWith('vis-sample-'))
       }
     } catch (err) {
       console.warn('[VisitorRepository] Error reading local file fallback:', err)
@@ -43,13 +44,31 @@ export class VisitorRepository {
 
   private saveToFile(visitors: VisitorRecord[]): void {
     try {
-      fs.writeFileSync(visitorsFilePath, JSON.stringify(visitors, null, 2), 'utf8')
+      const clean = visitors.filter(v => v && !v.id?.startsWith('vis-sample-'))
+      fs.writeFileSync(visitorsFilePath, JSON.stringify(clean, null, 2), 'utf8')
     } catch (err) {
       console.warn('[VisitorRepository] Error saving local file fallback:', err)
     }
   }
 
   async getAll(): Promise<VisitorRecord[]> {
+    if (db) {
+      try {
+        const snapshot = await db.collection('visitors').get()
+        if (!snapshot.empty) {
+          const docs = snapshot.docs
+            .map(d => ({ id: d.id, ...d.data() }) as VisitorRecord)
+            .filter(v => v && !v.id?.startsWith('vis-sample-'))
+          if (docs.length > 0) {
+            this.localStore = docs
+            return docs
+          }
+        }
+      } catch (err) {
+        console.warn('[VisitorRepository] Firestore getAll error, falling back to local file:', err)
+      }
+    }
+
     if (!this.localStore) {
       this.localStore = this.readFromFile()
     }
@@ -61,7 +80,12 @@ export class VisitorRepository {
       try {
         const doc = await db.collection('analytics').doc('visitors_summary').get()
         if (doc.exists) {
-          return doc.data() as CachedStats
+          const data = doc.data() as CachedStats
+          // If summary contains legacy sample data, invalidate it
+          const hasLegacyMock = data.locations?.some(l => l.country === 'United States' && l.city === 'New York' && l.lat === 40.7128)
+          if (!hasLegacyMock) {
+            return data
+          }
         }
       } catch (err) {
         console.warn('[VisitorRepository] Firestore getAggregatedStats failed:', err)
@@ -84,8 +108,22 @@ export class VisitorRepository {
   }
 
   async saveVisitors(visitors: VisitorRecord[]): Promise<void> {
-    this.localStore = visitors
-    this.saveToFile(visitors)
+    const clean = visitors.filter(v => v && !v.id?.startsWith('vis-sample-'))
+    this.localStore = clean
+    this.saveToFile(clean)
+
+    if (db) {
+      try {
+        const batch = db.batch()
+        for (const visitor of clean) {
+          const docRef = db.collection('visitors').doc(visitor.id)
+          batch.set(docRef, visitor, { merge: true })
+        }
+        await batch.commit()
+      } catch (err) {
+        console.warn('[VisitorRepository] Firestore batch write visitors error:', err)
+      }
+    }
   }
 }
 
