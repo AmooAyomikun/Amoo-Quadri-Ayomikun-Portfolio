@@ -16,6 +16,8 @@ export interface VisitorRecord {
   lat: number | null
   lon: number | null
   timestamp: string
+  visitCount?: number
+  lastSeenAt?: string
 }
 
 export interface CachedStats {

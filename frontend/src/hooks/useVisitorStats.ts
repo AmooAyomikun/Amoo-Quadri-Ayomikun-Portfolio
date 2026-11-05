@@ -153,20 +153,18 @@ export function useVisitorStats() {
         }
       }
 
+      // Non-blocking background lookup for client hints (does not hold up UI)
       if (!clientGeo) {
-        try {
-          const geoRes = await fetch('https://get.geojs.io/v1/ip/geo.json', {
-            signal: AbortSignal.timeout(3000)
-          })
-          if (geoRes.ok) {
-            clientGeo = (await geoRes.json()) as ClientGeo
-            if (clientGeo) {
-              sessionStorage.setItem(CACHED_USER_GEO, JSON.stringify(clientGeo))
+        void fetch('https://get.geojs.io/v1/ip/geo.json', { signal: AbortSignal.timeout(2500) })
+          .then(async (geoRes) => {
+            if (geoRes.ok) {
+              const geo = (await geoRes.json()) as ClientGeo
+              if (geo) {
+                sessionStorage.setItem(CACHED_USER_GEO, JSON.stringify(geo))
+              }
             }
-          }
-        } catch (err) {
-          console.debug('Client geo lookup note:', err)
-        }
+          })
+          .catch(() => {})
       }
 
       const country = clientGeo?.country || ''

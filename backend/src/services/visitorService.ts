@@ -3,7 +3,35 @@ import { env } from '../config/env.js'
 import { visitorRepository, VisitorRecord, CachedStats } from '../repositories/visitorRepository.js'
 
 let memoryStatsCache: (CachedStats & { cachedAt: number }) | null = null
-const CACHE_TTL_MS = 60 * 1000
+const CACHE_TTL_MS = 30 * 1000
+
+export const ISO_COUNTRY_NAMES: Record<string, string> = {
+  NG: 'Nigeria',
+  US: 'United States',
+  GB: 'United Kingdom',
+  CA: 'Canada',
+  DE: 'Germany',
+  FR: 'France',
+  IN: 'India',
+  GH: 'Ghana',
+  ZA: 'South Africa',
+  KE: 'Kenya',
+  RW: 'Rwanda',
+  EG: 'Egypt',
+  NL: 'Netherlands',
+  SE: 'Sweden',
+  IE: 'Ireland',
+  AU: 'Australia',
+  BR: 'Brazil',
+  JP: 'Japan',
+  SG: 'Singapore',
+  CN: 'China',
+  IT: 'Italy',
+  ES: 'Spain',
+  CH: 'Switzerland',
+  AE: 'United Arab Emirates',
+  SA: 'Saudi Arabia'
+}
 
 export class VisitorService {
   private hashIp(ip: string): string {
@@ -15,10 +43,14 @@ export class VisitorService {
     const countryStats: Record<string, number> = {}
     const countryCodeMap: Record<string, string> = {}
     const validLocations: Array<{ lat: number; lon: number; city: string; country: string; countryCode?: string }> = []
+    let totalVisits = 0
 
     visitors.forEach(v => {
+      const count = Math.max(1, v.visitCount || 1)
+      totalVisits += count
+
       if (v.country && v.country !== 'Unknown') {
-        countryStats[v.country] = (countryStats[v.country] || 0) + 1
+        countryStats[v.country] = (countryStats[v.country] || 0) + count
         if (v.countryCode) {
           countryCodeMap[v.country] = v.countryCode
         }
@@ -45,7 +77,7 @@ export class VisitorService {
       }))
 
     return {
-      total: visitors.length,
+      total: totalVisits,
       countries: Object.keys(countryStats).length,
       countryStats,
       topCountries,
@@ -76,7 +108,12 @@ export class VisitorService {
     city?: string
     lat?: number | null
     lon?: number | null
-  }): Promise<CachedStats> {
+  }): Promise<{
+    stats: CachedStats
+    resolvedCountry: string
+    resolvedCity: string
+    resolvedCode: string
+  }> {
     const rawIp = ipAddress.replace(/^::ffff:/, '').trim()
     let country = typeof clientHint.country === 'string' ? clientHint.country.trim().slice(0, 60) : ''
     let countryCode = typeof clientHint.countryCode === 'string' ? clientHint.countryCode.trim().toUpperCase().slice(0, 3) : ''
@@ -84,30 +121,49 @@ export class VisitorService {
     let lat: number | null = (typeof clientHint.lat === 'number' && !isNaN(clientHint.lat) && clientHint.lat >= -90 && clientHint.lat <= 90) ? clientHint.lat : null
     let lon: number | null = (typeof clientHint.lon === 'number' && !isNaN(clientHint.lon) && clientHint.lon >= -180 && clientHint.lon <= 180) ? clientHint.lon : null
 
-    if (lat === null || lon === null || !country || !city) {
-      lat = null
-      lon = null
+    // Normalize country from 2-letter ISO code if needed
+    if (countryCode && (!country || country.length <= 3)) {
+      country = ISO_COUNTRY_NAMES[countryCode] || countryCode
     }
 
     const isPrivateIp = !rawIp || rawIp === '::1' || rawIp === '127.0.0.1' || rawIp.startsWith('192.168.') || rawIp.startsWith('10.') || rawIp.startsWith('172.')
     let resolvedIp = rawIp
 
-    // Geolocation lookup if needed
-    if ((!country || !city || lat === null || lon === null) && resolvedIp && !isPrivateIp) {
+    // 1. Production Geolocation: Resolve via public IP lookup if country missing
+    if ((!country || country === 'Unknown' || lat === null || lon === null) && resolvedIp && !isPrivateIp) {
       try {
         const geoRes = await fetch(`https://freeipapi.com/api/json/${resolvedIp}`, { signal: AbortSignal.timeout(3000) })
         if (geoRes.ok) {
           const geo = await geoRes.json() as any
           if (geo?.cityName && geo?.countryName) {
             country = geo.countryName
-            countryCode = geo.countryCode || 'UN'
+            countryCode = geo.countryCode || countryCode || 'UN'
             city = geo.cityName
-            lat = typeof geo.latitude === 'number' ? geo.latitude : null
-            lon = typeof geo.longitude === 'number' ? geo.longitude : null
+            lat = typeof geo.latitude === 'number' ? geo.latitude : lat
+            lon = typeof geo.longitude === 'number' ? geo.longitude : lon
           }
         }
       } catch {
-        // Fallback
+        // Fallback silently
+      }
+    }
+
+    // 2. Local Development Geolocation: Resolve developer's public IP
+    if ((!country || country === 'Unknown') && isPrivateIp) {
+      try {
+        const localGeoRes = await fetch('https://freeipapi.com/api/json/', { signal: AbortSignal.timeout(2500) })
+        if (localGeoRes.ok) {
+          const devGeo = await localGeoRes.json() as any
+          if (devGeo?.countryName) {
+            country = devGeo.countryName
+            countryCode = devGeo.countryCode || 'UN'
+            city = devGeo.cityName || 'Local'
+            lat = typeof devGeo.latitude === 'number' ? devGeo.latitude : 6.4474
+            lon = typeof devGeo.longitude === 'number' ? devGeo.longitude : 3.3903
+          }
+        }
+      } catch {
+        // Fallback silently
       }
     }
 
@@ -122,15 +178,26 @@ export class VisitorService {
     const ipKey = this.hashIp(resolvedIp || 'anonymous-' + Date.now())
     const visitors = await visitorRepository.getAll()
     const existingIndex = visitors.findIndex(v => v.ipHash === ipKey)
+    const nowIso = new Date().toISOString()
+    const SESSION_INACTIVITY_MS = 30 * 60 * 1000 // 30 minutes industry-standard session window
 
     if (existingIndex >= 0) {
-      visitors[existingIndex].timestamp = new Date().toISOString()
+      const existing = visitors[existingIndex]
+      const lastSeenTime = new Date(existing.lastSeenAt || existing.timestamp).getTime()
+      const isNewSession = isNaN(lastSeenTime) || (Date.now() - lastSeenTime) > SESSION_INACTIVITY_MS
+
+      if (isNewSession) {
+        existing.visitCount = (existing.visitCount || 1) + 1
+      }
+      existing.lastSeenAt = nowIso
+      existing.timestamp = nowIso
+
       if (country !== 'Unknown') {
-        visitors[existingIndex].country = country
-        visitors[existingIndex].countryCode = countryCode
-        visitors[existingIndex].city = city
-        visitors[existingIndex].lat = lat
-        visitors[existingIndex].lon = lon
+        existing.country = country
+        existing.countryCode = countryCode
+        existing.city = city
+        existing.lat = lat
+        existing.lon = lon
       }
     } else {
       visitors.push({
@@ -141,7 +208,9 @@ export class VisitorService {
         city,
         lat,
         lon,
-        timestamp: new Date().toISOString()
+        timestamp: nowIso,
+        lastSeenAt: nowIso,
+        visitCount: 1
       })
     }
 
@@ -152,7 +221,12 @@ export class VisitorService {
       console.warn('[VisitorService] Failed to update aggregated firestore document:', err)
     })
 
-    return stats
+    return {
+      stats,
+      resolvedCountry: country,
+      resolvedCity: city,
+      resolvedCode: countryCode
+    }
   }
 }
 
