@@ -67,7 +67,7 @@ export const SocialSidebars: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: hideSidebars ? 0 : 1, y: hideSidebars ? 20 : 0 }}
         transition={{ duration: 0.3 }}
-        className={`hidden md:flex fixed bottom-0 left-6 lg:left-10 z-30 flex-col items-center gap-6 ${
+        className={`hidden xl:flex fixed bottom-0 left-6 2xl:left-10 z-30 flex-col items-center gap-6 ${
           hideSidebars ? 'pointer-events-none' : ''
         }`}
       >
@@ -89,12 +89,12 @@ export const SocialSidebars: React.FC = () => {
         <div className="w-[1px] h-24 bg-[var(--color-border)]" />
       </motion.div>
 
-      {/* Right Email Bar */}
+      {/* Right Email Bar — positioned above BackToTop button so they never overlap */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: hideSidebars ? 0 : 1, y: hideSidebars ? 20 : 0 }}
         transition={{ duration: 0.3 }}
-        className={`hidden md:flex fixed bottom-0 right-6 lg:right-10 z-30 flex-col items-center gap-6 ${
+        className={`hidden xl:flex fixed bottom-20 right-6 2xl:right-10 z-30 flex-col items-center gap-5 ${
           hideSidebars ? 'pointer-events-none' : ''
         }`}
       >
@@ -105,7 +105,7 @@ export const SocialSidebars: React.FC = () => {
           {portfolioData.personal.email}
         </a>
         {/* Vertical Rule Line */}
-        <div className="w-[1px] h-24 bg-[var(--color-border)]" />
+        <div className="w-[1px] h-16 bg-[var(--color-border)]" />
       </motion.div>
     </>
   )
