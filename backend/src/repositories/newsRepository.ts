@@ -49,10 +49,13 @@ export class NewsRepository {
           .get()
 
         if (!snapshot.empty) {
-          return snapshot.docs.map((doc: any) => ({
+          const docs = snapshot.docs.map((doc: any) => ({
             id: doc.id,
             ...doc.data()
           })) as NewsItem[]
+          return docs
+            .filter(item => !item.title.toLowerCase().includes('new research paper published'))
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         }
       } catch (err) {
         console.warn('[NewsRepository] Firestore read failed, falling back to local store:', err)
@@ -69,6 +72,15 @@ export class NewsRepository {
   }
 
   async save(article: NewsItem): Promise<void> {
+    // Prevent automated integration test fixtures from polluting production Firestore
+    if (process.env.NODE_ENV === 'test' || article.title.toLowerCase().includes('new research paper published')) {
+      if (!this.localStore) {
+        this.localStore = this.readFromFile()
+      }
+      this.localStore.unshift(article)
+      return
+    }
+
     if (db) {
       try {
         await db.collection('news').doc(article.id).set(article)

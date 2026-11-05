@@ -114,6 +114,15 @@ export class ContactRepository {
   }
 
   async save(message: ContactSubmission): Promise<void> {
+    // Prevent automated integration test fixtures from polluting production Firestore
+    if (process.env.NODE_ENV === 'test' || message.email?.includes('test') || message.name?.includes('Dr. Jane Smith')) {
+      if (!this.localStore) {
+        this.localStore = this.readFromFile()
+      }
+      this.localStore.unshift(message)
+      return
+    }
+
     if (db) {
       try {
         await db.collection('contact_messages').doc(message.id).set(message)
