@@ -79,15 +79,17 @@ export class GuestbookRepository {
         })) as GuestbookEntry[]
 
         const filtered = rawEntries.filter(e => !this.isMockOrTestEntry(e))
-        const hasMore = filtered.length > limit
-        const entries = hasMore ? filtered.slice(0, limit) : filtered
-        const nextCursor = hasMore && entries.length > 0 ? entries[entries.length - 1].id : null
+        if (filtered.length > 0) {
+          const hasMore = filtered.length > limit
+          const entries = hasMore ? filtered.slice(0, limit) : filtered
+          const nextCursor = hasMore && entries.length > 0 ? entries[entries.length - 1].id : null
 
-        return {
-          entries,
-          nextCursor,
-          hasMore,
-          total: entries.length
+          return {
+            entries,
+            nextCursor,
+            hasMore,
+            total: entries.length
+          }
         }
       } catch (err) {
         console.warn('[GuestbookRepository] Firestore read failed, using local store:', err)
@@ -120,7 +122,7 @@ export class GuestbookRepository {
   }
 
   async save(entry: GuestbookEntry): Promise<void> {
-    if (process.env.NODE_ENV === 'test') {
+    if (this.isMockOrTestEntry(entry) || process.env.NODE_ENV === 'test') {
       if (!this.localStore) {
         this.localStore = this.readFromFile()
       }
@@ -131,7 +133,6 @@ export class GuestbookRepository {
     if (db) {
       try {
         await db.collection('guestbook').doc(entry.id).set(entry)
-        return
       } catch (err) {
         console.warn('[GuestbookRepository] Firestore write failed, writing to fallback:', err)
       }
@@ -140,7 +141,7 @@ export class GuestbookRepository {
     if (!this.localStore) {
       this.localStore = this.readFromFile()
     }
-    this.localStore.unshift(entry)
+    this.localStore = [entry, ...this.localStore.filter(e => e.id !== entry.id)]
     this.saveToFile(this.localStore)
   }
 
@@ -148,7 +149,6 @@ export class GuestbookRepository {
     if (db) {
       try {
         await db.collection('guestbook').doc(id).delete()
-        return true
       } catch (err) {
         console.warn('[GuestbookRepository] Firestore delete failed, falling back:', err)
       }

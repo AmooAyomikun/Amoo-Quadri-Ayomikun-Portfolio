@@ -99,25 +99,25 @@ export const ResearchSection: React.FC = () => {
             {portfolioData.publications.map((pub) => (
               <div 
                 key={pub.id} 
-                className="bg-[var(--color-surface-card)] rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 shadow-xs transition-colors group"
+                className="bg-[var(--color-surface-card)] rounded-xl sm:rounded-3xl p-4 sm:p-7 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 shadow-xs transition-colors group"
               >
                 {/* Meta Row: Type, Status, Date */}
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-2.5 py-0.5 rounded-md bg-[var(--color-surface-elevated)] border border-[var(--color-border)] text-[10px] font-mono font-bold tracking-wider uppercase text-[var(--color-text-muted)]">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2 sm:mb-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                    <span className="px-2 py-0.5 rounded-md bg-[var(--color-surface-elevated)] border border-[var(--color-border)] text-[9px] sm:text-[10px] font-mono font-bold tracking-wider uppercase text-[var(--color-text-muted)]">
                       {pub.type}
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-md bg-[var(--color-surface-elevated)] border border-[var(--color-border)] text-[10px] font-mono font-bold tracking-wider uppercase text-[var(--color-primary)]">
+                    <span className="px-2 py-0.5 rounded-md bg-[var(--color-surface-elevated)] border border-[var(--color-border)] text-[9px] sm:text-[10px] font-mono font-bold tracking-wider uppercase text-[var(--color-primary)]">
                       {pub.status}
                     </span>
                   </div>
-                  <span className="text-xs font-mono font-bold text-[var(--color-primary)]">
+                  <span className="text-[11px] sm:text-xs font-mono font-bold text-[var(--color-primary)]">
                     {pub.date}
                   </span>
                 </div>
 
                 {/* Title */}
-                <h4 className="text-base sm:text-xl font-serif font-bold text-[var(--color-text-main)] mb-2.5 leading-snug group-hover:text-[var(--color-primary)] transition-colors">
+                <h4 className="text-sm sm:text-lg md:text-xl font-serif font-bold text-[var(--color-text-main)] mb-2 leading-snug group-hover:text-[var(--color-primary)] transition-colors">
                   {pub.link ? (
                     <a href={pub.link} target="_blank" rel="noopener noreferrer" className="hover:underline">
                       {pub.title}
@@ -128,7 +128,7 @@ export const ResearchSection: React.FC = () => {
                 </h4>
 
                 {/* Authors */}
-                <p className="text-xs sm:text-sm text-[var(--color-text-muted)] mb-5 font-sans">
+                <p className="text-[11px] sm:text-sm text-[var(--color-text-muted)] mb-3 sm:mb-5 font-sans leading-relaxed">
                   {pub.authors.split(';').map((author, aIdx, arr) => {
                     const trimmed = author.trim()
                     const isMain = trimmed.includes('Amoo')
@@ -144,8 +144,8 @@ export const ResearchSection: React.FC = () => {
                 </p>
 
                 {/* Footer: Venue & Action */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-[var(--color-border)] text-xs">
-                  <span className="font-serif italic text-[var(--color-text-muted)] text-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-[var(--color-border)] text-xs">
+                  <span className="font-serif italic text-[var(--color-text-muted)] text-xs sm:text-sm">
                     {pub.journal}
                   </span>
 
@@ -154,7 +154,7 @@ export const ResearchSection: React.FC = () => {
                       href={pub.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[var(--color-primary)] uppercase tracking-wider hover:underline self-start sm:self-auto"
+                      className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-mono font-bold text-[var(--color-primary)] uppercase tracking-wider hover:underline self-start sm:self-auto"
                     >
                       <span>VIEW PUBLICATION</span>
                       <ExternalLink className="w-3.5 h-3.5" />

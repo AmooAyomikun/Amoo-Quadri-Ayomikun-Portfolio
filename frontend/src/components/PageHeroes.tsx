@@ -37,21 +37,21 @@ const Eyebrow: React.FC<EyebrowProps> = ({ children }) => (
 
 export const ResearchHero: React.FC = () => {
   return (
-    <header className="pt-6 sm:pt-14 pb-6 sm:pb-12 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
+    <header className="pt-5 sm:pt-14 pb-4 sm:pb-12 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
         <span className="text-xs">🔬</span> // EMPIRICAL RESEARCH &amp; SCHOLARSHIP
       </Eyebrow>
 
       <motion.h1
         {...rise(0.08)}
-        className="font-serif font-bold text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-[var(--color-text-main)] tracking-tight leading-tight mt-2"
+        className="font-serif font-bold text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-[var(--color-text-main)] tracking-tight leading-tight mt-1.5"
       >
         Research &amp; Scientific Publications
       </motion.h1>
 
       <motion.p
         {...rise(0.16)}
-        className="mt-3 sm:mt-4 text-xs sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed px-1 sm:px-0"
+        className="mt-2.5 sm:mt-4 text-xs sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed px-1 sm:px-0"
       >
         Peer-reviewed papers, empirical investigations, and algorithmic software engineering models spanning machine learning, recommender systems, and fairness in AI.
       </motion.p>
@@ -59,27 +59,29 @@ export const ResearchHero: React.FC = () => {
       {/* Quick highlight tags */}
       <motion.div
         {...rise(0.24)}
-        className="mt-5 sm:mt-7 flex flex-wrap items-center justify-center gap-1.5 sm:gap-3 text-[11px] sm:text-xs font-mono"
+        className="mt-4 sm:mt-7 flex flex-wrap items-center justify-center gap-1.5 sm:gap-3 text-[10px] sm:text-xs font-mono"
       >
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+        <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] shrink-0" />
-          <span>2 Peer-Reviewed Papers</span>
+          <span className="sm:hidden">2 Papers</span>
+          <span className="hidden sm:inline">2 Peer-Reviewed Papers</span>
         </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+        <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />
           <span>1 B.Sc. Thesis</span>
         </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+        <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-          <span>4 Departmental Awards</span>
+          <span className="sm:hidden">4 Awards</span>
+          <span className="hidden sm:inline">4 Departmental Awards</span>
         </span>
         <a
           href={portfolioData.personal.googleScholar}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 text-[var(--color-primary)] font-semibold hover:bg-[var(--color-primary)]/20 transition-all hover:scale-105"
+          className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 text-[var(--color-primary)] font-semibold hover:bg-[var(--color-primary)]/20 transition-all hover:scale-105"
         >
-          <span>Google Scholar</span>
+          <span>Scholar</span>
           <ExternalLink className="w-3 h-3" />
         </a>
       </motion.div>
@@ -119,21 +121,21 @@ const marqueeRow2 = [...techIconsRow2, ...techIconsRow2, ...techIconsRow2, ...te
 
 export const ProjectsHero: React.FC = () => {
   return (
-    <header className="pt-10 sm:pt-14 pb-8 sm:pb-10 px-4 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
+    <header className="pt-6 sm:pt-14 pb-5 sm:pb-10 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span>⚡</span> // PRODUCTION SYSTEMS &amp; ARCHITECTURE
+        <span className="text-xs">⚡</span> // PRODUCTION SYSTEMS &amp; ARCHITECTURE
       </Eyebrow>
 
       <motion.h1
         {...rise(0.08)}
-        className="font-sans font-extrabold text-3xl sm:text-5xl md:text-6xl text-[var(--color-text-main)] tracking-tight leading-tight"
+        className="font-sans font-extrabold text-2xl sm:text-4xl md:text-5xl text-[var(--color-text-main)] tracking-tight leading-snug sm:leading-tight mt-1 sm:mt-2"
       >
         Engineering Systems &amp; Software Works
       </motion.h1>
 
       <motion.p
         {...rise(0.16)}
-        className="mt-4 text-sm sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed"
+        className="mt-2.5 sm:mt-4 text-xs sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed px-1 sm:px-0"
       >
         Production web applications, full-stack architectures, and intelligent algorithmic platforms engineered for scalability and real-world impact.
       </motion.p>
@@ -141,24 +143,24 @@ export const ProjectsHero: React.FC = () => {
       {/* Infinite Animated Tech Logos Carousel */}
       <motion.div
         {...rise(0.24)}
-        className="relative w-full max-w-2xl mx-auto overflow-hidden py-3 mt-6 group select-none"
+        className="relative w-full max-w-2xl mx-auto overflow-hidden py-2 sm:py-3 mt-4 sm:mt-6 group select-none"
       >
         {/* Soft edge gradient fades */}
-        <div className="absolute top-0 bottom-0 left-0 w-12 sm:w-20 bg-gradient-to-r from-[var(--color-surface-base)] to-transparent z-10 pointer-events-none" />
-        <div className="absolute top-0 bottom-0 right-0 w-12 sm:w-20 bg-gradient-to-l from-[var(--color-surface-base)] to-transparent z-10 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 left-0 w-8 sm:w-20 bg-gradient-to-r from-[var(--color-surface-base)] to-transparent z-10 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 right-0 w-8 sm:w-20 bg-gradient-to-l from-[var(--color-surface-base)] to-transparent z-10 pointer-events-none" />
 
         {/* Row 1 - scrolling left */}
-        <div className="flex items-center space-x-4 sm:space-x-6 whitespace-nowrap w-max py-2 animate-marquee group-hover:[animation-play-state:paused]">
+        <div className="flex items-center space-x-3 sm:space-x-6 whitespace-nowrap w-max py-1.5 animate-marquee group-hover:[animation-play-state:paused]">
           {marqueeRow1.map((tech, idx) => (
             <div
               key={`m1-${idx}`}
               title={tech.name}
-              className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center p-2 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] shadow-xs hover:border-[var(--color-primary)] hover:scale-115 transition-all duration-200 cursor-default shrink-0"
+              className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] shadow-xs hover:border-[var(--color-primary)] hover:scale-115 transition-all duration-200 cursor-default shrink-0"
             >
               <img
                 src={tech.iconUrl}
                 alt={tech.name}
-                className="w-6 h-6 object-contain"
+                className="w-5 h-5 sm:w-6 sm:h-6 object-contain"
                 loading="lazy"
               />
             </div>
@@ -167,20 +169,19 @@ export const ProjectsHero: React.FC = () => {
 
         {/* Row 2 - scrolling right (reverse) */}
         <div
-          className="flex items-center space-x-4 sm:space-x-6 whitespace-nowrap w-max py-2 animate-marquee group-hover:[animation-play-state:paused]"
+          className="flex items-center space-x-3 sm:space-x-6 whitespace-nowrap w-max py-1.5 animate-marquee group-hover:[animation-play-state:paused]"
           style={{ animationDirection: 'reverse' }}
         >
           {marqueeRow2.map((tech, idx) => (
             <div
               key={`m2-${idx}`}
               title={tech.name}
-              className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center p-2 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] shadow-xs hover:border-[var(--color-primary)] hover:scale-115 transition-all duration-200 cursor-default shrink-0"
+              className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] shadow-xs hover:border-[var(--color-primary)] hover:scale-115 transition-all duration-200 cursor-default shrink-0"
             >
               <img
                 src={tech.iconUrl}
                 alt={tech.name}
-                className="w-6 h-6 object-contain"
-                style={{ filter: tech.name === 'Next.js' ? 'var(--nextjs-filter, none)' : 'none' }}
+                className="w-5 h-5 sm:w-6 sm:h-6 object-contain"
                 loading="lazy"
               />
             </div>
@@ -197,7 +198,7 @@ export const ProjectsHero: React.FC = () => {
 
 export const ExperienceHero: React.FC = () => {
   return (
-    <header className="pt-6 sm:pt-14 pb-4 sm:pb-12 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
+    <header className="pt-5 sm:pt-14 pb-4 sm:pb-12 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
         <span className="text-xs">💼</span> // CAREER &amp; ENGINEERING TIMELINE
       </Eyebrow>
@@ -216,22 +217,25 @@ export const ExperienceHero: React.FC = () => {
         Detailed overview of software engineering engagements, machine learning research fellowships, and university teaching track records.
       </motion.p>
 
-      {/* Clean metrics row */}
+      {/* Clean metrics row - responsive compact pill badges */}
       <motion.div
         {...rise(0.24)}
-        className="mt-4 sm:mt-6 flex flex-wrap items-center justify-center gap-1.5 sm:gap-3 text-[11px] sm:text-xs font-mono"
+        className="mt-3.5 sm:mt-6 flex flex-wrap items-center justify-center gap-1.5 sm:gap-3 text-[10px] sm:text-xs font-mono"
       >
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+        <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] shrink-0" />
-          <span>3+ Years Software Engineering</span>
+          <span className="sm:hidden font-semibold">3+ Yrs Exp</span>
+          <span className="hidden sm:inline">3+ Years Software Engineering</span>
         </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+        <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />
-          <span>5 Industry &amp; Academic Roles</span>
+          <span className="sm:hidden font-semibold">5 Key Roles</span>
+          <span className="hidden sm:inline">5 Industry &amp; Academic Roles</span>
         </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
+        <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] shadow-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-          <span>500+ Undergraduates Tutored</span>
+          <span className="sm:hidden font-semibold">500+ Tutored</span>
+          <span className="hidden sm:inline">500+ Undergraduates Tutored</span>
         </span>
       </motion.div>
     </header>
@@ -244,9 +248,9 @@ export const ExperienceHero: React.FC = () => {
 
 export const EducationHero: React.FC = () => {
   return (
-    <header className="pt-6 sm:pt-14 pb-4 sm:pb-8 px-2 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
+    <header className="pt-5 sm:pt-14 pb-4 sm:pb-8 px-2 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span>🎓</span> // ACADEMIC FOUNDATIONS &amp; CREDENTIALS
+        <span className="text-xs">🎓</span> // ACADEMIC FOUNDATIONS &amp; CREDENTIALS
       </Eyebrow>
 
       <motion.h1
@@ -258,7 +262,7 @@ export const EducationHero: React.FC = () => {
 
       <motion.p
         {...rise(0.16)}
-        className="mt-2.5 sm:mt-4 text-xs sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed"
+        className="mt-2 sm:mt-4 text-xs sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed px-1 sm:px-0"
       >
         Software engineering degree, professional diplomas, departmental subject honors, and core coursework foundations.
       </motion.p>
@@ -272,21 +276,21 @@ export const EducationHero: React.FC = () => {
 
 export const NewsHero: React.FC = () => {
   return (
-    <header className="pt-10 sm:pt-14 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
+    <header className="pt-6 sm:pt-14 pb-4 sm:pb-12 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span>📰</span> // DISPATCHES &amp; ANNOUNCEMENTS
+        <span className="text-xs">📰</span> // DISPATCHES &amp; ANNOUNCEMENTS
       </Eyebrow>
 
       <motion.h1
         {...rise(0.08)}
-        className="font-sans font-extrabold text-3xl sm:text-5xl md:text-6xl text-[var(--color-text-main)] tracking-tight leading-tight"
+        className="font-sans font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-[var(--color-text-main)] tracking-tight leading-tight mt-1 sm:mt-2"
       >
         News &amp; Announcements
       </motion.h1>
 
       <motion.p
         {...rise(0.16)}
-        className="mt-4 text-sm sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed"
+        className="mt-2.5 sm:mt-4 text-xs sm:text-base md:text-lg text-[var(--color-text-muted)] max-w-2xl mx-auto leading-relaxed px-1 sm:px-0"
       >
         Latest updates on research appointments, publications, software releases, and academic honors.
       </motion.p>

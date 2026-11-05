@@ -13,39 +13,42 @@ export const ExperienceSection: React.FC = () => {
   return (
     <section id="experience" className="w-full">
       {/* Filter Tabs - Horizontal scrollable on mobile with zero clipping, centered on desktop */}
-      <div className="flex items-center sm:justify-center gap-2 overflow-x-auto no-scrollbar pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 sm:pb-0 mb-6 sm:mb-10">
+      <div className="flex items-center sm:justify-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 sm:pb-0 mb-6 sm:mb-10">
         <button
           type="button"
           onClick={() => setActiveTab('all')}
-          className={`px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[11px] sm:text-xs font-mono shrink-0 transition-all cursor-pointer border select-none ${
+          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-mono shrink-0 transition-all cursor-pointer border select-none ${
             activeTab === 'all'
               ? 'bg-[var(--color-primary)] text-[#0a192f] border-[var(--color-primary)] font-bold shadow-xs'
               : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border-[var(--color-border)] hover:border-[var(--color-border-hover)]/30 font-medium'
           }`}
         >
-          All Track Record ({portfolioData.experience.length})
+          <span className="sm:hidden">All ({portfolioData.experience.length})</span>
+          <span className="hidden sm:inline">All Track Record ({portfolioData.experience.length})</span>
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('industry')}
-          className={`px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[11px] sm:text-xs font-mono shrink-0 transition-all cursor-pointer border select-none ${
+          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-mono shrink-0 transition-all cursor-pointer border select-none ${
             activeTab === 'industry'
               ? 'bg-[var(--color-primary)] text-[#0a192f] border-[var(--color-primary)] font-bold shadow-xs'
               : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border-[var(--color-border)] hover:border-[var(--color-border-hover)]/30 font-medium'
           }`}
         >
-          Industrial Development
+          <span className="sm:hidden">Industry</span>
+          <span className="hidden sm:inline">Industrial Development</span>
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('teaching')}
-          className={`px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[11px] sm:text-xs font-mono shrink-0 transition-all cursor-pointer border select-none ${
+          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-mono shrink-0 transition-all cursor-pointer border select-none ${
             activeTab === 'teaching'
               ? 'bg-[var(--color-primary)] text-[#0a192f] border-[var(--color-primary)] font-bold shadow-xs'
               : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border-[var(--color-border)] hover:border-[var(--color-border-hover)]/30 font-medium'
           }`}
         >
-          Teaching &amp; Mentorship
+          <span className="sm:hidden">Teaching</span>
+          <span className="hidden sm:inline">Teaching &amp; Mentorship</span>
         </button>
       </div>
 

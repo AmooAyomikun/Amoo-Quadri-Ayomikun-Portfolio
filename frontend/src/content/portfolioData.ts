@@ -232,7 +232,7 @@ export const portfolioData = {
   publications: [
     {
       id: 'pub-hotel',
-      title: 'DEVELOPMENT OF A HOTEL MANAGEMENT SYSTEM WITH LOCATION-BASED RECOMMENDATION AND RESERVATION',
+      title: 'Development of a Hotel Management System with Location-Based Recommendation and Reservation',
       authors: 'Amoo, Quadri Ayomikun',
       date: '2026',
       type: 'JOURNAL ARTICLE',

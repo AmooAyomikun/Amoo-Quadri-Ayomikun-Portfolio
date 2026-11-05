@@ -154,17 +154,17 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
   const blogCount = newsList.filter(i => i.type === 'blog').length
 
   return (
-    <section id="news" className="py-12 sm:py-16 bg-[var(--color-surface-base)] relative">
-      <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20">
-        <div className="border-t border-[#233554] pt-12">
+    <section id="news" className="py-8 sm:py-16 bg-[var(--color-surface-base)] relative">
+      <div className="max-w-6xl mx-auto px-4 sm:px-12 md:px-16 lg:px-20">
+        <div className="border-t border-[#233554] pt-6 sm:pt-12">
         
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div>
             <span className="text-xs font-mono uppercase tracking-widest text-[var(--color-primary)] font-semibold flex items-center gap-1.5">
               <Newspaper className="w-4 h-4" /> {badgeText}
             </span>
-            <h2 className="text-2xl sm:text-4xl font-serif font-bold text-[var(--color-text-main)] mt-1">
+            <h2 className="text-xl sm:text-4xl font-serif font-bold text-[var(--color-text-main)] mt-1">
               <AnimatedWords text={heading} />
             </h2>
           </div>
@@ -172,7 +172,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
           {Boolean(getAdminToken()) && (
             <button
               onClick={() => setPublishModalOpen(true)}
-              className="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-semibold bg-[var(--color-surface-card)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all cursor-pointer shadow-xs active:scale-95"
+              className="self-start sm:self-auto inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-mono font-semibold bg-[var(--color-surface-card)] text-[var(--color-text-main)] hover:text-[var(--color-primary)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all cursor-pointer shadow-xs active:scale-95"
             >
               <PlusCircle className="w-4 h-4 text-[var(--color-primary)]" />
               <span>Post Update (Admin)</span>
@@ -180,40 +180,43 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
           )}
         </div>
 
-        {/* Tab Controls: Separating News from Blogs */}
-        <div className="flex flex-wrap items-center gap-2 mb-8">
+        {/* Tab Controls: Separating News from Blogs - compact horizontal layout on mobile */}
+        <div className="flex items-center gap-1.5 sm:gap-2 mb-6 sm:mb-8 overflow-x-auto no-scrollbar pb-1 -mx-2 px-2 sm:mx-0 sm:px-0 sm:flex-wrap">
           <button
             onClick={() => setActiveTab('all')}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer shrink-0 ${
               activeTab === 'all'
-                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm'
+                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm font-bold'
                 : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>All Entries ({newsList.length})</span>
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            <span className="sm:hidden">All ({newsList.length})</span>
+            <span className="hidden sm:inline">All Entries ({newsList.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('news')}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer shrink-0 ${
               activeTab === 'news'
-                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm'
+                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm font-bold'
                 : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
             }`}
           >
-            <Newspaper className="w-3.5 h-3.5" />
-            <span>News & Announcements ({newsCount})</span>
+            <Newspaper className="w-3.5 h-3.5 shrink-0" />
+            <span className="sm:hidden">News ({newsCount})</span>
+            <span className="hidden sm:inline">News &amp; Announcements ({newsCount})</span>
           </button>
           <button
             onClick={() => setActiveTab('blog')}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer shrink-0 ${
               activeTab === 'blog'
-                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm'
+                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm font-bold'
                 : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Blog Posts & Tech Articles ({blogCount})</span>
+            <BookOpen className="w-3.5 h-3.5 shrink-0" />
+            <span className="sm:hidden">Blog ({blogCount})</span>
+            <span className="hidden sm:inline">Blog Posts &amp; Tech Articles ({blogCount})</span>
           </button>
         </div>
 
