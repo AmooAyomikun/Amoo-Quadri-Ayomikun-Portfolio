@@ -31,7 +31,7 @@ describe('<SEO /> component', () => {
     expect(descMeta?.getAttribute('content')).toBe('Exploration of software engineering systems')
 
     const canonical = document.querySelector('link[rel="canonical"]')
-    expect(canonical?.getAttribute('href')).toBe('https://amoo-quadri.vercel.app/projects')
+    expect(canonical?.getAttribute('href')).toBe('https://amoo-quadri-ayomikun-portfolio-fron.vercel.app/projects')
   })
 
   it('injects Schema.org JSON-LD structured data when noIndex is false', () => {

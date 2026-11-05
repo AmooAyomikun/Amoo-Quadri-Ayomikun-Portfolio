@@ -271,7 +271,7 @@ export default function NewsArticlePage() {
   }
 
   // Social Sharing Handlers
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : 'https://amoo-quadri.vercel.app'
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : 'https://amoo-quadri-ayomikun-portfolio-fron.vercel.app'
 
   const handleNativeShare = async () => {
     if (navigator.share && news) {

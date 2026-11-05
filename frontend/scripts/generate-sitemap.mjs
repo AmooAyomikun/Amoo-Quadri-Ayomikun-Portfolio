@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const ROOT = join(__dirname, '..')
 
-const baseUrl = (process.env.VITE_SITE_URL || 'https://amoo-quadri.vercel.app').replace(/\/$/, '')
+const baseUrl = (process.env.VITE_SITE_URL || 'https://amoo-quadri-ayomikun-portfolio-fron.vercel.app').replace(/\/$/, '')
 const today = new Date().toISOString().split('T')[0]
 
 // Define all valid, canonical, indexed routes with priorities

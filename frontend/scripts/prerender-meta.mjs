@@ -16,7 +16,7 @@ const __dirname = dirname(__filename)
 const ROOT = join(__dirname, '..')
 const DIST_DIR = join(ROOT, 'dist')
 
-const baseUrl = (process.env.VITE_SITE_URL || 'https://amoo-quadri.vercel.app').replace(/\/$/, '')
+const baseUrl = (process.env.VITE_SITE_URL || 'https://amoo-quadri-ayomikun-portfolio-fron.vercel.app').replace(/\/$/, '')
 
 const PAGE_METADATA = [
   {

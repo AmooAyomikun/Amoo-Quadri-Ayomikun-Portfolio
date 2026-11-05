@@ -14,6 +14,10 @@ const proxyLimiter = rateLimit({
 
 const ALLOWED_DEMO_HOSTS = new Set([
   'cleanreport-frontend.vercel.app',
+  'dispatch-lane-delivery-and-dispatch.vercel.app',
+  'kora-e-commerce-website.vercel.app',
+  'kynda-ai-assistant-learning-platfor.vercel.app',
+  'pathly-online-learnig-platform.vercel.app',
   ...(env.ALLOWED_PROXY_HOSTS ? env.ALLOWED_PROXY_HOSTS.split(',').map(h => h.trim().toLowerCase()) : [])
 ])
 
@@ -126,7 +130,7 @@ router.get('/', proxyLimiter, async (req: Request, res: Response): Promise<void>
 
     res.setHeader(
       'Content-Security-Policy',
-      "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; frame-ancestors 'self' https://amoo-quadri.vercel.app https://amooquadri.dev https://www.amooquadri.dev http://localhost:5173 http://localhost:3000;"
+      "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; frame-ancestors 'self' https://amoo-quadri-ayomikun-portfolio-fron.vercel.app https://amoo-quadri.vercel.app https://*.vercel.app https://amooquadri.dev https://www.amooquadri.dev http://localhost:5173 http://localhost:3000;"
     )
     res.setHeader('X-Content-Type-Options', 'nosniff')
     res.type('html').send(html)

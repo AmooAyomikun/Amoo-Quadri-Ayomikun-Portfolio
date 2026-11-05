@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /admin/
 
-Sitemap: https://amoo-quadri.vercel.app/sitemap.xml
+Sitemap: https://amoo-quadri-ayomikun-portfolio-fron.vercel.app/sitemap.xml
