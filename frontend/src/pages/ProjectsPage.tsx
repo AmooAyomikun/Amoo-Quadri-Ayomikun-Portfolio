@@ -7,7 +7,7 @@ import { SEO } from '../components/SEO'
 export default function ProjectsPage() {
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[#64ffda] selection:text-[#0a192f]">
+    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[var(--color-primary)] selection:text-[var(--color-primary-text)]">
       <SEO 
         title="Featured Projects & Architecture" 
         description="Explore real-world software engineering projects, system architectures, and case studies built by Quadri Ayomikun Amoo."

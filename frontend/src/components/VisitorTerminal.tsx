@@ -97,23 +97,23 @@ export const VisitorTerminal: React.FC = () => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      className="mt-12 rounded-lg border border-[#233554] bg-[#0b1d36]"
+      className="mt-12 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-card)]"
     >
-      <div className="flex items-center justify-between px-5 py-3 border-b border-[#233554]">
-        <span className="font-mono text-xs text-[#8892b0]">guest@amoo-quadri.vercel.app</span>
-        <span className="text-xs text-[#495670] hidden sm:inline">Ask about my work, or pick a command</span>
+      <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--color-border)]">
+        <span className="font-mono text-xs text-[var(--color-text-muted)]">guest@amoo-quadri.vercel.app</span>
+        <span className="text-xs text-[var(--color-text-subtle)] hidden sm:inline">Ask about my work, or pick a command</span>
       </div>
 
       <div className="h-44 overflow-y-auto px-5 py-4 space-y-2 font-mono text-[13px] leading-relaxed scrollbar-none">
         {terminalLogs.map((log, i) => (
-          <div key={i} className={log.type === 'input' ? 'text-[#64ffda]' : 'text-[#a8b2d1]'}>
+          <div key={i} className={log.type === 'input' ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)]'}>
             {log.text}
           </div>
         ))}
         <div ref={terminalEndRef} />
       </div>
 
-      <div className="border-t border-[#233554] px-5 py-3 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+      <div className="border-t border-[var(--color-border)] px-5 py-3 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -121,16 +121,16 @@ export const VisitorTerminal: React.FC = () => {
           }}
           className="flex items-center gap-2 flex-1 min-w-0"
         >
-          <span className="font-mono text-sm text-[#64ffda]">$</span>
+          <span className="font-mono text-sm text-[var(--color-primary)]">$</span>
           <input
             type="text"
             value={terminalInput}
             onChange={(e) => setTerminalInput(e.target.value)}
             placeholder="type a command or question"
             aria-label="Terminal command"
-            className="bg-transparent text-[13px] text-[#ccd6f6] placeholder-[#495670] focus:outline-none w-full font-mono"
+            className="bg-transparent text-[13px] text-[var(--color-text-main)] placeholder-[var(--color-text-subtle)] focus:outline-none w-full font-mono"
           />
-          <button type="submit" aria-label="Send command" className="text-[#495670] hover:text-[#64ffda] transition-colors">
+          <button type="submit" aria-label="Send command" className="text-[var(--color-text-subtle)] hover:text-[var(--color-primary)] transition-colors">
             <CornerDownLeft className="w-3.5 h-3.5" />
           </button>
         </form>
@@ -141,7 +141,7 @@ export const VisitorTerminal: React.FC = () => {
               key={cmd}
               type="button"
               onClick={() => handleTerminalCommand(cmd)}
-              className="text-[#8892b0] hover:text-[#64ffda] underline-offset-4 hover:underline transition-colors cursor-pointer"
+              className="text-[var(--color-text-muted)] hover:text-[var(--color-primary)] underline-offset-4 hover:underline transition-colors cursor-pointer"
             >
               {cmd}
             </button>

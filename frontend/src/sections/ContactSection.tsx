@@ -61,7 +61,7 @@ export const ContactSection: React.FC<{ showHeader?: boolean }> = ({ showHeader 
   return (
     <section id="contact" className={`${showHeader ? 'py-16 sm:py-20 bg-[var(--color-surface-card)]' : 'pb-16 sm:pb-20 pt-4 bg-transparent'} relative overflow-hidden`}>
       <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20 relative z-10">
-        <div className={showHeader ? "border-t border-[#233554] pt-12 sm:pt-16" : ""}>
+        <div className={showHeader ? "border-t border-[var(--color-border)] pt-12 sm:pt-16" : ""}>
         
         {/* Header with animation */}
         {showHeader && (

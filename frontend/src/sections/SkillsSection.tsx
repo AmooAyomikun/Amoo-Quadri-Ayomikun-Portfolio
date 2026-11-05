@@ -7,7 +7,7 @@ export const SkillsSection: React.FC = () => {
       index: '01',
       title: 'Artificial Intelligence & Data Science',
       icon: Brain,
-      color: '#64ffda',
+      color: '#d4a359',
       focus: 'Recommender systems, predictive modeling, algorithmic fairness, and LLM applications.',
       groups: [
         {
@@ -210,9 +210,9 @@ export const SkillsSection: React.FC = () => {
                             {skill.level && (
                               <span 
                                 style={{ 
-                                  backgroundColor: skill.level === 'Expert' ? 'rgba(100, 255, 218, 0.1)' : 'rgba(56, 189, 248, 0.1)',
-                                  color: skill.level === 'Expert' ? '#64ffda' : '#38bdf8',
-                                  borderColor: skill.level === 'Expert' ? 'rgba(100, 255, 218, 0.25)' : 'rgba(56, 189, 248, 0.25)'
+                                  backgroundColor: skill.level === 'Expert' ? 'rgba(212, 163, 89, 0.12)' : 'rgba(56, 189, 248, 0.1)',
+                                  color: skill.level === 'Expert' ? '#d4a359' : '#38bdf8',
+                                  borderColor: skill.level === 'Expert' ? 'rgba(212, 163, 89, 0.3)' : 'rgba(56, 189, 248, 0.25)'
                                 }}
                                 className="text-[9px] uppercase px-1.5 py-0.2 rounded border font-bold"
                               >

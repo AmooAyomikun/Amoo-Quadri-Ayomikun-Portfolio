@@ -64,10 +64,10 @@ export const Footer: React.FC = () => {
   }
 
   return (
-    <footer className="bg-[var(--color-surface-base)] text-[#0a192f] pt-8 pb-6 relative z-40 overflow-hidden">
+    <footer className="bg-[var(--color-surface-base)] text-[#111110] pt-8 pb-6 relative z-40 overflow-hidden">
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Teal Watts Asymmetric Arch Pill Container - Full and Independent */}
+        {/* Asymmetric Arch Pill Container */}
         <div className="rounded-t-[4rem] sm:rounded-tl-[8rem] sm:rounded-tr-[2rem] rounded-b-[2rem] bg-[var(--color-primary)] border border-[var(--color-primary)]/40 p-6 sm:p-8 lg:p-10 relative overflow-hidden shadow-2xl text-[var(--color-primary-text)]">
           
           {/* Top Row Grid */}
@@ -125,13 +125,13 @@ export const Footer: React.FC = () => {
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="Email Address"
-                    className="w-full bg-[#0a192f] border border-white/20 rounded-full py-2.5 pl-4 pr-28 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-white transition-colors font-mono shadow-inner"
+                    className="w-full bg-[#111110] border border-white/20 rounded-full py-2.5 pl-4 pr-28 text-xs text-[#edeae4] placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-white transition-colors font-mono shadow-inner"
                     required
                   />
                   <button
                     type="submit"
                     disabled={subscribing}
-                    className="absolute right-1 px-4 py-1.5 bg-white text-[#0a192f] font-mono font-bold text-xs rounded-full hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-75 shadow-xs"
+                    className="absolute right-1 px-4 py-1.5 bg-[#f7f4ee] text-[#111110] font-mono font-bold text-xs rounded-full hover:bg-white transition-colors cursor-pointer disabled:opacity-75 shadow-xs"
                   >
                     {subscribing ? 'Sending...' : subscribed ? 'Subscribed!' : 'Subscribe'}
                   </button>
@@ -151,13 +151,13 @@ export const Footer: React.FC = () => {
 
               {/* Follow Us Badges */}
               <div>
-                <h4 className="font-mono font-bold text-[10px] text-[#0a192f] uppercase tracking-widest mb-2.5">
+                <h4 className="font-mono font-bold text-[10px] text-[var(--color-primary-text)] uppercase tracking-widest mb-2.5">
                   FOLLOW US
                 </h4>
                 <div className="flex items-center gap-2">
                   <a
                     href={`mailto:${portfolioData.personal.email}`}
-                    className="w-8 h-8 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
+                    className="w-8 h-8 rounded-full bg-[#111110] text-[#d4a359] flex items-center justify-center hover:bg-[#22221f] transition-all cursor-pointer shadow-md"
                     aria-label="Email"
                   >
                     <Mail className="w-3.5 h-3.5" />
@@ -166,7 +166,7 @@ export const Footer: React.FC = () => {
                     href={portfolioData.personal.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
+                    className="w-8 h-8 rounded-full bg-[#111110] text-[#d4a359] flex items-center justify-center hover:bg-[#22221f] transition-all cursor-pointer shadow-md"
                     aria-label="GitHub"
                   >
                     <GithubIcon className="w-3.5 h-3.5" />
@@ -175,7 +175,7 @@ export const Footer: React.FC = () => {
                     href={portfolioData.personal.linkedIn}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
+                    className="w-8 h-8 rounded-full bg-[#111110] text-[#d4a359] flex items-center justify-center hover:bg-[#22221f] transition-all cursor-pointer shadow-md"
                     aria-label="LinkedIn"
                   >
                     <LinkedinIcon className="w-3.5 h-3.5" />
@@ -184,7 +184,7 @@ export const Footer: React.FC = () => {
                     href={portfolioData.personal.twitter || 'https://x.com'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-full bg-[#0a192f] text-[var(--color-primary)] flex items-center justify-center hover:bg-[#112240] transition-all cursor-pointer shadow-md"
+                    className="w-8 h-8 rounded-full bg-[#111110] text-[#d4a359] flex items-center justify-center hover:bg-[#22221f] transition-all cursor-pointer shadow-md"
                     aria-label="Twitter"
                   >
                     <TwitterIcon className="w-3.5 h-3.5" />
@@ -197,17 +197,17 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Bottom Sleek Typography Watermark ("quadri") */}
-          <div className="relative pt-3 flex flex-col items-end justify-between border-t border-[#0a192f]/15 mt-3">
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-sans font-black tracking-tighter leading-none text-[#0a192f]/90 select-none text-right uppercase pointer-events-none w-full">
+          <div className="relative pt-3 flex flex-col items-end justify-between border-t border-[var(--color-primary-text)]/15 mt-3">
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-sans font-black tracking-tighter leading-none text-[var(--color-primary-text)]/90 select-none text-right uppercase pointer-events-none w-full">
               quadri
             </h1>
 
             {/* Back to top row */}
-            <div className="w-full flex justify-between items-center pt-3 text-xs font-mono text-[#0a192f]/80 font-medium">
+            <div className="w-full flex justify-between items-center pt-3 text-xs font-mono text-[var(--color-primary-text)]/80 font-medium">
               <span className="uppercase">IBADAN, NIGERIA (GMT+1)</span>
               <button
                 onClick={scrollToTop}
-                className="flex items-center gap-1.5 text-[#0a192f] font-bold hover:opacity-75 transition-opacity cursor-pointer"
+                className="flex items-center gap-1.5 text-[var(--color-primary-text)] font-bold hover:opacity-75 transition-opacity cursor-pointer"
               >
                 <span>BACK TO TOP</span>
                 <ArrowUp className="w-3.5 h-3.5" />

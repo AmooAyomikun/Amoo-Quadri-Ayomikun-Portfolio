@@ -130,7 +130,7 @@ export const EducationMobileDeck: React.FC<EducationMobileDeckProps> = ({
             {idx < educationCards.length - 1 && (
               <div className="flex justify-center my-3 select-none pointer-events-none">
                 <svg
-                  className="w-20 h-14 text-[var(--color-primary)] drop-shadow-[0_2px_8px_rgba(100,255,218,0.2)]"
+                  className="w-20 h-14 text-[var(--color-primary)] drop-shadow-[0_2px_8px_rgba(212,163,89,0.2)]"
                   viewBox="0 0 100 56"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"

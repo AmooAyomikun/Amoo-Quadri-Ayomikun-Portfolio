@@ -19,7 +19,7 @@ export const ExperienceSection: React.FC = () => {
           onClick={() => setActiveTab('all')}
           className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-mono shrink-0 transition-all cursor-pointer border select-none ${
             activeTab === 'all'
-              ? 'bg-[var(--color-primary)] text-[#0a192f] border-[var(--color-primary)] font-bold shadow-xs'
+              ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] border-[var(--color-primary)] font-bold shadow-xs'
               : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border-[var(--color-border)] hover:border-[var(--color-border-hover)]/30 font-medium'
           }`}
         >
@@ -31,7 +31,7 @@ export const ExperienceSection: React.FC = () => {
           onClick={() => setActiveTab('industry')}
           className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-mono shrink-0 transition-all cursor-pointer border select-none ${
             activeTab === 'industry'
-              ? 'bg-[var(--color-primary)] text-[#0a192f] border-[var(--color-primary)] font-bold shadow-xs'
+              ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] border-[var(--color-primary)] font-bold shadow-xs'
               : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border-[var(--color-border)] hover:border-[var(--color-border-hover)]/30 font-medium'
           }`}
         >
@@ -43,7 +43,7 @@ export const ExperienceSection: React.FC = () => {
           onClick={() => setActiveTab('teaching')}
           className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-mono shrink-0 transition-all cursor-pointer border select-none ${
             activeTab === 'teaching'
-              ? 'bg-[var(--color-primary)] text-[#0a192f] border-[var(--color-primary)] font-bold shadow-xs'
+              ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] border-[var(--color-primary)] font-bold shadow-xs'
               : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border-[var(--color-border)] hover:border-[var(--color-border-hover)]/30 font-medium'
           }`}
         >

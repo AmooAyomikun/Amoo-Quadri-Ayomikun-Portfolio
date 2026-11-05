@@ -162,7 +162,7 @@ export const QuestionsSection: React.FC = () => {
   return (
     <section id="faq" className="py-14 sm:py-20 bg-[var(--color-surface-base)] text-[var(--color-text-main)] relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20">
-        <div className="border-t border-[#233554] pt-12">
+        <div className="border-t border-[var(--color-border)] pt-12">
           
           {/* Header with Centered Title & Watermark Effect matching the reference */}
           <div className="relative text-center mb-12 sm:mb-16 select-none">

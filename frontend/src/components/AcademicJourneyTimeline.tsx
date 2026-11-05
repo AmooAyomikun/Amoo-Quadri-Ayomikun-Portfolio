@@ -63,7 +63,7 @@ export const AcademicJourneyTimeline: React.FC = () => {
       institution: 'First Technical University (Abiola Ajimobi Technical Univ.)',
       highlight: '4.45 / 5.00 Final CGPA · Second-Class Upper (Top 10% of Cohort)',
       icon: <GraduationCap className="w-4 h-4" />,
-      badgeColor: '#64ffda'
+      badgeColor: '#d4a359'
     },
     {
       id: 'm4',
@@ -135,7 +135,7 @@ export const AcademicJourneyTimeline: React.FC = () => {
       institution: 'Delta State University, Asaba',
       highlight: 'AI & computational research supervised by Assoc. Prof. Jude Sinebe',
       icon: <Briefcase className="w-4 h-4" />,
-      badgeColor: '#64ffda'
+      badgeColor: '#d4a359'
     },
     {
       id: 'm10',
@@ -668,7 +668,7 @@ export const AcademicJourneyTimeline: React.FC = () => {
             {filteredMilestones.map((item, index) => (
               <div 
                 key={item.id}
-                className="w-[82vw] max-w-[310px] shrink-0 bg-gradient-to-b from-[#0f2038] to-[#0a192f] border border-white/[0.08] rounded-2xl p-4 shadow-[0_12px_32px_-12px_rgba(0,0,0,0.5)] flex flex-col justify-between relative overflow-hidden transition-all"
+                className="w-[82vw] max-w-[310px] shrink-0 bg-gradient-to-b from-[#1e1d1a] to-[#141412] border border-white/[0.08] rounded-2xl p-4 shadow-[0_12px_32px_-12px_rgba(0,0,0,0.5)] flex flex-col justify-between relative overflow-hidden transition-all"
               >
                 {/* Subtle top hairline */}
                 <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[var(--color-primary)]/40 to-transparent" />

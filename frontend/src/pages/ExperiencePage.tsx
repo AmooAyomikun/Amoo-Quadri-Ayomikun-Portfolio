@@ -10,7 +10,7 @@ import { PageContainer } from '../components/PageContainer'
 
 export default function ExperiencePage() {
   return (
-    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[#64ffda] selection:text-[#0a192f]">
+    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[var(--color-primary)] selection:text-[var(--color-primary-text)]">
       <SEO 
         title="Work Experience & History" 
         description="Professional career timeline, software engineering roles, and leadership experience of Quadri Ayomikun Amoo."

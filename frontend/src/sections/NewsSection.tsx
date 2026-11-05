@@ -156,7 +156,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
   return (
     <section id="news" className="py-8 sm:py-16 bg-[var(--color-surface-base)] relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-12 md:px-16 lg:px-20">
-        <div className="border-t border-[#233554] pt-6 sm:pt-12">
+        <div className="border-t border-[var(--color-border)] pt-6 sm:pt-12">
         
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
@@ -186,7 +186,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
             onClick={() => setActiveTab('all')}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer shrink-0 ${
               activeTab === 'all'
-                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm font-bold'
+                ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] shadow-sm font-bold'
                 : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
             }`}
           >
@@ -198,7 +198,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
             onClick={() => setActiveTab('news')}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer shrink-0 ${
               activeTab === 'news'
-                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm font-bold'
+                ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] shadow-sm font-bold'
                 : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
             }`}
           >
@@ -210,7 +210,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
             onClick={() => setActiveTab('blog')}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer shrink-0 ${
               activeTab === 'blog'
-                ? 'bg-[var(--color-primary)] text-[#0a192f] shadow-sm font-bold'
+                ? 'bg-[var(--color-primary)] text-[var(--color-primary-text)] shadow-sm font-bold'
                 : 'bg-[var(--color-surface-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] border border-[var(--color-border)]'
             }`}
           >

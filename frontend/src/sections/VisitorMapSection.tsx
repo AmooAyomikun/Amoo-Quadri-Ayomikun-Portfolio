@@ -70,12 +70,12 @@ export const VisitorMapSection: React.FC = () => {
 
   const statusDot =
     connectionStatus === 'connected'
-      ? 'bg-[#64ffda]'
+      ? 'bg-[var(--color-primary)]'
       : isWakingServer
       ? 'bg-amber-400 animate-ping'
       : connectionStatus === 'connecting'
       ? 'bg-amber-400'
-      : 'bg-[#495670]'
+      : 'bg-[var(--color-text-subtle)]'
 
   const stats = [
     { label: 'Total visits', value: data.totalVisitors > 0 ? data.totalVisitors.toLocaleString() : '—' },
@@ -94,9 +94,9 @@ export const VisitorMapSection: React.FC = () => {
   }
 
   return (
-    <section id="visitors" className="py-12 sm:py-16 bg-[#0a192f] text-[#ccd6f6]">
+    <section id="visitors" className="py-12 sm:py-16 bg-[var(--color-surface-base)] text-[var(--color-text-main)]">
       <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20">
-        <div className="border-t border-[#233554] pt-12">
+        <div className="border-t border-[var(--color-border)] pt-12">
           {/* Header */}
           <motion.header
             initial={{ opacity: 0, y: 12 }}
@@ -106,14 +106,14 @@ export const VisitorMapSection: React.FC = () => {
             className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-14 items-end"
           >
             <div className="lg:col-span-7">
-              <span className="text-xs font-mono uppercase tracking-widest text-[#64ffda] font-semibold">
+              <span className="text-xs font-mono uppercase tracking-widest text-[var(--color-primary)] font-semibold">
                 // Visitors
               </span>
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-[#ccd6f6] mt-1">
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-[var(--color-text-main)] mt-1">
                 <AnimatedWords text="Readers around the world" />
               </h2>
             </div>
-            <p className="lg:col-span-5 text-sm leading-relaxed text-[#8892b0]">
+            <p className="lg:col-span-5 text-sm leading-relaxed text-[var(--color-text-muted)]">
               Each highlighted country is somewhere this site has been opened from.
               The numbers update as new people drop by.
             </p>
@@ -153,7 +153,7 @@ export const VisitorMapSection: React.FC = () => {
                 type="button"
                 onClick={handlePinpointCity}
                 disabled={pinpointLoading}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded border border-[#233554] hover:border-[#64ffda]/40 text-[#64ffda] text-xs font-mono hover:bg-[#64ffda]/10 transition-colors cursor-pointer self-start sm:self-auto disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded border border-[var(--color-border)] hover:border-[var(--color-primary)]/40 text-[var(--color-primary)] text-xs font-mono hover:bg-[var(--color-primary-light)] transition-colors cursor-pointer self-start sm:self-auto disabled:opacity-50"
               >
                 {pinpointLoading ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

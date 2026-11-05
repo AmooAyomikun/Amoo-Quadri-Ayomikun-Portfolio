@@ -56,7 +56,7 @@ export const VisitorMapChart: React.FC<VisitorMapChartProps> = ({
       transition={{ duration: 0.6 }}
       className="lg:col-span-8"
     >
-      <div className="relative w-full h-[260px] sm:h-[360px] rounded-lg border border-[#233554] bg-[#0b1d36] overflow-hidden">
+      <div className="relative w-full h-[260px] sm:h-[360px] rounded-lg border border-[var(--color-border)] bg-[#161513] overflow-hidden">
         <ComposableMap
           projection="geoEqualEarth"
           projectionConfig={{ scale: 145, center: [10, 10] }}
@@ -77,17 +77,17 @@ export const VisitorMapChart: React.FC<VisitorMapChartProps> = ({
                 const hasVisitors = visitorCount > 0 || isUserGeo
                 const count = isUserGeo ? Math.max(visitorCount, data.userCountryCount) : visitorCount
 
-                let fillColor = '#122a4a'
-                let strokeColor = '#0b1d36'
+                let fillColor = '#24221f'
+                let strokeColor = '#161513'
                 let strokeWidth = 0.5
 
                 if (isUserGeo) {
-                  fillColor = '#2a8f80'
-                  strokeColor = '#64ffda'
+                  fillColor = '#9a6b2e'
+                  strokeColor = '#d4a359'
                   strokeWidth = 0.9
                 } else if (hasVisitors) {
-                  fillColor = count >= 5 ? '#237468' : '#1b5650'
-                  strokeColor = '#0b1d36'
+                  fillColor = count >= 5 ? '#7a5424' : '#573d1b'
+                  strokeColor = '#161513'
                   strokeWidth = 0.5
                 }
 
@@ -124,12 +124,12 @@ export const VisitorMapChart: React.FC<VisitorMapChartProps> = ({
                 onMouseLeave={() => setHoveredNode(null)}
               >
                 {isUserCountry && (
-                  <circle r={9} fill="none" stroke="#64ffda" strokeWidth={1} opacity={0.6} />
+                  <circle r={9} fill="none" stroke="#d4a359" strokeWidth={1} opacity={0.6} />
                 )}
                 <circle
                   r={isUserCountry ? 3.5 : 2.5}
-                  fill={isUserCountry ? '#64ffda' : '#ccd6f6'}
-                  stroke="#0b1d36"
+                  fill={isUserCountry ? '#d4a359' : '#edeae4'}
+                  stroke="#161513"
                   strokeWidth={1}
                 />
               </Marker>
@@ -138,22 +138,22 @@ export const VisitorMapChart: React.FC<VisitorMapChartProps> = ({
         </ComposableMap>
 
         {hoveredNode && (
-          <div className="absolute top-3 left-3 bg-[#0a192f] border border-[#233554] text-[#ccd6f6] px-2.5 py-1 rounded text-xs font-mono pointer-events-none">
+          <div className="absolute top-3 left-3 bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-main)] px-2.5 py-1 rounded text-xs font-mono pointer-events-none">
             {hoveredNode}
           </div>
         )}
       </div>
 
-      <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#8892b0]">
+      <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[var(--color-text-muted)]">
         <span className="flex items-center gap-5">
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#1b5650]" /> Visited
+            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#573d1b]" /> Visited
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#2a8f80] ring-1 ring-[#64ffda]" /> You
+            <span className="w-2.5 h-2.5 rounded-[2px] bg-[#9a6b2e] ring-1 ring-[#d4a359]" /> You
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#ccd6f6]" /> City
+            <span className="w-1.5 h-1.5 rounded-full bg-[#edeae4]" /> City
           </span>
         </span>
         <span className="flex items-center gap-1.5">

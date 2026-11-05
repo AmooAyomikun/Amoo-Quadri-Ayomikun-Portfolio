@@ -234,12 +234,12 @@ export function useGithubContributions() {
 
     if (colorTheme === 'cyberpunk') {
       switch (level) {
-        case 0: return 'bg-[#112240] border border-[#233554]'
-        case 1: return 'bg-[#0d3b43] border border-[#134e56]'
-        case 2: return 'bg-[#165a65] border border-[#1f7583]'
-        case 3: return 'bg-[#299d95] border border-[#37b8af]'
-        case 4: return 'bg-[#64ffda] border border-[#9bfce5] shadow-[0_0_8px_rgba(100,255,218,0.5)]'
-        default: return 'bg-[#112240]'
+        case 0: return 'bg-[var(--color-surface-elevated)] border border-[var(--color-border)]'
+        case 1: return 'bg-[#4d381b] border border-[#614722]'
+        case 2: return 'bg-[#7a5828] border border-[#946b31]'
+        case 3: return 'bg-[#ab7b38] border border-[#c48e42]'
+        case 4: return 'bg-[#d4a359] border border-[#e3b56b] shadow-[0_0_8px_rgba(212,163,89,0.4)]'
+        default: return 'bg-[var(--color-surface-elevated)]'
       }
     }
 

@@ -81,7 +81,7 @@ export const TestimonialsSection: React.FC = () => {
       className="py-10 sm:py-16 bg-[var(--color-surface-base)] relative overflow-hidden flex flex-col justify-center"
     >
       <div className="max-w-6xl mx-auto px-6 sm:px-12 md:px-16 lg:px-20 w-full">
-        <div className="border-t border-[#233554] pt-8 sm:pt-12">
+        <div className="border-t border-[var(--color-border)] pt-8 sm:pt-12">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 gap-4">

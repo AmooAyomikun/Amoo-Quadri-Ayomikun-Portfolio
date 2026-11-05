@@ -29,7 +29,7 @@ export default function EducationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[#64ffda] selection:text-[#0a192f]">
+    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[var(--color-primary)] selection:text-[var(--color-primary-text)]">
       <SEO 
         title="Education & Academic Background" 
         description="Academic credentials, certifications, coursework, and honors of Quadri Ayomikun Amoo. B.Sc. Software Engineering (4.45/5.00 Final CGPA, Top 10%)."
@@ -105,7 +105,7 @@ export default function EducationPage() {
         <div id="academic-awards" className="mb-14 max-w-4xl mx-auto scroll-mt-24">
           <div className="flex items-center justify-between pb-3 mb-5 border-b border-[var(--color-border)]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#64ffda]/10 border border-[#64ffda]/30 flex items-center justify-center text-[#64ffda]">
+              <div className="w-8 h-8 rounded-lg bg-[var(--color-primary-light)] border border-[var(--color-primary)]/30 flex items-center justify-center text-[var(--color-primary)]">
                 <Award className="w-4 h-4" />
               </div>
               <div>
@@ -117,7 +117,7 @@ export default function EducationPage() {
                 </p>
               </div>
             </div>
-            <span className="text-[11px] font-mono text-[#64ffda] bg-[#64ffda]/10 px-2.5 py-0.5 rounded-full border border-[#64ffda]/30 font-semibold hidden sm:inline-block">
+            <span className="text-[11px] font-mono text-[var(--color-primary)] bg-[var(--color-primary-light)] px-2.5 py-0.5 rounded-full border border-[var(--color-primary)]/30 font-semibold hidden sm:inline-block">
               Top Rank
             </span>
           </div>
@@ -147,13 +147,13 @@ export default function EducationPage() {
             ].map((award, i) => (
               <div 
                 key={i}
-                className="bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[#64ffda]/50 rounded-xl p-4 transition-colors relative"
+                className="bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 rounded-xl p-4 transition-colors relative"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#64ffda]/10 text-[#64ffda] border border-[#64ffda]/25 font-semibold">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[var(--color-primary-light)] text-[var(--color-primary)] border border-[var(--color-primary)]/25 font-semibold">
                     {award.badge}
                   </span>
-                  <span className="text-[#64ffda] font-bold text-base">★</span>
+                  <span className="text-[var(--color-primary)] font-bold text-base">★</span>
                 </div>
                 <h4 className="text-sm font-serif font-bold text-[var(--color-text-main)] mb-1">
                   {award.title}
@@ -163,7 +163,7 @@ export default function EducationPage() {
                 </p>
                 <div className="mt-2.5 pt-2 border-t border-[var(--color-border)] text-[10px] font-mono text-[var(--color-text-muted)] flex items-center justify-between">
                   <span>First Technical University</span>
-                  <span className="text-[#64ffda]/80 font-medium">Rank 1</span>
+                  <span className="text-[var(--color-primary)]/80 font-medium">Rank 1</span>
                 </div>
               </div>
             ))}
@@ -174,7 +174,7 @@ export default function EducationPage() {
         <div className="mb-14 max-w-4xl mx-auto">
           <div className="flex items-center justify-between pb-3 mb-5 border-b border-[var(--color-border)]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#64ffda]/10 border border-[#64ffda]/30 flex items-center justify-center text-[#64ffda]">
+              <div className="w-8 h-8 rounded-lg bg-[var(--color-primary-light)] border border-[var(--color-primary)]/30 flex items-center justify-center text-[var(--color-primary)]">
                 <Layers className="w-4 h-4" />
               </div>
               <div>
@@ -192,10 +192,10 @@ export default function EducationPage() {
             {curriculumModules.map((mod, i) => (
               <div 
                 key={i}
-                className="bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[#64ffda]/40 rounded-xl p-3.5 transition-colors"
+                className="bg-[var(--color-surface-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)]/40 rounded-xl p-3.5 transition-colors"
               >
                 <div className="flex items-start gap-1.5 mb-1">
-                  <Code2 className="w-3.5 h-3.5 text-[#64ffda] shrink-0 mt-0.5" />
+                  <Code2 className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0 mt-0.5" />
                   <span className="text-xs font-mono font-bold text-[var(--color-text-main)] leading-snug">
                     {mod.name}
                   </span>
@@ -211,15 +211,15 @@ export default function EducationPage() {
         {/* Academic Distinctions & Summary */}
         <div className="bg-[var(--color-surface-card)] border border-[var(--color-border)] rounded-2xl p-5 sm:p-6 max-w-4xl mx-auto shadow-sm">
           <h3 className="text-base font-serif font-bold text-[var(--color-text-main)] mb-3 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#64ffda]" /> Academic Summary
+            <Sparkles className="w-4 h-4 text-[var(--color-primary)]" /> Academic Summary
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-[var(--color-text-muted)] font-mono">
             <div className="bg-[var(--color-surface-base)] p-3 rounded-xl border border-[var(--color-border)]">
-              <span className="text-[#64ffda] font-bold block mb-0.5">4.45 / 5.00 Final CGPA</span>
+              <span className="text-[var(--color-primary)] font-bold block mb-0.5">4.45 / 5.00 Final CGPA</span>
               <span>Second-Class Honours (Upper Division) with a 5.0 / 5.0 peak term GPA at Technical University.</span>
             </div>
             <div className="bg-[var(--color-surface-base)] p-3 rounded-xl border border-[var(--color-border)]">
-              <span className="text-[#64ffda] font-bold block mb-0.5">Top 10% Graduating Class</span>
+              <span className="text-[var(--color-primary)] font-bold block mb-0.5">Top 10% Graduating Class</span>
               <span>Top decile graduating standing with 4 departmental first-place subject excellence awards.</span>
             </div>
           </div>

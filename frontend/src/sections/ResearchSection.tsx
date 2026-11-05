@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { 
   BookOpen, 
   ExternalLink, 
@@ -6,12 +6,25 @@ import {
   FileText, 
   Trophy, 
   Calendar,
-  GraduationCap
+  GraduationCap,
+  Copy,
+  Check,
+  ChevronDown
 } from 'lucide-react'
 import { portfolioData } from '../content/portfolioData'
 import { AnimatedCounter } from '../components/AnimatedCounter'
 
 export const ResearchSection: React.FC = () => {
+  const [openAbstractId, setOpenAbstractId] = useState<string | null>(null)
+  const [openBibtexId, setOpenBibtexId] = useState<string | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const handleCopyBibtex = (id: string, bibtex: string) => {
+    navigator.clipboard.writeText(bibtex)
+    setCopiedId(id)
+    setTimeout(() => setCopiedId((prev) => (prev === id ? null : prev)), 2000)
+  }
+
   return (
     <section id="research" className="py-4 sm:py-8 bg-transparent">
       <div className="w-full space-y-12 sm:space-y-16">
@@ -143,24 +156,128 @@ export const ResearchSection: React.FC = () => {
                   })}
                 </p>
 
-                {/* Footer: Venue & Action */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-[var(--color-border)] text-xs">
-                  <span className="font-serif italic text-[var(--color-text-muted)] text-xs sm:text-sm">
-                    {pub.journal}
-                  </span>
+                {/* Footer: Venue, Academic Controls & Action */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 sm:pt-4 border-t border-[var(--color-border)] text-xs">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="font-serif italic text-[var(--color-text-muted)] text-xs sm:text-sm">
+                      {pub.journal}
+                    </span>
+                    {pub.doi && (
+                      <>
+                        <span className="text-[var(--color-border)]">·</span>
+                        <span className="font-mono text-[11px] text-[var(--color-text-subtle)]">
+                          DOI: {pub.doi}
+                        </span>
+                      </>
+                    )}
+                  </div>
 
-                  {pub.link && (
-                    <a
-                      href={pub.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-mono font-bold text-[var(--color-primary)] uppercase tracking-wider hover:underline self-start sm:self-auto"
-                    >
-                      <span>VIEW PUBLICATION</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  )}
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                    {pub.abstract && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenAbstractId((prev) => (prev === pub.id ? null : pub.id))
+                        }
+                        className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-mono font-medium text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors cursor-pointer"
+                      >
+                        <span>Abstract &amp; Findings</span>
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                            openAbstractId === pub.id ? 'rotate-180 text-[var(--color-primary)]' : ''
+                          }`}
+                        />
+                      </button>
+                    )}
+
+                    {pub.bibtex && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenBibtexId((prev) => (prev === pub.id ? null : pub.id))
+                        }
+                        className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-mono font-medium text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors cursor-pointer"
+                      >
+                        <span>Cite (.bib)</span>
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                            openBibtexId === pub.id ? 'rotate-180 text-[var(--color-primary)]' : ''
+                          }`}
+                        />
+                      </button>
+                    )}
+
+                    {pub.link && (
+                      <a
+                        href={pub.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-mono font-bold text-[var(--color-primary)] uppercase tracking-wider hover:underline"
+                      >
+                        <span>VIEW PUBLICATION</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
                 </div>
+
+                {/* Expandable Abstract & Key Findings Panel */}
+                {openAbstractId === pub.id && pub.abstract && (
+                  <div className="mt-4 pt-4 border-t border-[var(--color-border)] space-y-3 text-xs sm:text-sm text-[var(--color-text-muted)] font-sans leading-relaxed">
+                    <div>
+                      <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--color-text-subtle)] font-semibold mb-1">
+                        Abstract
+                      </div>
+                      <p>{pub.abstract}</p>
+                    </div>
+
+                    {pub.keyFindings && pub.keyFindings.length > 0 && (
+                      <div>
+                        <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--color-text-subtle)] font-semibold mb-1.5">
+                          Key Empirical Contributions
+                        </div>
+                        <ul className="space-y-1.5 list-disc list-inside text-[var(--color-text-main)]/90">
+                          {pub.keyFindings.map((finding, fIdx) => (
+                            <li key={fIdx} className="leading-relaxed">
+                              {finding}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Expandable BibTeX Citation Drawer */}
+                {openBibtexId === pub.id && pub.bibtex && (
+                  <div className="mt-4 pt-4 border-t border-[var(--color-border)]">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-[var(--color-text-subtle)] font-semibold">
+                        BibTeX Citation Record
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyBibtex(pub.id, pub.bibtex!)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-elevated)] hover:border-[var(--color-primary)] text-[11px] font-mono text-[var(--color-text-main)] transition-colors cursor-pointer"
+                      >
+                        {copiedId === pub.id ? (
+                          <>
+                            <Check className="w-3 h-3 text-[var(--color-primary)]" />
+                            <span className="text-[var(--color-primary)]">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3 text-[var(--color-text-muted)]" />
+                            <span>Copy .bib</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <pre className="p-3.5 rounded-lg bg-[var(--color-surface-base)] border border-[var(--color-border)] font-mono text-[11px] sm:text-xs text-[var(--color-text-muted)] overflow-x-auto leading-relaxed">
+                      <code>{pub.bibtex}</code>
+                    </pre>
+                  </div>
+                )}
               </div>
             ))}
           </div>

@@ -58,7 +58,7 @@ export const AboutSection: React.FC = () => {
             <p className="text-xs text-[var(--color-primary)]/80 mb-4 font-sans">View full details of my degrees, diplomas, and academic awards.</p>
             <a
               href="/education"
-              className="inline-block px-4 py-2 bg-[var(--color-primary)] text-[#0a192f] text-xs font-mono font-bold rounded-xl hover:bg-[var(--color-primary-hover)] transition-colors shadow-xs"
+              className="inline-block px-4 py-2 bg-[var(--color-primary)] text-[var(--color-primary-text)] text-xs font-mono font-bold rounded-xl hover:bg-[var(--color-primary-hover)] transition-colors shadow-xs"
             >
               Explore Education Deck →
             </a>

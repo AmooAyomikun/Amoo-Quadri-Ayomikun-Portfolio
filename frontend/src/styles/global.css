@@ -56,8 +56,8 @@
 }
 
 ::selection {
-  background-color: #233554;
-  color: #64ffda;
+  background-color: var(--color-surface-elevated);
+  color: var(--color-primary);
 }
 
 /* Utility Animations */

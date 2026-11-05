@@ -114,10 +114,10 @@ export const GithubCalendarGrid: React.FC<GithubCalendarGridProps> = ({
       {/* Floating Day Tooltip */}
       {hoveredDay && (
         <div
-          className="fixed z-50 pointer-events-none transform -translate-x-1/2 -translate-y-full px-2.5 py-1 rounded bg-[#0a192f] border border-[#233554] text-xs font-mono text-[#ccd6f6] shadow-xl whitespace-nowrap"
+          className="fixed z-50 pointer-events-none transform -translate-x-1/2 -translate-y-full px-2.5 py-1 rounded bg-[var(--color-surface-card)] border border-[var(--color-border)] text-xs font-mono text-[var(--color-text-main)] shadow-xl whitespace-nowrap"
           style={{ left: `${hoveredDay.x}px`, top: `${hoveredDay.y}px` }}
         >
-          <span className="text-[#64ffda] font-bold">
+          <span className="text-[var(--color-primary)] font-bold">
             {hoveredDay.day.count} {hoveredDay.day.count === 1 ? 'contribution' : 'contributions'}
           </span>{' '}
           on {hoveredDay.day.dateStr}

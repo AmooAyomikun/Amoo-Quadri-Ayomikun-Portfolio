@@ -31,6 +31,10 @@ export interface PublicationItem {
   status: string
   journal?: string
   link?: string
+  doi?: string
+  abstract?: string
+  keyFindings?: string[]
+  bibtex?: string
 }
 
 export interface ResearchItem {
@@ -238,7 +242,23 @@ export const portfolioData = {
       type: 'JOURNAL ARTICLE',
       status: 'PUBLISHED',
       journal: 'Zenodo',
-      link: 'https://zenodo.org/records/22926326'
+      doi: '10.5281/zenodo.22926326',
+      link: 'https://zenodo.org/records/22926326',
+      abstract:
+        'Traditional hotel reservation platforms rely heavily on static popularity rankings rather than spatial relevance and multi-criteria user constraints. This study presents the architectural design and empirical evaluation of a web-based hotel management and reservation system integrating Haversine great-circle spatial proximity calculation with weighted preference scoring across budget, amenities, and historical guest ratings.',
+      keyFindings: [
+        'Formulated a hybrid spatial-preference scoring model combining Haversine distance decay with normalized budget and amenity weights.',
+        'Engineered an end-to-end reservation workflow with transactional room availability locking in PostgreSQL.',
+        'Reduced search-to-booking decision latency during user evaluation compared to unranked directory listings.'
+      ],
+      bibtex: `@article{amoo2026hotel,
+  author    = {Amoo, Quadri Ayomikun},
+  title     = {Development of a Hotel Management System with Location-Based Recommendation and Reservation},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.22926326},
+  url       = {https://zenodo.org/records/22926326}
+}`
     },
     {
       id: 'pub-bias',
@@ -248,7 +268,23 @@ export const portfolioData = {
       type: 'PREPRINT',
       status: 'OPEN',
       journal: 'Zenodo',
-      link: 'https://zenodo.org/records/20269104'
+      doi: '10.5281/zenodo.20269104',
+      link: 'https://zenodo.org/records/20269104',
+      abstract:
+        'Machine learning classifiers trained on skewed real-world datasets frequently exhibit systematic bias against underrepresented target classes, compounded by label noise and feature incompleteness. This paper proposes a data quality-aware preprocessing and evaluation framework that couples structural data auditing with targeted resampling prior to model training to mitigate downstream prediction disparities.',
+      keyFindings: [
+        'Audited how class imbalance interacts with missingness and feature noise to amplify false-negative rates on minority cohorts.',
+        'Demonstrated measurable gains in minority-class F1 and balanced accuracy without degrading overall model calibration.',
+        'Established a reproducible preprocessing protocol for fairness-sensitive classification pipelines.'
+      ],
+      bibtex: `@article{amoo2026bias,
+  author    = {Amoo, Quadri Ayomikun and Ademola, Mayowa Mosunmola and Agboola, Farouq Ayodeji},
+  title     = {A Data Quality-Aware Framework for Reducing Algorithmic Bias in Imbalanced Datasets},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.20269104},
+  url       = {https://zenodo.org/records/20269104}
+}`
     }
   ] as PublicationItem[],
 

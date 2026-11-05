@@ -128,7 +128,7 @@ export const Navbar: React.FC = () => {
         {active && (
           <motion.span
             layoutId="dockActive"
-            className="absolute inset-0 rounded-full bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/30 shadow-[0_0_12px_rgba(100,255,218,0.2)]"
+            className="absolute inset-0 rounded-full bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/30 shadow-[0_0_12px_rgba(212,163,89,0.2)]"
             transition={{ type: 'spring', stiffness: 420, damping: 34 }}
           />
         )}

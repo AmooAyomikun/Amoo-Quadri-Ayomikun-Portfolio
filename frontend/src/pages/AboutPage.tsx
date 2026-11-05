@@ -9,7 +9,7 @@ import { PageContainer } from '../components/PageContainer'
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[#64ffda] selection:text-[#0a192f]">
+    <div className="min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-main)] flex flex-col justify-between selection:bg-[var(--color-primary)] selection:text-[var(--color-primary-text)]">
       <SEO 
         title="About & Biography" 
         description="Learn about Quadri Ayomikun Amoo, his background in Software Engineering (4.45/5.00 Final CGPA, Top 10%), research philosophy, and engineering mindset."

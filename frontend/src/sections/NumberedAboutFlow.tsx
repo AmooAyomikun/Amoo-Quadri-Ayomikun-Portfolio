@@ -18,9 +18,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 01. IDENTITY',
       tabLabel: '01. IDENTITY',
       shortLabel: 'IDENTITY',
-      accentColor: '#64ffda',
-      tabBg: 'bg-[#64ffda]',
-      tabText: 'text-[#0a192f]',
+      accentColor: '#d4a359',
+      tabBg: 'bg-[var(--color-primary)]',
+      tabText: 'text-[var(--color-primary-text)]',
       title: 'Full-Stack Engineer & AI Enthusiast',
       icon: <Sparkles className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -35,9 +35,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 02. ACADEMICS',
       tabLabel: '02. ACADEMICS',
       shortLabel: 'ACADEMICS',
-      accentColor: '#64ffda',
-      tabBg: 'bg-[#64ffda]',
-      tabText: 'text-[#0a192f]',
+      accentColor: '#d4a359',
+      tabBg: 'bg-[var(--color-primary)]',
+      tabText: 'text-[var(--color-primary-text)]',
       title: 'Academic Milestones',
       icon: <GraduationCap className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -52,9 +52,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 03. RESEARCH',
       tabLabel: '03. RESEARCH',
       shortLabel: 'RESEARCH',
-      accentColor: '#64ffda',
-      tabBg: 'bg-[#64ffda]',
-      tabText: 'text-[#0a192f]',
+      accentColor: '#d4a359',
+      tabBg: 'bg-[var(--color-primary)]',
+      tabText: 'text-[var(--color-primary-text)]',
       title: 'Applied Research',
       icon: <BookOpen className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -69,9 +69,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 04. LEADERSHIP',
       tabLabel: '04. LEADERSHIP',
       shortLabel: 'LEADERSHIP',
-      accentColor: '#64ffda',
-      tabBg: 'bg-[#64ffda]',
-      tabText: 'text-[#0a192f]',
+      accentColor: '#d4a359',
+      tabBg: 'bg-[var(--color-primary)]',
+      tabText: 'text-[var(--color-primary-text)]',
       title: 'Mentorship & Impact',
       icon: <Users className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -86,9 +86,9 @@ export const NumberedAboutFlow: React.FC = () => {
       codeTag: '// 05. VISION',
       tabLabel: '05. VISION',
       shortLabel: 'VISION',
-      accentColor: '#64ffda',
-      tabBg: 'bg-[#64ffda]',
-      tabText: 'text-[#0a192f]',
+      accentColor: '#d4a359',
+      tabBg: 'bg-[var(--color-primary)]',
+      tabText: 'text-[var(--color-primary-text)]',
       title: 'Next Steps',
       icon: <Award className="w-4 h-4 shrink-0" />,
       textHtml: (
@@ -194,7 +194,7 @@ export const NumberedAboutFlow: React.FC = () => {
                     {item.tags?.map((tag, tIdx) => (
                       <span
                         key={tIdx}
-                        className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider text-[#0a192f]"
+                        className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider text-[#111110]"
                         style={{ backgroundColor: item.accentColor }}
                       >
                         {tag}
@@ -259,7 +259,7 @@ export const NumberedAboutFlow: React.FC = () => {
                       left: `${idx * 153}px`,
                       clipPath: clipPolygon,
                       backgroundColor: item.accentColor,
-                      color: '#0a192f'
+                      color: '#111110'
                     }}
                   >
                     <span className="shrink-0">{item.icon}</span>
@@ -326,7 +326,7 @@ export const NumberedAboutFlow: React.FC = () => {
                         className="px-3 py-1.5 rounded-full text-xs font-mono font-bold tracking-wider"
                         style={{
                           backgroundColor: item.accentColor,
-                          color: '#0a192f'
+                          color: '#111110'
                         }}
                       >
                         {tag}

@@ -23,7 +23,7 @@ export const Badge: React.FC<BadgeProps> = ({
   }
 
   const variantStyles = {
-    primary: "bg-[var(--color-primary)] !text-[var(--color-primary-text)] font-bold border border-transparent shadow-[0_0_10px_rgba(100,255,218,0.3)]",
+    primary: "bg-[var(--color-primary)] !text-[var(--color-primary-text)] font-bold border border-transparent shadow-[0_0_10px_rgba(212,163,89,0.25)]",
     accent: "bg-[var(--color-accent)] text-white border border-transparent",
     outline: "border border-[var(--color-border)] text-[var(--color-text-main)] bg-transparent",
     subtle: "bg-[var(--color-surface-card)] text-[var(--color-text-main)] border border-[var(--color-border)] hover:border-[var(--color-primary)]/50"
