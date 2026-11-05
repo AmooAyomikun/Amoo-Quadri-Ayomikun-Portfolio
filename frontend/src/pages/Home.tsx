@@ -3,6 +3,7 @@ import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { SocialSidebars } from '../components/SocialSidebars'
 import { HeroSection } from '../sections/HeroSection'
+import { SelectedWorksSection } from '../sections/SelectedWorksSection'
 import { AboutJourneySection } from '../sections/AboutJourneySection'
 import { NewsSection } from '../sections/NewsSection'
 import { QuestionsSection } from '../sections/QuestionsSection'
@@ -27,6 +28,8 @@ export default function Home() {
         <AboutJourneySection />
 
         <TechStackSection />
+
+        <SelectedWorksSection />
         
         <VisitorMapSection />
         

@@ -1,15 +1,15 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, GraduationCap, Briefcase, Download } from 'lucide-react'
+import { ArrowRight, GraduationCap, Briefcase, BookOpen, Download } from 'lucide-react'
 import { motion, type Variants } from 'framer-motion'
 import { AnimatedWords } from '../components/AnimatedWords'
 import { useTypewriter } from '../hooks/useTypewriter'
 
 const TYPEWRITER_PHRASES = [
-  'intelligent systems.',
-  'research applications.',
-  'accessible platforms.',
-  'scalable software.'
+  'applied ML frameworks.',
+  'geospatial architectures.',
+  'offline-first platforms.',
+  'data-driven software.'
 ]
 
 const containerVariants: Variants = {
@@ -46,15 +46,19 @@ export const HeroSection: React.FC = () => {
           animate="visible"
           className="flex flex-col items-start text-left space-y-3 sm:space-y-4 md:space-y-4 max-w-4xl"
         >
-          {/* Subtitle / Intro Greeting */}
+          {/* Discipline / Credential Eyebrow */}
           <motion.div
             variants={itemVariants}
-            className="font-mono text-[var(--color-primary)] text-xs sm:text-sm tracking-wide font-medium"
+            className="font-mono text-[var(--color-primary)] text-[11px] sm:text-xs tracking-widest uppercase font-semibold flex flex-wrap items-center gap-x-2.5 gap-y-1"
           >
-            Hi, my name is
+            <span>Software Engineer &amp; Applied ML Researcher</span>
+            <span className="text-[var(--color-text-subtle)] hidden sm:inline">·</span>
+            <span className="text-[var(--color-text-muted)] font-normal hidden sm:inline">
+              B.Sc. Software Engineering (4.45 / 5.00 CGPA, Top 10%)
+            </span>
           </motion.div>
 
-          {/* Huge Main Name Header */}
+          {/* Main Name Header */}
           <motion.h1
             variants={itemVariants}
             className="text-3xl sm:text-5xl lg:text-6xl font-sans font-bold text-[var(--color-text-main)] tracking-tight leading-tight break-words"
@@ -67,7 +71,7 @@ export const HeroSection: React.FC = () => {
             variants={itemVariants}
             className="text-xl sm:text-3xl lg:text-4xl font-sans font-bold text-[var(--color-text-muted)] tracking-tight leading-snug"
           >
-            <span>I build things for the web &amp;&nbsp;</span>
+            <span>Engineering production web systems &amp;&nbsp;</span>
             <span className="text-[var(--color-primary)] inline">{currentText}</span>
             <span
               className="inline-block w-[3px] h-[0.85em] bg-[var(--color-primary)] ml-1 align-baseline animate-pulse"
@@ -75,12 +79,12 @@ export const HeroSection: React.FC = () => {
             />
           </motion.h2>
 
-          {/* Subtitle / Bio Paragraph */}
+          {/* Grounded Bio Paragraph */}
           <motion.p
             variants={itemVariants}
             className="text-[var(--color-text-muted)] text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl font-sans pt-1"
           >
-            I am a software engineer specializing in building high-performance web applications with a strong focus on creating fast, intuitive, and accessible user experiences. While frontend is where I do my best work, I also build complete full-stack applications and engage in applied academic research in machine learning, data-driven systems, and intelligent computing.
+            I design and build full-stack web applications alongside empirical research in machine learning and spatial recommendation systems. My work bridges accessible, offline-capable frontend engineering with peer-reviewed studies on data quality, algorithmic fairness, and location-aware computing.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -92,7 +96,7 @@ export const HeroSection: React.FC = () => {
               to="/projects"
               className="inline-flex items-center justify-center px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg border border-[var(--color-primary)] text-[var(--color-primary)] font-mono text-xs sm:text-sm font-semibold hover:bg-[var(--color-primary-light)] transition-all duration-200 group text-center"
             >
-              <span>Check out my work!</span>
+              <span>Explore Projects &amp; Research</span>
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Link>
 
@@ -111,14 +115,18 @@ export const HeroSection: React.FC = () => {
             variants={itemVariants}
             className="pt-4 sm:pt-5 border-t border-[var(--color-border)] w-full flex flex-wrap items-center gap-4 sm:gap-7 font-mono text-[11px] sm:text-xs text-[var(--color-text-muted)]"
           >
-            <a href="#about" className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 cursor-pointer">
-              <GraduationCap className="w-3.5 h-3.5 text-[var(--color-primary)]" />
-              <span>Read Biography</span>
-            </a>
+            <Link to="/research" className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-[var(--color-primary)]" />
+              <span>Publications (2)</span>
+            </Link>
             <Link to="/experience" className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5">
               <Briefcase className="w-3.5 h-3.5 text-[var(--color-primary)]" />
               <span>Experience</span>
             </Link>
+            <a href="#about" className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 cursor-pointer">
+              <GraduationCap className="w-3.5 h-3.5 text-[var(--color-primary)]" />
+              <span>Biography</span>
+            </a>
             <a href="#contact" className="hover:text-[var(--color-primary)] transition-colors">
               <span>Get in Touch →</span>
             </a>
