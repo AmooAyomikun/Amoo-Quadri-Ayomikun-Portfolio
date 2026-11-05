@@ -14,7 +14,7 @@ export function matchPortfolioQuery(userPrompt: string): string {
   const isGreeting = /\b(yo|wassup|what's up|sup|hi|hello|hey|heyy|howdy|hola|good morning|good afternoon|good evening|how are you|how far|wagywan)\b/i.test(lower)
   
   if (isGreeting && !/\b(study|studied|school|gpa|cgpa|education|degree|where|research|thesis|project|projects|skill|skills|job|experience|contact|email|phone|goal|goals|vision|aim|award|awards|who|about)\b/i.test(lower)) {
-    return "Yo! What's up? 👋 I'm Quadri's AI Assistant. I'm doing great! Ask me anything about Quadri's software engineering projects, AI research, education & honors, or how to get in touch!"
+    return "Hello! I'm Quadri's AI Assistant. Ask me anything about Quadri's software engineering projects, AI research, education & honors, or how to get in touch!"
   }
 
   // 2. EDUCATION / DEGREE / SCHOOL / UNIVERSITY / GPA / CGPA / STUDY / WHERE

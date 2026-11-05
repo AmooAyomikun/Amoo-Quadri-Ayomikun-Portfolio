@@ -7,6 +7,7 @@ import { Badge } from '../components/Badge'
 import { NewsHero } from '../components/PageHeroes'
 import { SEO } from '../components/SEO'
 import { PageContainer } from '../components/PageContainer'
+import { ArrowUpRight } from 'lucide-react'
 
 export default function NewsPage() {
 
@@ -39,8 +40,9 @@ export default function NewsPage() {
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-[var(--color-border)]">
                   <span className="text-xs font-bold font-mono tracking-widest uppercase text-[var(--color-text-main)]">{pub.journal}</span>
                   {pub.link && (
-                    <a href={pub.link} target="_blank" rel="noreferrer" className="text-xs text-[var(--color-primary)] hover:underline font-mono font-bold">
-                      View Publication ↗
+                    <a href={pub.link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-[var(--color-primary)] hover:underline font-mono font-bold">
+                      <span>View Publication</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
                     </a>
                   )}
                 </div>

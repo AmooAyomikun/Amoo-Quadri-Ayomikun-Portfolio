@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { SlidersHorizontal, Check } from 'lucide-react'
+import { SlidersHorizontal, Check, ArrowUpRight } from 'lucide-react'
 import type { ColorTheme } from '../hooks/useGithubContributions'
 
 interface GithubSettingsDropdownProps {
@@ -99,7 +99,8 @@ export const GithubSettingsDropdown: React.FC<GithubSettingsDropdownProps> = ({
                 rel="noreferrer"
                 className="text-[var(--color-primary)] hover:underline flex items-center gap-1"
               >
-                GitHub Settings ↗
+                <span>GitHub Settings</span>
+                <ArrowUpRight className="w-3 h-3" />
               </a>
             </div>
           </motion.div>

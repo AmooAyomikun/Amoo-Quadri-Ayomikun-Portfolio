@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
-import { Award, Sparkles, Code2, Layers } from 'lucide-react'
+import { Award, Sparkles, Code2, Layers, Star } from 'lucide-react'
 import { SEO } from '../components/SEO'
 import { EducationHero } from '../components/PageHeroes'
 import { AnimatedCounter } from '../components/AnimatedCounter'
@@ -153,7 +153,7 @@ export default function EducationPage() {
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[var(--color-primary-light)] text-[var(--color-primary)] border border-[var(--color-primary)]/25 font-semibold">
                     {award.badge}
                   </span>
-                  <span className="text-[var(--color-primary)] font-bold text-base">★</span>
+                  <Star className="w-3.5 h-3.5 fill-current text-[var(--color-primary)] shrink-0" />
                 </div>
                 <h4 className="text-sm font-serif font-bold text-[var(--color-text-main)] mb-1">
                   {award.title}

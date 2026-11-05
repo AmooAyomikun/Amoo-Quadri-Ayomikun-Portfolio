@@ -20,7 +20,7 @@ if (getApps().length === 0) {
       });
       console.log('Firebase Admin initialized successfully from environment variables.');
     } catch (error) {
-      console.error('⚠️ Failed to parse FIREBASE_CREDENTIALS environment variable:', error);
+      console.error('[WARN] Failed to parse FIREBASE_CREDENTIALS environment variable:', error);
     }
   } else if (fs.existsSync(serviceAccountPath)) {
     const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
@@ -29,8 +29,8 @@ if (getApps().length === 0) {
     });
     console.log('Firebase Admin initialized successfully from file.');
   } else {
-    console.warn('⚠️ Firebase service account key not found at:', serviceAccountPath);
-    console.warn('⚠️ Firestore features will not work until you add firebase-key.json or FIREBASE_CREDENTIALS env var.');
+    console.warn('[WARN] Firebase service account key not found at:', serviceAccountPath);
+    console.warn('[WARN] Firestore features will not work until you add firebase-key.json or FIREBASE_CREDENTIALS env var.');
   }
 }
 

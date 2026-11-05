@@ -23,7 +23,7 @@ const envSchema = z.object({
 const parsedEnv = envSchema.safeParse(process.env)
 
 if (!parsedEnv.success) {
-  console.warn('⚠️ Environment configuration notice:')
+  console.warn('[WARN] Environment configuration notice:')
   for (const issue of parsedEnv.error.issues) {
     console.warn(` - [${issue.path.join('.')}]: ${issue.message}`)
   }
@@ -35,7 +35,7 @@ const fallbackSalt = process.env.VISITOR_SALT || 'amoo-quadri-visitor-salt-produ
 const fallbackSecret = process.env.ADMIN_TOKEN_SECRET || process.env.ADMIN_PASSWORD || 'amoo-quadri-admin-token-secret-fallback-key-32'
 
 if (isProd && (!process.env.VISITOR_SALT || process.env.VISITOR_SALT.length < 16)) {
-  console.warn('⚠️ [Production Warning] VISITOR_SALT is not configured in Render dashboard. Using secure internal fallback.')
+  console.warn('[WARN] [Production Warning] VISITOR_SALT is not configured in Render dashboard. Using secure internal fallback.')
 }
 
 export const env = {

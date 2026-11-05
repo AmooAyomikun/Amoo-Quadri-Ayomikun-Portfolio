@@ -220,7 +220,7 @@ export default function GuestbookPage() {
                       setMessage(e.target.value)
                       if (submitError) setSubmitError(null)
                     }}
-                    placeholder="You are amazing, keep it up! 🔥"
+                    placeholder="Great work on your portfolio and research!"
                     rows={3}
                     className="w-full bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--color-primary)] transition-colors resize-none"
                   />

@@ -1,6 +1,17 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Check, Copy, ExternalLink, Mail } from 'lucide-react'
+import {
+  Briefcase,
+  Check,
+  Copy,
+  ExternalLink,
+  GraduationCap,
+  Mail,
+  Microscope,
+  Newspaper,
+  PenLine,
+  Zap
+} from 'lucide-react'
 import { portfolioData } from '../content/portfolioData'
 
 /* -------------------------------------------------------------------------- */
@@ -16,8 +27,8 @@ const rise = (delay = 0) => ({
 })
 
 /**
- * Terminal / Monospace Eyebrow Badge matching reference screenshots:
- * e.g. `>_ QA.PROJECTS_AND_SKILLS>` or `🔬 QA.RESEARCH_AND_PUBLICATIONS>`
+ * Terminal / Monospace Eyebrow Badge
+ * e.g. `>_ QA.PROJECTS_AND_SKILLS>` or `// QA.RESEARCH_AND_PUBLICATIONS>`
  */
 interface EyebrowProps {
   children: React.ReactNode
@@ -39,7 +50,7 @@ export const ResearchHero: React.FC = () => {
   return (
     <header className="pt-5 sm:pt-14 pb-4 sm:pb-12 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span className="text-xs">🔬</span> // EMPIRICAL RESEARCH &amp; SCHOLARSHIP
+        <Microscope className="w-3.5 h-3.5 shrink-0" /> // EMPIRICAL RESEARCH &amp; SCHOLARSHIP
       </Eyebrow>
 
       <motion.h1
@@ -123,7 +134,7 @@ export const ProjectsHero: React.FC = () => {
   return (
     <header className="pt-6 sm:pt-14 pb-5 sm:pb-10 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span className="text-xs">⚡</span> // PRODUCTION SYSTEMS &amp; ARCHITECTURE
+        <Zap className="w-3.5 h-3.5 shrink-0" /> // PRODUCTION SYSTEMS &amp; ARCHITECTURE
       </Eyebrow>
 
       <motion.h1
@@ -200,7 +211,7 @@ export const ExperienceHero: React.FC = () => {
   return (
     <header className="pt-5 sm:pt-14 pb-4 sm:pb-12 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span className="text-xs">💼</span> // CAREER &amp; ENGINEERING TIMELINE
+        <Briefcase className="w-3.5 h-3.5 shrink-0" /> // CAREER &amp; ENGINEERING TIMELINE
       </Eyebrow>
 
       <motion.h1
@@ -250,7 +261,7 @@ export const EducationHero: React.FC = () => {
   return (
     <header className="pt-5 sm:pt-14 pb-4 sm:pb-8 px-2 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span className="text-xs">🎓</span> // ACADEMIC FOUNDATIONS &amp; CREDENTIALS
+        <GraduationCap className="w-3.5 h-3.5 shrink-0" /> // ACADEMIC FOUNDATIONS &amp; CREDENTIALS
       </Eyebrow>
 
       <motion.h1
@@ -278,7 +289,7 @@ export const NewsHero: React.FC = () => {
   return (
     <header className="pt-6 sm:pt-14 pb-4 sm:pb-12 px-3 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span className="text-xs">📰</span> // DISPATCHES &amp; ANNOUNCEMENTS
+        <Newspaper className="w-3.5 h-3.5 shrink-0" /> // DISPATCHES &amp; ANNOUNCEMENTS
       </Eyebrow>
 
       <motion.h1
@@ -319,7 +330,7 @@ export const ContactHero: React.FC = () => {
   return (
     <header className="pt-10 sm:pt-14 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span>✉️</span> // DIRECT INQUIRIES &amp; COLLABORATION
+        <Mail className="w-3.5 h-3.5 shrink-0" /> // DIRECT INQUIRIES &amp; COLLABORATION
       </Eyebrow>
 
       <motion.h1
@@ -372,7 +383,7 @@ export const GuestbookHero: React.FC = () => {
   return (
     <header className="pt-10 sm:pt-14 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 text-center max-w-4xl mx-auto">
       <Eyebrow>
-        <span>✍️</span> // DIGITAL VISITOR LOGBOOK
+        <PenLine className="w-3.5 h-3.5 shrink-0" /> // DIGITAL VISITOR LOGBOOK
       </Eyebrow>
 
       <motion.h1

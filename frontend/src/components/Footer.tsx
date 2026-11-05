@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Mail, ArrowUp, CheckCircle2 } from 'lucide-react'
+import { Mail, ArrowUp, ArrowUpRight, Download, CheckCircle2 } from 'lucide-react'
 import { portfolioData } from '../content/portfolioData'
 
 const GithubIcon: React.FC<{ className?: string }> = ({ className = "w-4 h-4" }) => (
@@ -104,10 +104,10 @@ export const Footer: React.FC = () => {
                 </h3>
                 <ul className="space-y-2 text-xs text-[var(--color-primary-text)]/85 font-medium font-sans">
                   <li><Link to="/contact" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Contact Me</Link></li>
-                  <li><a href={portfolioData.personal.github} target="_blank" rel="noreferrer" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">GitHub ↗</a></li>
-                  <li><a href={portfolioData.personal.linkedIn} target="_blank" rel="noreferrer" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">LinkedIn ↗</a></li>
-                  <li><a href={portfolioData.personal.googleScholar} target="_blank" rel="noreferrer" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Google Scholar ↗</a></li>
-                  <li><a href="/Amoo_Quadri_CV.pdf" download="Amoo_Quadri_CV.pdf" className="hover:text-[var(--color-primary-text)] hover:underline transition-colors">Download CV ↓</a></li>
+                  <li><a href={portfolioData.personal.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-[var(--color-primary-text)] hover:underline transition-colors"><span>GitHub</span><ArrowUpRight className="w-3 h-3" /></a></li>
+                  <li><a href={portfolioData.personal.linkedIn} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-[var(--color-primary-text)] hover:underline transition-colors"><span>LinkedIn</span><ArrowUpRight className="w-3 h-3" /></a></li>
+                  <li><a href={portfolioData.personal.googleScholar} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-[var(--color-primary-text)] hover:underline transition-colors"><span>Google Scholar</span><ArrowUpRight className="w-3 h-3" /></a></li>
+                  <li><a href="/Amoo_Quadri_CV.pdf" download="Amoo_Quadri_CV.pdf" className="inline-flex items-center gap-1 hover:text-[var(--color-primary-text)] hover:underline transition-colors"><span>Download CV</span><Download className="w-3 h-3" /></a></li>
                 </ul>
               </div>
             </div>

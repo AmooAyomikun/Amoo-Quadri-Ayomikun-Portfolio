@@ -79,24 +79,24 @@ const isServerEntry = entryFile.endsWith('server.ts') || entryFile.endsWith('ser
 
 if (!isTestRun && isServerEntry) {
   const server = app.listen(PORT, () => {
-    console.log(`🚀 Quadri Portfolio Backend Server listening on http://localhost:${PORT}`)
+    console.log(`[INFO] Quadri Portfolio Backend Server listening on http://localhost:${PORT}`)
   })
 
   // Graceful shutdown handler (Issue 1.4)
   const shutdown = (signal: string) => {
-    console.log(`\n🛑 Received ${signal}. Starting graceful shutdown...`)
+    console.log(`\n[INFO] Received ${signal}. Starting graceful shutdown...`)
     server.close((err) => {
       if (err) {
         console.error('Error during server close:', err)
         process.exit(1)
       }
-      console.log('✅ HTTP server closed. Inflight requests drained.')
+      console.log('[INFO] HTTP server closed. Inflight requests drained.')
       process.exit(0)
     })
 
     // Force exit if connections take too long to close
     setTimeout(() => {
-      console.error('⚠️ Forcing server shutdown after 10s timeout.')
+      console.error('[WARN] Forcing server shutdown after 10s timeout.')
       process.exit(1)
     }, 10000).unref()
   }

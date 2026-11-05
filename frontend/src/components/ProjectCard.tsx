@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import type { ProjectItem } from '../content/portfolioData'
-import { BookOpen } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, BookOpen } from 'lucide-react'
 import { InteractiveAppPreview } from './InteractiveAppPreview'
 
 interface ProjectCardProps {
@@ -43,7 +43,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
               {project.title}
             </h3>
             <span className="text-[var(--color-primary)] opacity-0 group-hover/link:opacity-100 transition-opacity duration-300 transform group-hover/link:translate-x-1 font-mono">
-              →
+              <ArrowRight className="w-4 h-4" />
             </span>
           </div>
 
@@ -56,13 +56,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
               {project.category.replace('-', ' ').toUpperCase()} · {project.technologies.slice(0, 2).join(' / ')}
             </p>
             <span className="text-xs font-mono text-[var(--color-primary)] group-hover/link:underline inline-flex items-center gap-1 font-semibold self-start sm:self-auto shrink-0">
-              {project.status === 'in-progress'
-                ? 'In Progress ↗'
-                : project.caseStudyPath
-                  ? 'Read Study ↗'
-                  : project.lens === 'research' || project.category === 'ai-data'
-                    ? 'View Publication ↗'
-                    : 'View Architecture ↗'}
+              <span>
+                {project.status === 'in-progress'
+                  ? 'In Progress'
+                  : project.caseStudyPath
+                    ? 'Read Study'
+                    : project.lens === 'research' || project.category === 'ai-data'
+                      ? 'View Publication'
+                      : 'View Architecture'}
+              </span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
             </span>
           </div>
         </Link>
