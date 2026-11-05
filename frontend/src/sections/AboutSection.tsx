@@ -1,5 +1,5 @@
 import React from 'react'
-import { GraduationCap, Award, BookOpen } from 'lucide-react'
+import { GraduationCap, BookOpen } from 'lucide-react'
 import { portfolioData } from '../content/portfolioData'
 import { SectionHeader } from '../components/SectionHeader'
 import { Badge } from '../components/Badge'

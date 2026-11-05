@@ -7,7 +7,6 @@ import {
   ArrowLeft, 
   Calendar, 
   Clock, 
-  Users, 
   Share2, 
   Headphones, 
   Play, 
@@ -70,16 +69,6 @@ export default function NewsArticlePage() {
     return Math.max(60, Math.round((words / 145) * 60))
   }, [news])
 
-  // Readers view count simulation based on article ID hash
-  const readersCount = useMemo(() => {
-    if (!id) return 14
-    let hash = 0
-    for (let i = 0; i < id.length; i++) {
-      hash = (hash << 5) - hash + id.charCodeAt(i)
-      hash |= 0
-    }
-    return 12 + Math.abs(hash % 24)
-  }, [id])
 
   // Load comments from localStorage for this specific article
   useEffect(() => {
