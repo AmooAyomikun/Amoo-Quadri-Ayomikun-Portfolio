@@ -4,6 +4,39 @@ import { apiUrl } from '../lib/api'
 
 const STORAGE_KEY = 'qaa_subscribed_email'
 const SYNC_EVENT = 'qaa-subscription-updated'
+const GMAIL_WEBHOOK_FALLBACK =
+  'https://script.google.com/macros/s/AKfycbwzoK7WhhSttUUY2OQgeESZapty8vQrqHaQmMi8C4YliBQsJyIAtnKvJ88PowTE1dBG5g/exec'
+
+async function dispatchClientWelcomeFallback(subscriberEmail: string) {
+  const frontendUrl = 'https://amoo-quadri-ayomikun-portfolio-fron.vercel.app'
+  try {
+    await fetch(GMAIL_WEBHOOK_FALLBACK, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        to: subscriberEmail,
+        subject: "Welcome to Quadri Ayomikun Amoo's Research & Engineering Dispatches",
+        html: `
+          <div style="font-family:Georgia,serif;max-width:580px;margin:0 auto;padding:28px;background:#111110;color:#edeae4;border-radius:16px;border:1px solid #2a2926;">
+            <p style="font-family:monospace;font-size:11px;letter-spacing:2px;color:#d4a359;text-transform:uppercase;margin:0 0 8px;">// SUBSCRIPTION CONFIRMED</p>
+            <h2 style="margin:0 0 16px;font-size:22px;color:#edeae4;">Thank you for subscribing</h2>
+            <p style="font-family:sans-serif;font-size:14px;line-height:1.6;color:#a19d95;">
+              Your email (<strong style="color:#edeae4;">${subscriberEmail}</strong>) is now subscribed to receive updates whenever new peer-reviewed research, technical articles, or software engineering milestones are published.
+            </p>
+            <div style="margin:24px 0;">
+              <a href="${frontendUrl}/news" style="display:inline-block;padding:10px 20px;background:#d4a359;color:#111110;text-decoration:none;font-family:monospace;font-weight:bold;font-size:12px;border-radius:8px;">
+                Explore Latest Dispatches
+              </a>
+            </div>
+          </div>
+        `
+      })
+    })
+  } catch {
+    // ignore fallback errors
+  }
+}
 
 const GoogleGIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
   <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
@@ -107,7 +140,8 @@ export const NewsletterSubscribeCard: React.FC<NewsletterSubscribeCardProps> = (
         })
       }
     } catch {
-      // Offline / cold-start fallback: still record locally and retry in background
+      // Offline / cold-start fallback: still record locally and dispatch welcome email via Gmail webhook
+      void dispatchClientWelcomeFallback(finalEmail)
       try {
         localStorage.setItem(STORAGE_KEY, finalEmail)
         window.dispatchEvent(new Event(SYNC_EVENT))
@@ -118,7 +152,7 @@ export const NewsletterSubscribeCard: React.FC<NewsletterSubscribeCardProps> = (
       setEmailInput('')
       setFeedback({
         type: 'success',
-        text: `Subscribed ${finalEmail}! Your email is queued for Quadri's research & engineering updates.`
+        text: `Subscribed ${finalEmail}! Check your Gmail inbox for a confirmation message.`
       })
     } finally {
       setSubmitting(false)
@@ -391,3 +425,4 @@ export const NewsletterSubscribeCard: React.FC<NewsletterSubscribeCardProps> = (
     </div>
   )
 }
+

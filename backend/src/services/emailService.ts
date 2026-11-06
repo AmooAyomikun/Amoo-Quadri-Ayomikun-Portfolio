@@ -150,24 +150,27 @@ export class EmailService {
     subject: string
     html: string
   }): Promise<boolean> {
-    const gmailWebhookUrl = process.env.GMAIL_WEBHOOK_URL?.trim()
+    const defaultGmailWebhook =
+      'https://script.google.com/macros/s/AKfycbwzoK7WhhSttUUY2OQgeESZapty8vQrqHaQmMi8C4YliBQsJyIAtnKvJ88PowTE1dBG5g/exec'
+    const gmailWebhookUrl = (process.env.GMAIL_WEBHOOK_URL || defaultGmailWebhook).trim()
     const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.trim()
     const gmailUser = (process.env.GMAIL_USER || process.env.ADMIN_NOTIFY_EMAIL || 'amooquadri555@gmail.com').trim()
     const resendApiKey = process.env.RESEND_API_KEY?.trim()
 
-    // 1. Try Gmail Apps Script HTTPS Webhook first if configured (never blocked by Render firewall)
+    // 1. Try Gmail Apps Script HTTPS Webhook first (never blocked by Render firewall)
     if (gmailWebhookUrl) {
       try {
         const res = await fetch(gmailWebhookUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          redirect: 'follow',
           body: JSON.stringify({
             to: params.to,
             subject: params.subject,
             html: params.html
           })
         })
-        if (res.ok) {
+        if (res.ok || res.status === 302) {
           console.log(`[EmailService] Sent email to ${params.to} via Gmail Webhook`)
           return true
         }
