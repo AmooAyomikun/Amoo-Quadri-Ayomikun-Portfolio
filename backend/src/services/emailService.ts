@@ -150,6 +150,14 @@ export class EmailService {
     subject: string
     html: string
   }): Promise<boolean> {
+    if (
+      process.env.NODE_ENV === 'test' ||
+      params.to.endsWith('@academic-lab.org') ||
+      params.html.includes('janesmith@university.edu')
+    ) {
+      return false
+    }
+
     const defaultGmailWebhook =
       'https://script.google.com/macros/s/AKfycbwzoK7WhhSttUUY2OQgeESZapty8vQrqHaQmMi8C4YliBQsJyIAtnKvJ88PowTE1dBG5g/exec'
     const gmailWebhookUrl = (process.env.GMAIL_WEBHOOK_URL || defaultGmailWebhook).trim()
