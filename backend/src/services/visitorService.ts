@@ -46,7 +46,8 @@ export class VisitorService {
     let totalVisits = 0
 
     visitors.forEach(v => {
-      const count = Math.max(1, v.visitCount || 1)
+      // Industry-standard Unique Visitor counting: 1 unique device/IP record = 1 visitor
+      const count = 1
       totalVisits += count
 
       if (v.country && v.country !== 'Unknown') {
@@ -180,17 +181,12 @@ export class VisitorService {
       (ipKey && v.ipHash === ipKey)
     )
     const nowIso = new Date().toISOString()
-    const DEBOUNCE_WINDOW_MS = 3 * 1000 // 3-second debounce to ignore React StrictMode duplicate mount calls
 
     let activeVisitor: VisitorRecord
     if (existingIndex >= 0) {
+      // Existing device / IP already counted: update lastSeenAt & geo without inflating count on page reloads
       const existing = visitors[existingIndex]
-      const lastSeenTime = new Date(existing.lastSeenAt || existing.timestamp).getTime()
-      const isCountableVisit = isNaN(lastSeenTime) || (Date.now() - lastSeenTime) > DEBOUNCE_WINDOW_MS
-
-      if (isCountableVisit) {
-        existing.visitCount = (existing.visitCount || 1) + 1
-      }
+      existing.visitCount = 1
       existing.lastSeenAt = nowIso
       existing.timestamp = nowIso
       if (vid && !existing.visitorId) {

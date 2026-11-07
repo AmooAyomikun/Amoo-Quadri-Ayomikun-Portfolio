@@ -90,8 +90,8 @@ export const findCountryCount = (geoName: string, stats: Record<string, number>)
   return 0
 }
 
-const CACHED_STATS_KEY = 'portfolio_visitor_stats_cache_v2'
-const LAST_MOUNT_TS_KEY = 'portfolio_visitor_last_mount_ts'
+const CACHED_STATS_KEY = 'portfolio_visitor_stats_cache_v3'
+const DEVICE_LOGGED_KEY = 'portfolio_device_logged_v1'
 
 const getOrCreateVisitorId = (): string => {
   const STORAGE_KEY = 'portfolio_anonymous_uid'
@@ -167,20 +167,6 @@ export function useVisitorStats() {
 
     const CACHED_USER_GEO = 'portfolio_user_geo'
 
-    // Check if this mount is a fresh page load (ignore React 19 StrictMode duplicate mount within 2.5s)
-    const nowMs = Date.now()
-    const lastMountMs = Number(sessionStorage.getItem(LAST_MOUNT_TS_KEY) || '0')
-    const isFreshVisit = nowMs - lastMountMs > 2500
-    if (isFreshVisit) {
-      try {
-        sessionStorage.setItem(LAST_MOUNT_TS_KEY, String(nowMs))
-      } catch {
-        // ignore
-      }
-    }
-
-    let hasAppliedLocalIncrement = false
-
     const applyClientGeoFallback = (geo: ClientGeo) => {
       const cName = geo.country || 'Nigeria'
       const cCode = geo.country_code || 'NG'
@@ -190,25 +176,14 @@ export function useVisitorStats() {
 
       if (!cName) return
 
-      const shouldIncrement = isFreshVisit && !hasAppliedLocalIncrement
-      hasAppliedLocalIncrement = true
-
       setData((prev) => {
         const nextStats = { ...prev.countryStats }
-        const currentCountryVal = findCountryCount(cName, nextStats)
-        const matchedKey =
-          Object.keys(nextStats).find((k) => normalizeCountry(k) === normalizeCountry(cName)) || cName
-
-        if (shouldIncrement) {
-          nextStats[matchedKey] = (currentCountryVal || 0) + 1
-        } else if (!currentCountryVal) {
-          nextStats[matchedKey] = 1
+        if (!findCountryCount(cName, nextStats)) {
+          nextStats[cName] = 1
         }
 
         const userCount = findCountryCount(cName, nextStats) || 1
-        const nextTotal = shouldIncrement
-          ? Math.max(prev.totalVisitors + 1, Object.values(nextStats).reduce((a, b) => a + b, 0))
-          : Math.max(prev.totalVisitors, Object.values(nextStats).reduce((a, b) => a + b, 0), 1)
+        const nextTotal = Math.max(prev.totalVisitors, Object.values(nextStats).reduce((a, b) => a + b, 0), 1)
 
         const nextTop: TopCountry[] = Object.entries(nextStats)
           .sort((a, b) => b[1] - a[1])
@@ -216,7 +191,16 @@ export function useVisitorStats() {
           .map(([name, count], idx) => ({
             rank: idx + 1,
             name: name.toUpperCase(),
-            code: normalizeCountry(name) === normalizeCountry(cName) ? cCode : (name.toUpperCase() === 'NIGERIA' ? 'NG' : name.toUpperCase() === 'UNITED STATES' ? 'US' : name.toUpperCase() === 'CANADA' ? 'CA' : 'UN'),
+            code:
+              normalizeCountry(name) === normalizeCountry(cName)
+                ? cCode
+                : name.toUpperCase() === 'NIGERIA'
+                ? 'NG'
+                : name.toUpperCase() === 'UNITED STATES'
+                ? 'US'
+                : name.toUpperCase() === 'CANADA'
+                ? 'CA'
+                : 'UN',
             count
           }))
 
@@ -367,25 +351,22 @@ export function useVisitorStats() {
           }
 
           setData((prev) => {
-            const mergedStats: Record<string, number> = { ...prev.countryStats }
-            for (const [k, v] of Object.entries(json.countryStats || {})) {
-              const numVal = Number(v) || 0
-              const existingKey = Object.keys(mergedStats).find((ek) => normalizeCountry(ek) === normalizeCountry(k)) || k
-              mergedStats[existingKey] = Math.max(mergedStats[existingKey] || 0, numVal)
-            }
+            const hasServerStats = json.countryStats && Object.keys(json.countryStats).length > 0
+            const mergedStats: Record<string, number> = hasServerStats
+              ? { ...json.countryStats }
+              : { ...prev.countryStats }
 
             if (finalCountry && finalCountry !== 'Unknown' && !findCountryCount(finalCountry, mergedStats)) {
               mergedStats[finalCountry] = 1
             }
 
-            const finalCountryCount = Math.max(
-              prev.userCountryCount,
-              typeof json.userCountryCount === 'number' ? json.userCountryCount : 0,
-              findCountryCount(finalCountry, mergedStats) || 1
-            )
+            const finalCountryCount =
+              typeof json.userCountryCount === 'number' && json.userCountryCount > 0
+                ? json.userCountryCount
+                : findCountryCount(finalCountry, mergedStats) || 1
 
-            const sumOfStats = Object.values(mergedStats).reduce((a, b) => a + b, 0)
-            const finalTotal = Math.max(prev.totalVisitors, serverTotal, sumOfStats, 1)
+            const sumOfStats = Object.values(mergedStats).reduce((a, b) => Number(a) + Number(b), 0)
+            const finalTotal = serverTotal > 0 ? Math.max(serverTotal, sumOfStats) : Math.max(prev.totalVisitors, sumOfStats, 1)
 
             const cleanTopCountries: TopCountry[] = Object.entries(mergedStats)
               .sort((a, b) => Number(b[1]) - Number(a[1]))
@@ -426,30 +407,54 @@ export function useVisitorStats() {
           })
         }
 
-        const visitorId = getOrCreateVisitorId()
-        const logPayload = {
-          visitorId,
-          ...(clientGeo ? { country, countryCode, city, lat, lon } : {})
-        }
+        const isDeviceAlreadyLogged = localStorage.getItem(DEVICE_LOGGED_KEY) === 'true'
 
-        const res = await fetch(apiUrl('/api/visitors/log'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(logPayload),
-          signal: controller.signal
-        })
-
-        if (res.ok) {
-          const json = await res.json()
-          if (!controller.signal.aborted) {
-            setConnectionStatus('connected')
-            updateDataWithJson(json, country, city, countryCode)
+        if (isDeviceAlreadyLogged) {
+          // Same device reloading: fetch read-only stats without logging a duplicate visit
+          const res = await fetch(apiUrl('/api/visitors'), { signal: controller.signal })
+          if (res.ok) {
+            const json = await res.json()
+            if (!controller.signal.aborted) {
+              setConnectionStatus('connected')
+              updateDataWithJson(json, country, city, countryCode)
+            }
+          } else if (retryAttempt < 8 && !controller.signal.aborted) {
+            setConnectionStatus('connecting')
+            retryTimerRef.current = setTimeout(() => initStats(retryAttempt + 1), 4500)
+          } else if (!controller.signal.aborted) {
+            setConnectionStatus('offline')
           }
-        } else if (retryAttempt < 8 && !controller.signal.aborted) {
-          setConnectionStatus('connecting')
-          retryTimerRef.current = setTimeout(() => initStats(retryAttempt + 1), 4500)
-        } else if (!controller.signal.aborted) {
-          setConnectionStatus('offline')
+        } else {
+          const visitorId = getOrCreateVisitorId()
+          const logPayload = {
+            visitorId,
+            ...(clientGeo ? { country, countryCode, city, lat, lon } : {})
+          }
+
+          const res = await fetch(apiUrl('/api/visitors/log'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(logPayload),
+            signal: controller.signal
+          })
+
+          if (res.ok) {
+            const json = await res.json()
+            try {
+              localStorage.setItem(DEVICE_LOGGED_KEY, 'true')
+            } catch {
+              // ignore
+            }
+            if (!controller.signal.aborted) {
+              setConnectionStatus('connected')
+              updateDataWithJson(json, country, city, countryCode)
+            }
+          } else if (retryAttempt < 8 && !controller.signal.aborted) {
+            setConnectionStatus('connecting')
+            retryTimerRef.current = setTimeout(() => initStats(retryAttempt + 1), 4500)
+          } else if (!controller.signal.aborted) {
+            setConnectionStatus('offline')
+          }
         }
       } catch (err: unknown) {
         if (err instanceof DOMException && err.name === 'AbortError') return

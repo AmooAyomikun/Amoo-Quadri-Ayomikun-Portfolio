@@ -36,17 +36,13 @@ export class VisitorRepository {
     const map = new Map<string, VisitorRecord>()
     for (const r of records) {
       if (!r || r.id?.startsWith('vis-sample-')) continue
-      const key = r.id || r.visitorId || r.ipHash || (r as any).ip
+      const key = r.visitorId || r.ipHash || (r as any).ip || r.id
       if (!key) continue
       if (!map.has(key)) {
-        map.set(key, { ...r, visitCount: Math.max(1, r.visitCount || 1) })
+        map.set(key, { ...r, visitCount: 1 })
       } else {
         const existing = map.get(key)!
-        if (existing.id === r.id) {
-          existing.visitCount = Math.max(existing.visitCount || 1, r.visitCount || 1)
-        } else {
-          existing.visitCount = (existing.visitCount || 1) + (r.visitCount || 1)
-        }
+        existing.visitCount = 1
         if (r.country && r.country !== 'Unknown') {
           existing.country = r.country
           existing.countryCode = r.countryCode || existing.countryCode
