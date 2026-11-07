@@ -4,13 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Theme flash prevention — runs synchronously before first paint -->
+    <!-- Theme flash prevention — runs synchronously before first paint (Dark mode default) -->
     <script>
       (function () {
         try {
-          var stored = localStorage.getItem('aq-theme') || localStorage.getItem('qa-theme');
-          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var theme = (stored === 'dark' || stored === 'light') ? stored : (prefersDark ? 'dark' : 'light');
+          var stored = localStorage.getItem('qaa-theme-v2');
+          var theme = (stored === 'light' || stored === 'dark') ? stored : 'dark';
           document.documentElement.setAttribute('data-theme', theme);
           if (theme === 'dark') {
             document.documentElement.classList.add('dark');
@@ -20,8 +19,8 @@
             document.documentElement.classList.add('light');
           }
         } catch (e) {
-          document.documentElement.setAttribute('data-theme', 'light');
-          document.documentElement.classList.add('light');
+          document.documentElement.setAttribute('data-theme', 'dark');
+          document.documentElement.classList.add('dark');
         }
       })();
     </script>

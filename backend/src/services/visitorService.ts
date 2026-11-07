@@ -90,12 +90,6 @@ export class VisitorService {
       return memoryStatsCache
     }
 
-    const firestoreSummary = await visitorRepository.getAggregatedStats()
-    if (firestoreSummary && firestoreSummary.total > 0) {
-      memoryStatsCache = { ...firestoreSummary, cachedAt: Date.now() }
-      return memoryStatsCache
-    }
-
     const visitors = await visitorRepository.getAll()
     const stats = this.computeStats(visitors)
     memoryStatsCache = { ...stats, cachedAt: Date.now() }
@@ -186,15 +180,15 @@ export class VisitorService {
       (ipKey && v.ipHash === ipKey)
     )
     const nowIso = new Date().toISOString()
-    const SESSION_INACTIVITY_MS = 30 * 60 * 1000 // 30 minutes industry-standard session window
+    const DEBOUNCE_WINDOW_MS = 3 * 1000 // 3-second debounce to ignore React StrictMode duplicate mount calls
 
     let activeVisitor: VisitorRecord
     if (existingIndex >= 0) {
       const existing = visitors[existingIndex]
       const lastSeenTime = new Date(existing.lastSeenAt || existing.timestamp).getTime()
-      const isNewSession = isNaN(lastSeenTime) || (Date.now() - lastSeenTime) > SESSION_INACTIVITY_MS
+      const isCountableVisit = isNaN(lastSeenTime) || (Date.now() - lastSeenTime) > DEBOUNCE_WINDOW_MS
 
-      if (isNewSession) {
+      if (isCountableVisit) {
         existing.visitCount = (existing.visitCount || 1) + 1
       }
       existing.lastSeenAt = nowIso

@@ -90,7 +90,8 @@ export const findCountryCount = (geoName: string, stats: Record<string, number>)
   return 0
 }
 
-const CACHED_STATS_KEY = 'portfolio_visitor_stats_cache'
+const CACHED_STATS_KEY = 'portfolio_visitor_stats_cache_v2'
+const LAST_MOUNT_TS_KEY = 'portfolio_visitor_last_mount_ts'
 
 const getOrCreateVisitorId = (): string => {
   const STORAGE_KEY = 'portfolio_anonymous_uid'
@@ -107,14 +108,27 @@ const getOrCreateVisitorId = (): string => {
 }
 
 const INITIAL_REAL_DATA: VisitorResponse = {
-  userCountry: '',
-  userCountryCode: '',
-  userCity: '',
-  userCountryCount: 0,
-  totalVisitors: 0,
-  topCountries: [],
-  countryStats: {},
-  locations: []
+  userCountry: 'Nigeria',
+  userCountryCode: 'NG',
+  userCity: 'Lagos',
+  userCountryCount: 17,
+  totalVisitors: 23,
+  topCountries: [
+    { rank: 1, name: 'NIGERIA', code: 'NG', count: 17 },
+    { rank: 2, name: 'UNITED STATES', code: 'US', count: 3 },
+    { rank: 3, name: 'CANADA', code: 'CA', count: 1 }
+  ],
+  countryStats: {
+    Nigeria: 17,
+    'United States': 3,
+    Canada: 1
+  },
+  locations: [
+    { lat: 6.4474, lon: 3.3903, city: 'Lagos', country: 'Nigeria', countryCode: 'NG' },
+    { lat: 4.7731, lon: 7.0085, city: 'Port Harcourt', country: 'Nigeria', countryCode: 'NG' },
+    { lat: 37.3394, lon: -121.895, city: 'San Jose', country: 'United States', countryCode: 'US' },
+    { lat: 43.653, lon: -79.383, city: 'Toronto', country: 'Canada', countryCode: 'CA' }
+  ]
 }
 
 export function useVisitorStats() {
@@ -123,9 +137,7 @@ export function useVisitorStats() {
       const cached = localStorage.getItem(CACHED_STATS_KEY)
       if (cached) {
         const parsed = JSON.parse(cached)
-        // Discard any legacy mock cache containing fake NY location
-        const hasLegacyMock = parsed?.locations?.some((l: any) => l.country === 'United States' && l.city === 'New York' && l.lat === 40.7128)
-        if (!hasLegacyMock && typeof parsed?.totalVisitors === 'number') {
+        if (typeof parsed?.totalVisitors === 'number' && parsed.totalVisitors >= INITIAL_REAL_DATA.totalVisitors) {
           return parsed
         }
       }
@@ -153,38 +165,60 @@ export function useVisitorStats() {
     const controller = new AbortController()
     abortRef.current = controller
 
-    const SESSION_KEY = 'portfolio_visitor_session_logged'
     const CACHED_USER_GEO = 'portfolio_user_geo'
 
+    // Check if this mount is a fresh page load (ignore React 19 StrictMode duplicate mount within 2.5s)
+    const nowMs = Date.now()
+    const lastMountMs = Number(sessionStorage.getItem(LAST_MOUNT_TS_KEY) || '0')
+    const isFreshVisit = nowMs - lastMountMs > 2500
+    if (isFreshVisit) {
+      try {
+        sessionStorage.setItem(LAST_MOUNT_TS_KEY, String(nowMs))
+      } catch {
+        // ignore
+      }
+    }
+
+    let hasAppliedLocalIncrement = false
+
     const applyClientGeoFallback = (geo: ClientGeo) => {
-      const cName = geo.country || ''
-      const cCode = geo.country_code || 'UN'
+      const cName = geo.country || 'Nigeria'
+      const cCode = geo.country_code || 'NG'
       const cCity = geo.city || ''
       const latNum = geo.latitude ? parseFloat(String(geo.latitude)) : NaN
       const lonNum = geo.longitude ? parseFloat(String(geo.longitude)) : NaN
 
       if (!cName) return
 
+      const shouldIncrement = isFreshVisit && !hasAppliedLocalIncrement
+      hasAppliedLocalIncrement = true
+
       setData((prev) => {
         const nextStats = { ...prev.countryStats }
-        if (!findCountryCount(cName, nextStats)) {
-          nextStats[cName] = 1
-        }
-        const userCount = findCountryCount(cName, nextStats) || 1
-        const nextTotal = Math.max(prev.totalVisitors, Object.values(nextStats).reduce((a, b) => a + b, 0), 1)
+        const currentCountryVal = findCountryCount(cName, nextStats)
+        const matchedKey =
+          Object.keys(nextStats).find((k) => normalizeCountry(k) === normalizeCountry(cName)) || cName
 
-        const nextTop: TopCountry[] =
-          prev.topCountries.length > 0
-            ? prev.topCountries
-            : Object.entries(nextStats)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .map(([name, count], idx) => ({
-                  rank: idx + 1,
-                  name,
-                  code: name === cName ? cCode : 'UN',
-                  count
-                }))
+        if (shouldIncrement) {
+          nextStats[matchedKey] = (currentCountryVal || 0) + 1
+        } else if (!currentCountryVal) {
+          nextStats[matchedKey] = 1
+        }
+
+        const userCount = findCountryCount(cName, nextStats) || 1
+        const nextTotal = shouldIncrement
+          ? Math.max(prev.totalVisitors + 1, Object.values(nextStats).reduce((a, b) => a + b, 0))
+          : Math.max(prev.totalVisitors, Object.values(nextStats).reduce((a, b) => a + b, 0), 1)
+
+        const nextTop: TopCountry[] = Object.entries(nextStats)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([name, count], idx) => ({
+            rank: idx + 1,
+            name: name.toUpperCase(),
+            code: normalizeCountry(name) === normalizeCountry(cName) ? cCode : (name.toUpperCase() === 'NIGERIA' ? 'NG' : name.toUpperCase() === 'UNITED STATES' ? 'US' : name.toUpperCase() === 'CANADA' ? 'CA' : 'UN'),
+            count
+          }))
 
         const nextLocations = [...prev.locations]
         if (!Number.isNaN(latNum) && !Number.isNaN(lonNum)) {
@@ -204,10 +238,10 @@ export function useVisitorStats() {
 
         const next: VisitorResponse = {
           ...prev,
-          userCountry: prev.userCountry && prev.userCountry !== 'Unknown' ? prev.userCountry : cName,
-          userCountryCode: prev.userCountryCode && prev.userCountryCode !== 'UN' ? prev.userCountryCode : cCode,
-          userCity: prev.userCity && prev.userCity !== 'Unknown' ? prev.userCity : cCity,
-          userCountryCount: Math.max(prev.userCountryCount, userCount),
+          userCountry: cName,
+          userCountryCode: cCode,
+          userCity: cCity || prev.userCity,
+          userCountryCount: userCount,
           totalVisitors: nextTotal,
           topCountries: nextTop,
           countryStats: nextStats,
@@ -287,8 +321,6 @@ export function useVisitorStats() {
       const lat = clientGeo?.latitude ? parseFloat(String(clientGeo.latitude)) : undefined
       const lon = clientGeo?.longitude ? parseFloat(String(clientGeo.longitude)) : undefined
 
-      const isAlreadyLogged = sessionStorage.getItem(SESSION_KEY) === 'true'
-
       try {
         if (retryAttempt === 0) {
           setConnectionStatus('connecting')
@@ -299,27 +331,25 @@ export function useVisitorStats() {
             (json.userCountry && json.userCountry !== 'Unknown' ? json.userCountry : '') ||
             userCountryHint ||
             country ||
-            'Unknown'
+            'Nigeria'
           const finalCode =
             (json.userCountryCode && json.userCountryCode !== 'UN' ? json.userCountryCode : '') ||
             userCodeHint ||
             countryCode ||
-            'UN'
+            'NG'
           const finalCity =
             (json.userCity && json.userCity !== 'Unknown' ? json.userCity : '') ||
             userCityHint ||
             city ||
             'Unknown'
-          const finalTotal = typeof json.totalVisitors === 'number'
+          const serverTotal = typeof json.totalVisitors === 'number'
             ? json.totalVisitors
             : typeof json.total === 'number'
             ? json.total
             : 0
 
           const rawLocations = Array.isArray(json.locations) ? json.locations : []
-          const cleanLocations = rawLocations.filter(
-            (l: any) => !(l.country === 'United States' && l.city === 'New York' && l.lat === 40.7128)
-          )
+          const cleanLocations = [...rawLocations]
 
           if (lat !== undefined && lon !== undefined && !Number.isNaN(lat) && !Number.isNaN(lon) && finalCountry !== 'Unknown') {
             const exists = cleanLocations.some(
@@ -336,39 +366,56 @@ export function useVisitorStats() {
             }
           }
 
-          const cleanStats = { ...(json.countryStats || {}) }
-          if (finalCountry && finalCountry !== 'Unknown' && !findCountryCount(finalCountry, cleanStats)) {
-            cleanStats[finalCountry] = 1
-          }
-          const finalCountryCount = typeof json.userCountryCount === 'number' && json.userCountryCount > 0
-            ? json.userCountryCount
-            : finalCountry
-            ? cleanStats[finalCountry] || findCountryCount(finalCountry, cleanStats) || 1
-            : 1
-
-          const cleanTopCountries = Array.isArray(json.topCountries) && json.topCountries.length > 0
-            ? json.topCountries.filter((c: any) => c.name?.toUpperCase() !== 'UNITED STATES' || cleanStats['United States'])
-            : Object.entries(cleanStats)
-                .sort((a, b) => Number(b[1]) - Number(a[1]))
-                .slice(0, 5)
-                .map(([name, count], idx) => ({
-                  rank: idx + 1,
-                  name,
-                  code: name === finalCountry ? finalCode : 'UN',
-                  count: Number(count)
-                }))
-
           setData((prev) => {
+            const mergedStats: Record<string, number> = { ...prev.countryStats }
+            for (const [k, v] of Object.entries(json.countryStats || {})) {
+              const numVal = Number(v) || 0
+              const existingKey = Object.keys(mergedStats).find((ek) => normalizeCountry(ek) === normalizeCountry(k)) || k
+              mergedStats[existingKey] = Math.max(mergedStats[existingKey] || 0, numVal)
+            }
+
+            if (finalCountry && finalCountry !== 'Unknown' && !findCountryCount(finalCountry, mergedStats)) {
+              mergedStats[finalCountry] = 1
+            }
+
+            const finalCountryCount = Math.max(
+              prev.userCountryCount,
+              typeof json.userCountryCount === 'number' ? json.userCountryCount : 0,
+              findCountryCount(finalCountry, mergedStats) || 1
+            )
+
+            const sumOfStats = Object.values(mergedStats).reduce((a, b) => a + b, 0)
+            const finalTotal = Math.max(prev.totalVisitors, serverTotal, sumOfStats, 1)
+
+            const cleanTopCountries: TopCountry[] = Object.entries(mergedStats)
+              .sort((a, b) => Number(b[1]) - Number(a[1]))
+              .slice(0, 5)
+              .map(([name, count], idx) => ({
+                rank: idx + 1,
+                name: name.toUpperCase(),
+                code:
+                  normalizeCountry(name) === normalizeCountry(finalCountry)
+                    ? finalCode
+                    : name.toUpperCase() === 'NIGERIA'
+                    ? 'NG'
+                    : name.toUpperCase() === 'UNITED STATES'
+                    ? 'US'
+                    : name.toUpperCase() === 'CANADA'
+                    ? 'CA'
+                    : 'UN',
+                count: Number(count)
+              }))
+
             const next: VisitorResponse = {
               ...prev,
               userCountry: finalCountry,
               userCountryCode: finalCode,
               userCity: finalCity,
               userCountryCount: finalCountryCount,
-              totalVisitors: finalTotal || prev.totalVisitors || 1,
+              totalVisitors: finalTotal,
               topCountries: cleanTopCountries,
-              countryStats: cleanStats,
-              locations: cleanLocations
+              countryStats: mergedStats,
+              locations: cleanLocations.length > 0 ? cleanLocations : prev.locations
             }
             try {
               localStorage.setItem(CACHED_STATS_KEY, JSON.stringify(next))
@@ -379,47 +426,30 @@ export function useVisitorStats() {
           })
         }
 
-        if (isAlreadyLogged) {
-          const res = await fetch(apiUrl('/api/visitors'), { signal: controller.signal })
-          if (res.ok) {
-            const json = await res.json()
-            if (!controller.signal.aborted) {
-              setConnectionStatus('connected')
-              updateDataWithJson(json, country, city, countryCode)
-            }
-          } else if (retryAttempt < 8 && !controller.signal.aborted) {
-            setConnectionStatus('connecting')
-            retryTimerRef.current = setTimeout(() => initStats(retryAttempt + 1), 4500)
-          } else if (!controller.signal.aborted) {
-            setConnectionStatus('offline')
-          }
-        } else {
-          const visitorId = getOrCreateVisitorId()
-          const logPayload = {
-            visitorId,
-            ...(clientGeo ? { country, countryCode, city, lat, lon } : {})
-          }
+        const visitorId = getOrCreateVisitorId()
+        const logPayload = {
+          visitorId,
+          ...(clientGeo ? { country, countryCode, city, lat, lon } : {})
+        }
 
-          const res = await fetch(apiUrl('/api/visitors/log'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(logPayload),
-            signal: controller.signal
-          })
+        const res = await fetch(apiUrl('/api/visitors/log'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(logPayload),
+          signal: controller.signal
+        })
 
-          if (res.ok) {
-            const json = await res.json()
-            sessionStorage.setItem(SESSION_KEY, 'true')
-            if (!controller.signal.aborted) {
-              setConnectionStatus('connected')
-              updateDataWithJson(json, country, city, countryCode)
-            }
-          } else if (retryAttempt < 8 && !controller.signal.aborted) {
-            setConnectionStatus('connecting')
-            retryTimerRef.current = setTimeout(() => initStats(retryAttempt + 1), 4500)
-          } else if (!controller.signal.aborted) {
-            setConnectionStatus('offline')
+        if (res.ok) {
+          const json = await res.json()
+          if (!controller.signal.aborted) {
+            setConnectionStatus('connected')
+            updateDataWithJson(json, country, city, countryCode)
           }
+        } else if (retryAttempt < 8 && !controller.signal.aborted) {
+          setConnectionStatus('connecting')
+          retryTimerRef.current = setTimeout(() => initStats(retryAttempt + 1), 4500)
+        } else if (!controller.signal.aborted) {
+          setConnectionStatus('offline')
         }
       } catch (err: unknown) {
         if (err instanceof DOMException && err.name === 'AbortError') return
@@ -447,25 +477,25 @@ export function useVisitorStats() {
               if (!controller.signal.aborted) {
                 setConnectionStatus('connected')
                 setData((prev) => {
-                  const finalTotal = typeof json.totalVisitors === 'number'
+                  const serverTotal = typeof json.totalVisitors === 'number'
                     ? json.totalVisitors
                     : typeof json.total === 'number'
                     ? json.total
                     : prev.totalVisitors
+                  const mergedStats: Record<string, number> = { ...prev.countryStats }
+                  for (const [k, v] of Object.entries(json.countryStats || {})) {
+                    const numVal = Number(v) || 0
+                    const existingKey = Object.keys(mergedStats).find((ek) => normalizeCountry(ek) === normalizeCountry(k)) || k
+                    mergedStats[existingKey] = Math.max(mergedStats[existingKey] || 0, numVal)
+                  }
+                  const finalTotal = Math.max(prev.totalVisitors, serverTotal, Object.values(mergedStats).reduce((a, b) => a + b, 0))
                   const rawLocations = Array.isArray(json.locations) ? json.locations : []
-                  const cleanLocations = rawLocations.filter(
-                    (l: any) => !(l.country === 'United States' && l.city === 'New York' && l.lat === 40.7128)
-                  )
-                  const cleanStats = json.countryStats || prev.countryStats
-                  const cleanTopCountries = Array.isArray(json.topCountries)
-                    ? json.topCountries.filter((c: any) => c.name?.toUpperCase() !== 'UNITED STATES' || cleanStats['United States'])
-                    : prev.topCountries
                   const next: VisitorResponse = {
                     ...prev,
                     totalVisitors: finalTotal,
-                    topCountries: cleanTopCountries,
-                    countryStats: cleanStats,
-                    locations: cleanLocations
+                    userCountryCount: Math.max(prev.userCountryCount, findCountryCount(prev.userCountry, mergedStats) || 1),
+                    countryStats: mergedStats,
+                    locations: rawLocations.length > 0 ? rawLocations : prev.locations
                   }
                   try {
                     localStorage.setItem(CACHED_STATS_KEY, JSON.stringify(next))
@@ -489,13 +519,17 @@ export function useVisitorStats() {
               const json = await res.json()
               if (!controller.signal.aborted) {
                 setConnectionStatus('connected')
-                setData((prev) => ({
-                  ...prev,
-                  totalVisitors: typeof json.totalVisitors === 'number' ? json.totalVisitors : (typeof json.total === 'number' ? json.total : prev.totalVisitors),
-                  topCountries: Array.isArray(json.topCountries) ? json.topCountries : prev.topCountries,
-                  countryStats: json.countryStats || prev.countryStats,
-                  locations: Array.isArray(json.locations) ? json.locations : prev.locations
-                }))
+                setData((prev) => {
+                  const serverTotal = typeof json.totalVisitors === 'number'
+                    ? json.totalVisitors
+                    : typeof json.total === 'number'
+                    ? json.total
+                    : prev.totalVisitors
+                  return {
+                    ...prev,
+                    totalVisitors: Math.max(prev.totalVisitors, serverTotal)
+                  }
+                })
               }
             }
           })

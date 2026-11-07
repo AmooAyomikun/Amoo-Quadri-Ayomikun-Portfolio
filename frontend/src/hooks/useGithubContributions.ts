@@ -230,48 +230,53 @@ export function useGithubContributions() {
   }, [selectedYear, realContributions, includePrivate])
 
   const getLevelColor = (level: number, isEmptyPlaceholder: boolean) => {
-    if (isEmptyPlaceholder) return 'transparent'
+    if (isEmptyPlaceholder) return 'bg-transparent border-transparent pointer-events-none'
+
+    // Level 0 (0 contributions / no activity): recessed, low-opacity empty slot so inactive days are immediately obvious
+    const emptyDayClass =
+      'bg-[var(--color-surface-base)] border border-[var(--color-border)] opacity-35'
 
     if (colorTheme === 'cyberpunk') {
       switch (level) {
-        case 0: return 'bg-[var(--color-surface-elevated)] border border-[var(--color-border)]'
-        case 1: return 'bg-[#4d381b] border border-[#614722]'
-        case 2: return 'bg-[#7a5828] border border-[#946b31]'
-        case 3: return 'bg-[#ab7b38] border border-[#c48e42]'
-        case 4: return 'bg-[#d4a359] border border-[#e3b56b] shadow-[0_0_8px_rgba(212,163,89,0.4)]'
-        default: return 'bg-[var(--color-surface-elevated)]'
+        case 0: return emptyDayClass
+        case 1: return 'bg-[#6e4f23] border border-[#8a632c]'
+        case 2: return 'bg-[#9e7132] border border-[#b8843b]'
+        case 3: return 'bg-[#c99244] border border-[#dea34f]'
+        case 4: return 'bg-[#f0b965] border border-[#fad08c] shadow-[0_0_8px_rgba(212,163,89,0.5)]'
+        default: return emptyDayClass
       }
     }
 
     if (colorTheme === 'ocean') {
       switch (level) {
-        case 0: return 'bg-[#161B22] border border-neutral-900/60'
-        case 1: return 'bg-[#0A3069] border border-[#0A3069]'
-        case 2: return 'bg-[#0969DA] border border-[#0969DA]'
-        case 3: return 'bg-[#54AEFF] border border-[#54AEFF]'
-        case 4: return 'bg-[#80CCFF] border border-[#B6E3FF] shadow-[0_0_8px_rgba(84,174,255,0.4)]'
-        default: return 'bg-[#161B22]'
+        case 0: return emptyDayClass
+        case 1: return 'bg-[#11468F] border border-[#1B5cb8]'
+        case 2: return 'bg-[#0969DA] border border-[#218bff]'
+        case 3: return 'bg-[#54AEFF] border border-[#79c0ff]'
+        case 4: return 'bg-[#80CCFF] border border-[#B6E3FF] shadow-[0_0_8px_rgba(84,174,255,0.5)]'
+        default: return emptyDayClass
       }
     }
 
     if (colorTheme === 'sunset') {
       switch (level) {
-        case 0: return 'bg-[#161B22] border border-neutral-900/60'
-        case 1: return 'bg-[#5C1D11] border border-[#5C1D11]'
-        case 2: return 'bg-[#BD561D] border border-[#BD561D]'
-        case 3: return 'bg-[#FA8900] border border-[#FA8900]'
-        case 4: return 'bg-[#FFB703] border border-[#FFD000] shadow-[0_0_8px_rgba(255,183,3,0.4)]'
-        default: return 'bg-[#161B22]'
+        case 0: return emptyDayClass
+        case 1: return 'bg-[#7A2E1D] border border-[#943925]'
+        case 2: return 'bg-[#BD561D] border border-[#d46528]'
+        case 3: return 'bg-[#FA8900] border border-[#ff9f24]'
+        case 4: return 'bg-[#FFB703] border border-[#FFD000] shadow-[0_0_8px_rgba(255,183,3,0.5)]'
+        default: return emptyDayClass
       }
     }
 
+    // Classic GitHub Green — vivid active greens vs recessed empty Level 0
     switch (level) {
-      case 0: return 'bg-[#161B22] border border-neutral-900/60'
-      case 1: return 'bg-[#0E4429] border border-[#0E4429]'
-      case 2: return 'bg-[#006D32] border border-[#006D32]'
-      case 3: return 'bg-[#26A641] border border-[#26A641]'
-      case 4: return 'bg-[#39D353] border border-[#39D353] shadow-[0_0_8px_rgba(57,211,83,0.4)]'
-      default: return 'bg-[#161B22]'
+      case 0: return emptyDayClass
+      case 1: return 'bg-[#196c38] border border-[#228647]'
+      case 2: return 'bg-[#26A641] border border-[#2ea043]'
+      case 3: return 'bg-[#39D353] border border-[#4ae164]'
+      case 4: return 'bg-[#56f070] border border-[#82f796] shadow-[0_0_8px_rgba(57,211,83,0.5)]'
+      default: return emptyDayClass
     }
   }
 

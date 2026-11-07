@@ -120,16 +120,6 @@ export const VisitorMapSection: React.FC = () => {
           </motion.header>
 
           {/* Figures */}
-          {isWakingServer && (
-            <div className="mt-6 px-3.5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono flex items-center justify-between gap-2.5">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0" />
-                <span>Showing cached telemetry while waking backend server (~20–30s Render cold-start)...</span>
-              </div>
-              <span className="text-[10px] text-amber-400/80 font-mono hidden sm:inline">Will sync automatically</span>
-            </div>
-          )}
-
           <dl className="mt-6 sm:mt-8 grid grid-cols-3 border-y border-[var(--color-border)] divide-x divide-[var(--color-border)]">
             {stats.map((s) => (
               <div key={s.label} className="py-4 sm:py-5 px-2.5 sm:px-8 first:pl-0">

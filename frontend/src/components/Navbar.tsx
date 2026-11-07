@@ -22,10 +22,10 @@ export const Navbar: React.FC = () => {
   const location = useLocation()
   const isHome = location.pathname === '/'
 
-  // Theme mode (system / light / dark)
+  // Theme mode (default to dark unless explicitly saved in qaa-theme-mode-v2)
   const [mode, setMode] = useState<ThemeMode>(() => {
-    const saved = localStorage.getItem('aq-theme-mode') as ThemeMode | null
-    return saved === 'system' || saved === 'light' || saved === 'dark' ? saved : (theme as ThemeMode)
+    const saved = localStorage.getItem('qaa-theme-mode-v2') as ThemeMode | null
+    return saved === 'system' || saved === 'light' || saved === 'dark' ? saved : 'dark'
   })
 
   // Mobile menu open state
@@ -57,7 +57,7 @@ export const Navbar: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    localStorage.setItem('aq-theme-mode', mode)
+    localStorage.setItem('qaa-theme-mode-v2', mode)
     if (mode !== 'system') {
       setTheme(mode)
       return
@@ -198,8 +198,8 @@ export const Navbar: React.FC = () => {
                 style={{
                   fontFamily: "'Archivo Black', 'Inter', system-ui, sans-serif",
                   fontSize: isAbbreviated
-                    ? 'clamp(1.1rem, 3vw, 2.2rem)'
-                    : 'clamp(1.15rem, 4vw, 3.5rem)',
+                    ? 'clamp(1rem, 3vw, 2.2rem)'
+                    : 'clamp(1rem, 3.8vw, 3.5rem)',
                   transitionDelay: `${i * 60}ms`
                 }}
               >

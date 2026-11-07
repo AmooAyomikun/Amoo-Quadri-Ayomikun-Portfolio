@@ -61,7 +61,7 @@ export const HeroSection: React.FC = () => {
           {/* Main Name Header */}
           <motion.h1
             variants={itemVariants}
-            className="text-3xl sm:text-5xl lg:text-6xl font-sans font-bold text-[var(--color-text-main)] tracking-tight leading-tight break-words"
+            className="text-[clamp(1.35rem,6.2vw,3.75rem)] sm:text-5xl lg:text-6xl font-sans font-bold text-[var(--color-text-main)] tracking-tight leading-tight whitespace-nowrap"
           >
             <AnimatedWords text="Quadri Ayomikun Amoo." />
           </motion.h1>
