@@ -1,0 +1,14 @@
+name: Keep Render Backend Warm
+
+on:
+  schedule:
+    - cron: '*/14 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Health Endpoint
+        run: |
+          curl -fsSL --max-time 35 https://amoo-quadri-ayomikun-portfolio.onrender.com/api/health || true
