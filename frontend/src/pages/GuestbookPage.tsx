@@ -29,7 +29,6 @@ export default function GuestbookPage() {
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isWakingServer, setIsWakingServer] = useState(false)
   
   const sigCanvas = useRef<SignatureCanvas>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -71,9 +70,6 @@ export default function GuestbookPage() {
 
   const fetchEntries = async () => {
     setLoading(true)
-    const wakeTimer = setTimeout(() => {
-      setIsWakingServer(true)
-    }, 2500)
 
     try {
       const res = await fetch(apiUrl('/api/guestbook?limit=15'))
@@ -91,8 +87,6 @@ export default function GuestbookPage() {
     } catch (err) {
       console.error('Failed to fetch guestbook entries', err)
     } finally {
-      clearTimeout(wakeTimer)
-      setIsWakingServer(false)
       setLoading(false)
     }
   }
@@ -274,13 +268,6 @@ export default function GuestbookPage() {
 
           {/* Entries Grid */}
           <div className="lg:col-span-2">
-            {isWakingServer && (
-              <div className="mb-6 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono flex items-center gap-2.5 animate-pulse">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0" />
-                <span>Connecting to backend server (waking up free-tier instance, may take ~20–30s)...</span>
-              </div>
-            )}
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {loading ? (
                 Array.from({ length: 4 }).map((_, idx) => (

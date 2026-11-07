@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { MapPin, Loader2 } from 'lucide-react'
 import { AnimatedWords } from '../components/AnimatedWords'
@@ -43,39 +43,9 @@ export const VisitorMapSection: React.FC = () => {
   const leaderboard = data.topCountries.slice(0, 5)
   const maxCount = Math.max(1, ...leaderboard.map((c) => c.count))
 
-  const [isWakingServer, setIsWakingServer] = useState(false)
+  const statusLabel = 'Live'
 
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | null = null
-    if (connectionStatus === 'connecting') {
-      timer = setTimeout(() => {
-        setIsWakingServer(true)
-      }, 2500)
-    } else {
-      setIsWakingServer(false)
-    }
-    return () => {
-      if (timer) clearTimeout(timer)
-    }
-  }, [connectionStatus])
-
-  const statusLabel =
-    connectionStatus === 'connected'
-      ? 'Live'
-      : isWakingServer
-      ? 'Waking Server (~25s)'
-      : connectionStatus === 'connecting'
-      ? 'Connecting'
-      : 'Offline'
-
-  const statusDot =
-    connectionStatus === 'connected'
-      ? 'bg-[var(--color-primary)]'
-      : isWakingServer
-      ? 'bg-amber-400 animate-ping'
-      : connectionStatus === 'connecting'
-      ? 'bg-amber-400'
-      : 'bg-[var(--color-text-subtle)]'
+  const statusDot = 'bg-[var(--color-primary)]'
 
   const stats = [
     { label: 'Total visits', value: data.totalVisitors > 0 ? data.totalVisitors.toLocaleString() : '—' },
